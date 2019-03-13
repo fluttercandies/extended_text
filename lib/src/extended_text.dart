@@ -1,3 +1,4 @@
+import 'package:extended_text/extended_text.dart';
 import 'package:extended_text/src/extended_rich_text.dart';
 import 'package:extended_text/src/extended_text_utils.dart';
 import 'package:extended_text/src/special_text_span_builder.dart';
@@ -9,20 +10,20 @@ class ExtendedText extends StatelessWidget {
   ///
   /// If the [style] argument is null, the text will use the style from the
   /// closest enclosing [DefaultTextStyle].
-  const ExtendedText(
-    this.data, {
-    Key key,
-    this.style,
-    this.textAlign,
-    this.textDirection,
-    this.locale,
-    this.softWrap,
-    this.overflow,
-    this.textScaleFactor,
-    this.maxLines,
-    this.semanticsLabel,
-    this.specialTextSpanBuilder,
-  })  : assert(data != null),
+  const ExtendedText(this.data,
+      {Key key,
+      this.style,
+      this.textAlign,
+      this.textDirection,
+      this.locale,
+      this.softWrap,
+      this.overflow,
+      this.textScaleFactor,
+      this.maxLines,
+      this.semanticsLabel,
+      this.specialTextSpanBuilder,
+      this.onSpecialTextTap})
+      : assert(data != null),
         textSpan = null,
         super(key: key);
 
@@ -39,6 +40,7 @@ class ExtendedText extends StatelessWidget {
     this.textScaleFactor,
     this.maxLines,
     this.semanticsLabel,
+    this.onSpecialTextTap,
   })  : assert(textSpan != null),
         data = null,
         specialTextSpanBuilder = null,
@@ -51,6 +53,9 @@ class ExtendedText extends StatelessWidget {
 
   ///build your ccustom text span
   final SpecialTextSpanBuilder specialTextSpanBuilder;
+
+  ///call back of SpecialText tap
+  final SpecialTextGestureTapCallback onSpecialTextTap;
 
   /// The text to display as a [TextSpan].
   ///
@@ -146,8 +151,8 @@ class ExtendedText extends StatelessWidget {
       effectiveTextStyle = effectiveTextStyle
           .merge(const TextStyle(fontWeight: FontWeight.bold));
 
-    TextSpan textSpan =
-        specialTextSpanBuilder?.build(data, textStyle: effectiveTextStyle);
+    TextSpan textSpan = specialTextSpanBuilder?.build(data,
+        textStyle: effectiveTextStyle, onTap: onSpecialTextTap);
 
     if (textSpan == null)
       textSpan = TextSpan(
@@ -155,6 +160,13 @@ class ExtendedText extends StatelessWidget {
         text: data,
         children: textSpan != null ? <TextSpan>[textSpan] : null,
       );
+
+    if (textSpan.children != null)
+      textSpan.children.forEach((ts) {
+        if (ts is ImageSpan) {
+          ts.resolveImage(context: context);
+        }
+      });
 
     Widget result = ExtendedRichText(
       textAlign: textAlign ?? defaultTextStyle.textAlign ?? TextAlign.start,

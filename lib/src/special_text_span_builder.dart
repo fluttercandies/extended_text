@@ -7,7 +7,13 @@ abstract class SpecialTextSpanBuilder {
       {TextStyle textStyle, SpecialTextGestureTapCallback onTap});
 
   //build SpecialText base on startflag
-  TextSpan createSpecialText(String flag);
+  SpecialText createSpecialText(String flag,
+      {TextStyle textStyle, SpecialTextGestureTapCallback onTap});
+
+  /// start with SpecialText
+  bool isStart(String value, String startFlag) {
+    return value.endsWith(startFlag);
+  }
 }
 
 abstract class SpecialText {
@@ -33,16 +39,22 @@ abstract class SpecialText {
 
   ///is end of SpecialText
   bool isEnd(String value) {
-    return value == endFlag;
+    return value.endsWith(endFlag);
   }
 
   ///append text of SpecialText
-  void appendText(String value) {
+  void appendContent(String value) {
     _contetnt.write(value);
   }
 
   ///get content of SpecialText
-  String getText() {
+  String getContent() {
     return _contetnt.toString();
+  }
+
+  @override
+  String toString() {
+    // TODO: implement toString
+    return startFlag + getContent() + endFlag;
   }
 }
