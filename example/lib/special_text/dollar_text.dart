@@ -4,22 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/painting/text_span.dart';
 import 'package:flutter/src/painting/text_style.dart';
 
-class AtText extends SpecialText {
-  static const String flag = "@";
-  AtText(TextStyle textStyle, SpecialTextGestureTapCallback onTap)
-      : super(flag, " ", textStyle, onTap: onTap);
+class DollarText extends SpecialText {
+  static const String flag = "\$";
+  DollarText(TextStyle textStyle, SpecialTextGestureTapCallback onTap)
+      : super(flag, flag, textStyle, onTap: onTap);
 
   @override
   TextSpan finishText() {
     // TODO: implement finishText
-
-    final String atText = toString();
+    final String atText = getContent();
     return TextSpan(
         text: atText,
-        style: textStyle?.copyWith(color: Colors.blue, fontSize: 16.0),
+        style: textStyle?.copyWith(color: Colors.orange),
         recognizer: TapGestureRecognizer()
           ..onTap = () {
-            if (onTap != null) onTap(atText);
+            if (onTap != null) onTap(toString());
           });
   }
 }

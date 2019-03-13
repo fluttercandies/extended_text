@@ -1,3 +1,4 @@
+import 'package:extended_text/src/image_span.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -307,6 +308,11 @@ class ExtendedRenderParagraph extends RenderBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
+    _paint(context, offset);
+    _paintSpecialText(context, offset);
+  }
+
+  void _paint(PaintingContext context, Offset offset) {
     // Ideally we could compute the min/max intrinsic width/height with a
     // non-destructive operation. However, currently, computing these values
     // will destroy state inside the painter. If that happens, we need to
@@ -544,5 +550,62 @@ class ExtendedRenderParagraph extends RenderBox {
     properties
         .add(DiagnosticsProperty<Locale>('locale', locale, defaultValue: null));
     properties.add(IntProperty('maxLines', maxLines, ifNull: 'unlimited'));
+  }
+
+  @override
+  void detach() {
+    // TODO: implement detach
+    super.detach();
+    if (text.children != null)
+      text.children.forEach((ts) {
+        if (ts is ImageSpan) {
+          ts.dispose();
+        }
+      });
+  }
+
+  void _paintSpecialText(PaintingContext context, Offset offset) {
+    final Canvas canvas = context.canvas;
+    final Rect rect = offset & size;
+    canvas.save();
+
+    ///move to extended text
+    canvas.translate(offset.dx, offset.dy);
+    int textOffset = 0;
+
+    for (TextSpan ts in text.children) {
+      if (ts is ImageSpan) {
+        //get offset of Image Span
+        //center offset
+        Offset imageSpanOffset = getOffsetForCaret(
+          TextPosition(offset: textOffset),
+          rect,
+        );
+
+        //skip invalid or overflow
+        if (imageSpanOffset == null ||
+            (textOffset != 0 && imageSpanOffset == Offset.zero)) return;
+
+        if (!ts.paint(canvas, imageSpanOffset)) {
+          //image not ready
+          ts.resolveImage(
+              listener: (ImageInfo imageInfo, bool synchronousCall) {
+            if (synchronousCall)
+              ts.paint(canvas, imageSpanOffset);
+            else {
+              if (owner == null || !owner.debugDoingPaint) {
+                markNeedsPaint();
+              }
+            }
+          });
+
+          textOffset += ts.toPlainText().length;
+          continue;
+        }
+      }
+      textOffset += ts.toPlainText().length;
+    }
+
+    canvas.restore();
   }
 }
