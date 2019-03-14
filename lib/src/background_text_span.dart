@@ -15,15 +15,106 @@ class BackgroundTextSpan extends TextSpan {
   /// we will draw background by ourself
   final Paint background;
 
-  BackgroundTextSpan({
-    TextStyle style,
-    String text,
-    List<TextSpan> children,
-    GestureRecognizer recognizer,
-    this.background,
-  }) : super(
-            style: style,
-            text: text,
-            children: children,
-            recognizer: recognizer);
+  ///clip BorderRadius
+  final BorderRadius clipBorderRadius;
+
+  ///paint background by yourself
+  final PaintBackground paintBackground;
+
+  BackgroundTextSpan(
+      {TextStyle style,
+      String text,
+      //List<TextSpan> children,
+      GestureRecognizer recognizer,
+      double textScaleFactor: 1.0,
+      this.background,
+      this.clipBorderRadius,
+      this.paintBackground})
+      : assert(background != null),
+        super(style: style, text: text, children: null, recognizer: recognizer);
+
+  ///rect: all text size
+  paint(Canvas canvas, Offset offset, TextPainter painter, Rect rect,
+      {Offset endOffset}) {
+    if (paintBackground != null) {
+      bool handle = paintBackground(this, canvas, offset, painter, rect,
+              endOffset: endOffset) ??
+          false;
+      if (handle) return;
+    }
+
+    Rect textRect = offset & painter.size;
+
+    ///top-right
+    if (endOffset != null) {
+      Rect firstLineRect =
+          offset & Size(rect.right - offset.dx, painter.height);
+
+      if (clipBorderRadius != null) {
+        canvas.save();
+        canvas.clipPath(Path()
+          ..addRRect(BorderRadius.only(
+                  topLeft: clipBorderRadius.topLeft,
+                  bottomLeft: clipBorderRadius.bottomLeft)
+              .resolve(painter.textDirection)
+              .toRRect(firstLineRect)));
+      }
+
+      ///start
+      canvas.drawRect(firstLineRect, background);
+
+      if (clipBorderRadius != null) {
+        canvas.restore();
+      }
+
+      ///endOffset.y has deviation,so we calculate with text height
+      var leftLines = ((endOffset.dy - offset.dy) / painter.height).round();
+
+      double y = offset.dy;
+      for (int i = 0; i < leftLines; i++) {
+        y += painter.height;
+        //last line
+        if (i == leftLines - 1) {
+          Rect lastLineRect =
+              Offset(0.0, y) & Size(endOffset.dx, painter.height);
+          if (clipBorderRadius != null) {
+            canvas.save();
+            canvas.clipPath(Path()
+              ..addRRect(BorderRadius.only(
+                      topRight: clipBorderRadius.topRight,
+                      bottomRight: clipBorderRadius.bottomRight)
+                  .resolve(painter.textDirection)
+                  .toRRect(lastLineRect)));
+          }
+          canvas.drawRect(lastLineRect, background);
+          if (clipBorderRadius != null) {
+            canvas.restore();
+          }
+        } else {
+          ///draw full line
+          canvas.drawRect(
+              Offset(0.0, y) & Size(rect.width, painter.height), background);
+        }
+      }
+    } else {
+      if (clipBorderRadius != null) {
+        canvas.save();
+        canvas.clipPath(Path()
+          ..addRRect(
+              clipBorderRadius.resolve(painter.textDirection).toRRect(rect)));
+      }
+
+      canvas.drawRect(textRect, background);
+
+      if (clipBorderRadius != null) {
+        canvas.restore();
+      }
+    }
+  }
 }
+
+///if you don't want use default, please return true.
+///endOffset the text top-right Offfset
+typedef PaintBackground = bool Function(BackgroundTextSpan backgroundTextSpan,
+    Canvas canvas, Offset offset, TextPainter painter, Rect rect,
+    {Offset endOffset});
