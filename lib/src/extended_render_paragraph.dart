@@ -1,3 +1,4 @@
+import 'package:extended_text/src/background_text_span.dart';
 import 'package:extended_text/src/image_span.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -308,8 +309,8 @@ class ExtendedRenderParagraph extends RenderBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
+    _paintImage(context, offset);
     _paint(context, offset);
-    _paintSpecialText(context, offset);
   }
 
   void _paint(PaintingContext context, Offset offset) {
@@ -564,37 +565,35 @@ class ExtendedRenderParagraph extends RenderBox {
       });
   }
 
-  void _paintSpecialText(PaintingContext context, Offset offset) {
+  void _paintImage(PaintingContext context, Offset offset) {
     final Canvas canvas = context.canvas;
-    final Rect rect = offset & size;
 
     canvas.save();
 
     ///move to extended text
     canvas.translate(offset.dx, offset.dy);
-    paintImage(<TextSpan>[text], canvas, rect);
+
+    ///we have move the canvas, so rect top left should be (0,0)
+    final Rect rect = Offset(0.0, 0.0) & size;
+    _paintImageChildren(<TextSpan>[text], canvas, rect);
     canvas.restore();
   }
 
-  void paintImage(List<TextSpan> textSpans, Canvas canvas, Rect rect,
+  void _paintImageChildren(List<TextSpan> textSpans, Canvas canvas, Rect rect,
       {int textOffset: 0}) {
     for (TextSpan ts in textSpans) {
+      Offset topLeftOffset = getOffsetForCaret(
+        TextPosition(offset: textOffset, affinity: TextAffinity.downstream),
+        rect,
+      );
+      //skip invalid or overflow
+      if (topLeftOffset == null ||
+          (textOffset != 0 && topLeftOffset == Offset.zero)) return;
+
       if (ts is ImageSpan) {
-        //get top-left offset of imageSpanTransparentPlaceholderOffset (\u200B)
-        Offset imageSpanTransparentPlaceholderOffset = getOffsetForCaret(
-          TextPosition(offset: textOffset),
-          rect,
-        );
-
-        //skip invalid or overflow
-        if (imageSpanTransparentPlaceholderOffset == null ||
-            (textOffset != 0 &&
-                imageSpanTransparentPlaceholderOffset == Offset.zero)) return;
-
         ///imageSpanTransparentPlaceholder \u200B has no width, and we define image width by
         ///use letterSpacing,so the actual top-left offset of image should be subtract letterSpacing(width)/2.0
-        Offset imageSpanOffset =
-            imageSpanTransparentPlaceholderOffset - Offset(ts.width / 2.0, 0.0);
+        Offset imageSpanOffset = topLeftOffset - Offset(ts.width / 2.0, 0.0);
 
         if (!ts.paint(canvas, imageSpanOffset)) {
           //image not ready
@@ -608,14 +607,30 @@ class ExtendedRenderParagraph extends RenderBox {
               }
             }
           });
-
-          textOffset += ts.toPlainText().length;
-          continue;
         }
-      } else if (ts.children != null) {
-        paintImage(ts.children, canvas, rect, textOffset: textOffset);
-      }
+      } else if (ts is BackgroundTextSpan) {
+        var painter = TextPainter(
+            text: ts,
+            textAlign: _textPainter.textAlign,
+            textScaleFactor: _textPainter.textScaleFactor,
+            textDirection: _textPainter.textDirection,
+            locale: _textPainter.locale)
+          ..layout();
+        Rect textRect = topLeftOffset & painter.size;
+        Offset endOffset;
+        if (textRect.right > rect.right) {
+          endOffset = getOffsetForCaret(
+            TextPosition(
+                offset: textOffset + ts.toPlainText().length,
+                affinity: TextAffinity.upstream),
+            rect,
+          );
+        }
 
+        ts.paint(canvas, topLeftOffset, painter, rect, endOffset: endOffset);
+      } else if (ts.children != null) {
+        _paintImageChildren(ts.children, canvas, rect, textOffset: textOffset);
+      }
       textOffset += ts.toPlainText().length;
     }
   }

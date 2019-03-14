@@ -40,7 +40,7 @@ class ImageSpan extends TextSpan {
 
   final BoxFit fit;
 
-  ImageListener _listener;
+  final ImageSpanResolver imageSpanResolver;
 
   ImageSpan(this.image,
       {@required this.imageWidth,
@@ -53,6 +53,7 @@ class ImageSpan extends TextSpan {
         assert(imageWidth != null),
         assert(imageHeight != null),
         assert(fit != null),
+        imageSpanResolver = ImageSpanResolver(),
         width = imageWidth + (margin == null ? 0 : margin.horizontal),
         height = imageHeight + (margin == null ? 0 : margin.vertical),
         super(
@@ -67,6 +68,45 @@ class ImageSpan extends TextSpan {
                   imageHeight + (margin == null ? 0 : margin.vertical)),
             ));
 
+  void resolveImage({BuildContext context, ImageListener listener}) {
+    imageSpanResolver.resolveImage(
+        context: context,
+        listener: listener,
+        image: image,
+        imageWidth: imageWidth,
+        imageHeight: imageHeight);
+  }
+
+  void dispose() {
+    imageSpanResolver.dispose();
+  }
+
+  bool paint(Canvas canvas, Offset offset) {
+    Offset imageOffset = offset;
+    if (margin != null) {
+      imageOffset = imageOffset + Offset(margin.left, margin.top);
+    }
+    final Rect imageRect = imageOffset & Size(imageWidth, imageHeight);
+
+    bool handle = beforePaintImage?.call(canvas, imageRect, this) ?? false;
+    if (handle) return true;
+
+    if (imageSpanResolver.imageInfo?.image == null) return false;
+
+    paintImage(
+        canvas: canvas,
+        rect: imageRect,
+        image: imageSpanResolver.imageInfo?.image,
+        fit: fit,
+        alignment: Alignment.center);
+
+    afterPaintImage?.call(canvas, imageRect, this);
+    return true;
+  }
+}
+
+class ImageSpanResolver {
+  ImageListener _listener;
   ImageStream _imageStream;
   ImageInfo _imageInfo;
   ImageInfo get imageInfo => _imageInfo;
@@ -80,7 +120,12 @@ class ImageSpan extends TextSpan {
 //      _resolveImage();
 //  }
 
-  void resolveImage({BuildContext context, ImageListener listener}) {
+  void resolveImage(
+      {BuildContext context,
+      ImageListener listener,
+      ImageProvider image,
+      double imageWidth,
+      double imageHeight}) {
     if (context != null)
       _imageConfiguration = createLocalImageConfiguration(context,
           size: (imageWidth != null && imageHeight != null)
@@ -130,29 +175,6 @@ class ImageSpan extends TextSpan {
     assert(_imageStream != null);
     _stopListeningToStream();
     //super.dispose();
-  }
-
-  bool paint(Canvas canvas, Offset offset) {
-    Offset imageOffset = offset;
-    if (margin != null) {
-      imageOffset = imageOffset + Offset(margin.left, margin.top);
-    }
-    final Rect imageRect = imageOffset & Size(imageWidth, imageHeight);
-
-    bool handle = beforePaintImage?.call(canvas, imageRect, this) ?? false;
-    if (handle) return true;
-
-    if (_imageInfo?.image == null) return false;
-
-    paintImage(
-        canvas: canvas,
-        rect: imageRect,
-        image: _imageInfo?.image,
-        fit: fit,
-        alignment: Alignment.center);
-
-    afterPaintImage?.call(canvas, imageRect, this);
-    return true;
   }
 }
 

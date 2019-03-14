@@ -1,3 +1,4 @@
+import 'package:example/background_text_demo.dart';
 import 'package:example/common/tu_chong_repository.dart';
 import 'package:example/custom_image_demo.dart';
 import 'package:example/special_text/my_special_text_span_builder.dart';
@@ -58,6 +59,8 @@ class _MyHomePageState extends State<MyHomePage> {
     // TODO: implement initState
     pages.add(Page(PageType.Text, "quickly build special text"));
     pages.add(Page(PageType.CustomImage, "custom inline-image in text"));
+    pages.add(Page(PageType.BackgroundText,
+        "workaround for issue 24335/24337 about background"));
     listSourceRepository = new TuChongRepository();
     listSourceRepository.loadData().then((result) {
       if (listSourceRepository.length > 0) {
@@ -105,6 +108,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 case PageType.CustomImage:
                   pageWidget = new CustomImageDemo();
                   break;
+                case PageType.BackgroundText:
+                  pageWidget = new BackgroundTextDemo();
+                  break;
                 default:
                   break;
               }
@@ -134,6 +140,7 @@ class Page {
 enum PageType {
   Text,
   CustomImage,
+  BackgroundText,
 }
 
 List<String> _imageTestUrls;

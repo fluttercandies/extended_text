@@ -55,7 +55,7 @@ class CustomImageDemo extends StatelessWidget {
               drawPlaceholder(canvas, rect, imageSpan);
 
               ///you mush be restore canvas when image is not ready,so that it will not working to other image
-              if (imageSpan.imageInfo?.image == null) {
+              if (imageSpan.imageSpanResolver.imageInfo?.image == null) {
                 canvas.restore();
               }
 
@@ -86,7 +86,7 @@ class CustomImageDemo extends StatelessWidget {
               drawPlaceholder(canvas, rect, imageSpan);
 
               ///you mush be restore canvas when image is not ready,so that it will not working to other image
-              if (imageSpan.imageInfo?.image == null) {
+              if (imageSpan.imageSpanResolver.imageInfo?.image == null) {
                 canvas.restore();
               }
               return false;
@@ -130,7 +130,7 @@ class CustomImageDemo extends StatelessWidget {
   }
 
   void drawPlaceholder(Canvas canvas, Rect rect, ImageSpan imageSpan) {
-    if (imageSpan.imageInfo?.image == null) {
+    if (imageSpan.imageSpanResolver.imageInfo?.image == null) {
       canvas.drawRect(rect, Paint()..color = Colors.grey);
       var textPainter = TextPainter(
           text: TextSpan(text: "loading", style: TextStyle(fontSize: 10.0)),
