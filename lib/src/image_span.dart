@@ -11,7 +11,7 @@ const String imageSpanTransparentPlaceholder = "\u200B";
 ///fontSize 26 and text height =30.0
 //final double fontSize = 26.0;
 
-double _dpToFontSize(double dp) {
+double dpToFontSize(double dp) {
   return dp / 30.0 * 26.0;
 }
 
@@ -31,32 +31,46 @@ class ImageSpan extends TextSpan {
   ///height include margin
   final double height;
 
+  ///you can paint your placeholder or clip
+  ///any thing you want
+  final BeforePaintImage beforePaintImage;
+
+  ///you can paint border,shadow etc
+  final AfterPaintImage afterPaintImage;
+
+  final BoxFit fit;
+
   ImageListener _listener;
 
-  ImageSpan(
-    this.image, {
-    @required this.imageWidth,
-    @required this.imageHeight,
-    this.margin,
-  })  : assert(image != null),
+  ImageSpan(this.image,
+      {@required this.imageWidth,
+      @required this.imageHeight,
+      this.margin,
+      this.beforePaintImage,
+      this.afterPaintImage,
+      this.fit: BoxFit.scaleDown})
+      : assert(image != null),
         assert(imageWidth != null),
         assert(imageHeight != null),
+        assert(fit != null),
         width = imageWidth + (margin == null ? 0 : margin.horizontal),
-        height =
-            _dpToFontSize(imageHeight + (margin == null ? 0 : margin.vertical)),
+        height = imageHeight + (margin == null ? 0 : margin.vertical),
         super(
             text: imageSpanTransparentPlaceholder,
+            children: null,
             style: TextStyle(
               color: Colors.transparent,
               height: 1,
               letterSpacing:
                   imageWidth + (margin == null ? 0 : margin.horizontal),
-              fontSize: _dpToFontSize(
+              fontSize: dpToFontSize(
                   imageHeight + (margin == null ? 0 : margin.vertical)),
             ));
 
   ImageStream _imageStream;
   ImageInfo _imageInfo;
+  ImageInfo get imageInfo => _imageInfo;
+
   bool _isListeningToStream = false;
   ImageConfiguration _imageConfiguration;
 
@@ -119,22 +133,36 @@ class ImageSpan extends TextSpan {
   }
 
   bool paint(Canvas canvas, Offset offset) {
-    if (_imageInfo?.image == null) return false;
-
+    Offset imageOffset = offset;
     if (margin != null) {
-      offset = offset + Offset(margin.left, margin.top);
+      imageOffset = imageOffset + Offset(margin.left, margin.top);
     }
+    final Rect imageRect = imageOffset & Size(imageWidth, imageHeight);
 
-    ///center offset
-    offset = Offset(offset.dx - width / 2.0, offset.dy);
+    bool handle = beforePaintImage?.call(canvas, imageRect, this) ?? false;
+    if (handle) return true;
+
+    if (_imageInfo?.image == null) return false;
 
     paintImage(
         canvas: canvas,
-        rect: offset & Size(imageWidth, imageHeight),
+        rect: imageRect,
         image: _imageInfo?.image,
-        fit: BoxFit.scaleDown,
+        fit: fit,
         alignment: Alignment.center);
 
+    afterPaintImage?.call(canvas, imageRect, this);
     return true;
   }
 }
+
+///[rect] rect is not margin
+///if you have handle placeholder or paint image(clip) you can return true,  it will not paint original image,
+///you will have the channce to draw your placeholder before paint image
+typedef BeforePaintImage = bool Function(
+    Canvas canvas, Rect rect, ImageSpan imageSpan);
+
+///[rect] rect is not include margin
+///you can paint border,shadow etc at this moment
+typedef AfterPaintImage = void Function(
+    Canvas canvas, Rect rect, ImageSpan imageSpan);

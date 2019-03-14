@@ -1,3 +1,5 @@
+import 'package:example/common/tu_chong_repository.dart';
+import 'package:example/custom_image_demo.dart';
 import 'package:example/special_text/my_special_text_span_builder.dart';
 import 'package:example/text_demo.dart';
 import 'package:flutter/material.dart';
@@ -49,11 +51,21 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List<Page> pages = new List<Page>();
+  TuChongRepository listSourceRepository;
   @override
   void initState() {
+    clearExtendedTextDiskCachedImages();
     // TODO: implement initState
-    pages.add(Page(PageType.Text, "Special text"));
-
+    pages.add(Page(PageType.Text, "quickly build special text"));
+    pages.add(Page(PageType.CustomImage, "custom inline-image in text"));
+    listSourceRepository = new TuChongRepository();
+    listSourceRepository.loadData().then((result) {
+      if (listSourceRepository.length > 0) {
+        // _imageTestUrl = listSourceRepository.first.imageUrl;
+        _imageTestUrls =
+            listSourceRepository.map<String>((f) => f.imageUrl).toList();
+      }
+    });
     super.initState();
   }
 
@@ -90,6 +102,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 case PageType.Text:
                   pageWidget = new TextDemo();
                   break;
+                case PageType.CustomImage:
+                  pageWidget = new CustomImageDemo();
+                  break;
                 default:
                   break;
               }
@@ -118,4 +133,14 @@ class Page {
 
 enum PageType {
   Text,
+  CustomImage,
+}
+
+List<String> _imageTestUrls;
+List<String> get imageTestUrls =>
+    _imageTestUrls ??
+    <String>["https://photo.tuchong.com/4870004/f/298584322.jpg"];
+
+void clearMemoryImageCache() {
+  PaintingBinding.instance.imageCache.clear();
 }
