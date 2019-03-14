@@ -567,24 +567,34 @@ class ExtendedRenderParagraph extends RenderBox {
   void _paintSpecialText(PaintingContext context, Offset offset) {
     final Canvas canvas = context.canvas;
     final Rect rect = offset & size;
+
     canvas.save();
 
     ///move to extended text
     canvas.translate(offset.dx, offset.dy);
-    int textOffset = 0;
+    paintImage(<TextSpan>[text], canvas, rect);
+    canvas.restore();
+  }
 
-    for (TextSpan ts in text.children) {
+  void paintImage(List<TextSpan> textSpans, Canvas canvas, Rect rect,
+      {int textOffset: 0}) {
+    for (TextSpan ts in textSpans) {
       if (ts is ImageSpan) {
-        //get offset of Image Span
-        //center offset
-        Offset imageSpanOffset = getOffsetForCaret(
+        //get top-left offset of imageSpanTransparentPlaceholderOffset (\u200B)
+        Offset imageSpanTransparentPlaceholderOffset = getOffsetForCaret(
           TextPosition(offset: textOffset),
           rect,
         );
 
         //skip invalid or overflow
-        if (imageSpanOffset == null ||
-            (textOffset != 0 && imageSpanOffset == Offset.zero)) return;
+        if (imageSpanTransparentPlaceholderOffset == null ||
+            (textOffset != 0 &&
+                imageSpanTransparentPlaceholderOffset == Offset.zero)) return;
+
+        ///imageSpanTransparentPlaceholder \u200B has no width, and we define image width by
+        ///use letterSpacing,so the actual top-left offset of image should be subtract letterSpacing(width)/2.0
+        Offset imageSpanOffset =
+            imageSpanTransparentPlaceholderOffset - Offset(ts.width / 2.0, 0.0);
 
         if (!ts.paint(canvas, imageSpanOffset)) {
           //image not ready
@@ -602,10 +612,11 @@ class ExtendedRenderParagraph extends RenderBox {
           textOffset += ts.toPlainText().length;
           continue;
         }
+      } else if (ts.children != null) {
+        paintImage(ts.children, canvas, rect, textOffset: textOffset);
       }
+
       textOffset += ts.toPlainText().length;
     }
-
-    canvas.restore();
   }
 }

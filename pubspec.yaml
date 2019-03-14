@@ -10,6 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  path_provider: ^0.4.1
+  http_client_helper: ^0.1.7
+  transparent_image: ^0.1.0
+  crypto: ^2.0.6
 
 dev_dependencies:
   flutter_test:

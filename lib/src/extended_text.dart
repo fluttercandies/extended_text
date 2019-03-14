@@ -151,22 +151,17 @@ class ExtendedText extends StatelessWidget {
       effectiveTextStyle = effectiveTextStyle
           .merge(const TextStyle(fontWeight: FontWeight.bold));
 
-    TextSpan textSpan = specialTextSpanBuilder?.build(data,
+    TextSpan innerTextSpan = specialTextSpanBuilder?.build(data,
         textStyle: effectiveTextStyle, onTap: onSpecialTextTap);
 
-    if (textSpan == null)
-      textSpan = TextSpan(
+    if (innerTextSpan == null)
+      innerTextSpan = TextSpan(
         style: effectiveTextStyle,
         text: data,
         children: textSpan != null ? <TextSpan>[textSpan] : null,
       );
 
-    if (textSpan.children != null)
-      textSpan.children.forEach((ts) {
-        if (ts is ImageSpan) {
-          ts.resolveImage(context: context);
-        }
-      });
+    handleImageSpan(<TextSpan>[innerTextSpan], context);
 
     Widget result = ExtendedRichText(
       textAlign: textAlign ?? defaultTextStyle.textAlign ?? TextAlign.start,
@@ -178,7 +173,7 @@ class ExtendedText extends StatelessWidget {
       overflow: overflow ?? defaultTextStyle.overflow,
       textScaleFactor: textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
       maxLines: maxLines ?? defaultTextStyle.maxLines,
-      text: textSpan,
+      text: innerTextSpan,
     );
     if (semanticsLabel != null) {
       result = Semantics(
@@ -189,6 +184,16 @@ class ExtendedText extends StatelessWidget {
           ));
     }
     return result;
+  }
+
+  void handleImageSpan(List<TextSpan> textSpan, BuildContext context) {
+    textSpan.forEach((ts) {
+      if (ts is ImageSpan) {
+        ts.resolveImage(context: context);
+      } else if (ts.children != null) {
+        handleImageSpan(ts.children, context);
+      }
+    });
   }
 
   @override
