@@ -167,7 +167,7 @@ class ExtendedText extends StatelessWidget {
         children: textSpan != null ? <TextSpan>[textSpan] : null,
       );
 
-    handleImageSpan(<TextSpan>[innerTextSpan], context);
+    _createImageConfiguration(<TextSpan>[innerTextSpan], context);
 
     OverFlowTextSpan effectiveOverFlowTextSpan;
     if (overFlowTextSpan != null) {
@@ -205,12 +205,12 @@ class ExtendedText extends StatelessWidget {
     return result;
   }
 
-  void handleImageSpan(List<TextSpan> textSpan, BuildContext context) {
+  void _createImageConfiguration(List<TextSpan> textSpan, BuildContext context) {
     textSpan.forEach((ts) {
       if (ts is ImageSpan) {
-        ts.createimageConfiguration(context);
+        ts.createImageConfiguration(context);
       } else if (ts.children != null) {
-        handleImageSpan(ts.children, context);
+        _createImageConfiguration(ts.children, context);
       }
     });
   }

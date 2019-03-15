@@ -609,7 +609,6 @@ class ExtendedRenderParagraph extends RenderBox {
     final Canvas canvas = context.canvas;
 
     canvas.save();
-
     ///move to extended text
     canvas.translate(offset.dx, offset.dy);
 
