@@ -15,7 +15,10 @@ class CustomImageDemo extends StatelessWidget {
           TextSpan(children: <TextSpan>[
             ImageSpan(CachedNetworkImage(imageTestUrls.first), beforePaintImage:
                     (Canvas canvas, Rect rect, ImageSpan imageSpan) {
-              drawPlaceholder(canvas, rect, imageSpan);
+              bool hasPlaceholder = drawPlaceholder(canvas, rect, imageSpan);
+              if (!hasPlaceholder) {
+                clearRect(rect, canvas);
+              }
               return false;
             },
                 margin: EdgeInsets.only(right: 10.0),
@@ -29,7 +32,12 @@ class CustomImageDemo extends StatelessWidget {
                     : imageTestUrls.first),
                 beforePaintImage:
                     (Canvas canvas, Rect rect, ImageSpan imageSpan) {
-              drawPlaceholder(canvas, rect, imageSpan);
+              bool hasPlaceholder = drawPlaceholder(canvas, rect, imageSpan);
+
+              if (!hasPlaceholder) {
+                clearRect(rect, canvas);
+              }
+
               return false;
             }, afterPaintImage:
                     (Canvas canvas, Rect rect, ImageSpan imageSpan) {
@@ -52,11 +60,13 @@ class CustomImageDemo extends StatelessWidget {
                 ..addRRect(BorderRadius.all(Radius.circular(5.0))
                     .resolve(TextDirection.ltr)
                     .toRRect(rect)));
-              drawPlaceholder(canvas, rect, imageSpan);
+              bool hasPlaceholder = drawPlaceholder(canvas, rect, imageSpan);
 
               ///you mush be restore canvas when image is not ready,so that it will not working to other image
-              if (imageSpan.imageSpanResolver.imageInfo?.image == null) {
+              if (hasPlaceholder) {
                 canvas.restore();
+              } else {
+                clearRect(rect, canvas);
               }
 
               return false;
@@ -83,11 +93,13 @@ class CustomImageDemo extends StatelessWidget {
               var path = Path()..addOval(rect);
 
               canvas.clipPath(path);
-              drawPlaceholder(canvas, rect, imageSpan);
+              bool hasPlaceholder = drawPlaceholder(canvas, rect, imageSpan);
 
               ///you mush be restore canvas when image is not ready,so that it will not working to other image
-              if (imageSpan.imageSpanResolver.imageInfo?.image == null) {
+              if (hasPlaceholder) {
                 canvas.restore();
+              } else {
+                clearRect(rect, canvas);
               }
               return false;
             }, afterPaintImage:
@@ -129,8 +141,10 @@ class CustomImageDemo extends StatelessWidget {
     );
   }
 
-  void drawPlaceholder(Canvas canvas, Rect rect, ImageSpan imageSpan) {
-    if (imageSpan.imageSpanResolver.imageInfo?.image == null) {
+  bool drawPlaceholder(Canvas canvas, Rect rect, ImageSpan imageSpan) {
+    bool hasPlaceholder = imageSpan.imageSpanResolver.imageInfo?.image == null;
+
+    if (hasPlaceholder) {
       canvas.drawRect(rect, Paint()..color = Colors.grey);
       var textPainter = TextPainter(
           text: TextSpan(text: "loading", style: TextStyle(fontSize: 10.0)),
@@ -147,5 +161,16 @@ class CustomImageDemo extends StatelessWidget {
 
       // ..paint(canvas, rect.center);
     }
+
+    return hasPlaceholder;
+  }
+
+  void clearRect(Rect rect, Canvas canvas) {
+    ///if don't save layer
+    ///BlendMode.clear will show black
+    ///maybe this is bug for blendMode.clear
+    canvas.saveLayer(rect, Paint());
+    canvas.drawRect(rect, Paint()..blendMode = BlendMode.clear);
+    canvas.restore();
   }
 }

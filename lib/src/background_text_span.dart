@@ -1,3 +1,4 @@
+import 'package:extended_text/src/text_painter_helper.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -21,34 +22,43 @@ class BackgroundTextSpan extends TextSpan {
   ///paint background by yourself
   final PaintBackground paintBackground;
 
+  ///helper for textPainter
+  final TextPainterHelper _textPainterHelper;
+
   BackgroundTextSpan(
       {TextStyle style,
       String text,
       //List<TextSpan> children,
       GestureRecognizer recognizer,
-      double textScaleFactor: 1.0,
       this.background,
       this.clipBorderRadius,
       this.paintBackground})
       : assert(background != null),
+        _textPainterHelper = TextPainterHelper(),
         super(style: style, text: text, children: null, recognizer: recognizer);
 
+  TextPainter layout(TextPainter painter) {
+    return _textPainterHelper.layout(painter, this, compareChildren: false);
+  }
+
   ///rect: all text size
-  paint(Canvas canvas, Offset offset, TextPainter painter, Rect rect,
-      {Offset endOffset}) {
+  paint(Canvas canvas, Offset offset, Rect rect, {Offset endOffset}) {
+    assert(_textPainterHelper.painter != null);
+
     if (paintBackground != null) {
-      bool handle = paintBackground(this, canvas, offset, painter, rect,
+      bool handle = paintBackground(
+              this, canvas, offset, _textPainterHelper.painter, rect,
               endOffset: endOffset) ??
           false;
       if (handle) return;
     }
 
-    Rect textRect = offset & painter.size;
+    Rect textRect = offset & _textPainterHelper.painter.size;
 
     ///top-right
     if (endOffset != null) {
-      Rect firstLineRect =
-          offset & Size(rect.right - offset.dx, painter.height);
+      Rect firstLineRect = offset &
+          Size(rect.right - offset.dx, _textPainterHelper.painter.height);
 
       if (clipBorderRadius != null) {
         canvas.save();
@@ -56,7 +66,7 @@ class BackgroundTextSpan extends TextSpan {
           ..addRRect(BorderRadius.only(
                   topLeft: clipBorderRadius.topLeft,
                   bottomLeft: clipBorderRadius.bottomLeft)
-              .resolve(painter.textDirection)
+              .resolve(_textPainterHelper.painter.textDirection)
               .toRRect(firstLineRect)));
       }
 
@@ -68,22 +78,25 @@ class BackgroundTextSpan extends TextSpan {
       }
 
       ///endOffset.y has deviation,so we calculate with text height
-      var leftLines = ((endOffset.dy - offset.dy) / painter.height).round();
+      ///print(((endOffset.dy - offset.dy) / _painter.height));
+      var leftLines =
+          ((endOffset.dy - offset.dy) / _textPainterHelper.painter.height)
+              .round();
 
       double y = offset.dy;
       for (int i = 0; i < leftLines; i++) {
-        y += painter.height;
+        y += _textPainterHelper.painter.height;
         //last line
         if (i == leftLines - 1) {
-          Rect lastLineRect =
-              Offset(0.0, y) & Size(endOffset.dx, painter.height);
+          Rect lastLineRect = Offset(0.0, y) &
+              Size(endOffset.dx, _textPainterHelper.painter.height);
           if (clipBorderRadius != null) {
             canvas.save();
             canvas.clipPath(Path()
               ..addRRect(BorderRadius.only(
                       topRight: clipBorderRadius.topRight,
                       bottomRight: clipBorderRadius.bottomRight)
-                  .resolve(painter.textDirection)
+                  .resolve(_textPainterHelper.painter.textDirection)
                   .toRRect(lastLineRect)));
           }
           canvas.drawRect(lastLineRect, background);
@@ -93,15 +106,18 @@ class BackgroundTextSpan extends TextSpan {
         } else {
           ///draw full line
           canvas.drawRect(
-              Offset(0.0, y) & Size(rect.width, painter.height), background);
+              Offset(0.0, y) &
+                  Size(rect.width, _textPainterHelper.painter.height),
+              background);
         }
       }
     } else {
       if (clipBorderRadius != null) {
         canvas.save();
         canvas.clipPath(Path()
-          ..addRRect(
-              clipBorderRadius.resolve(painter.textDirection).toRRect(rect)));
+          ..addRRect(clipBorderRadius
+              .resolve(_textPainterHelper.painter.textDirection)
+              .toRRect(rect)));
       }
 
       canvas.drawRect(textRect, background);
