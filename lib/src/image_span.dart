@@ -68,7 +68,7 @@ class ImageSpan extends TextSpan {
                   imageHeight + (margin == null ? 0 : margin.vertical)),
             ));
 
-  void createimageConfiguration(BuildContext context) {
+  void createImageConfiguration(BuildContext context) {
     imageSpanResolver.createimageConfiguration(
         context, imageWidth, imageHeight);
   }

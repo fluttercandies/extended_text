@@ -4,7 +4,7 @@
 
 extended official text to quickly build special text like inline image or @somebody,it also provide custom background,custom over flow.
 
-[Chinese bolg](https://juejin.im/post/5bebcc44f265da61682aedb8)
+[Chinese bolg  inline image](https://juejin.im/post/5c8be0d06fb9a049a42ff067)
 
 ## Speical text
 
@@ -201,6 +201,24 @@ bool drawPlaceholder(Canvas canvas, Rect rect, ImageSpan imageSpan) {
     canvas.restore();
   }
 ```
+
+if you want cache the network image, you can use CachedNetworkImage and clear them with clearExtendedTextDiskCachedImages
+``` dart
+ CachedNetworkImage(this.url,
+      {this.scale = 1.0,
+      this.headers,
+      this.cache: false,
+      this.retries = 3,
+      this.timeLimit,
+      this.timeRetry = const Duration(milliseconds: 100)})
+      : assert(url != null),
+        assert(scale != null);
+
+/// Clear the disk cache directory then return if it succeed.
+///  <param name="duration">timespan to compute whether file has expired or not</param>
+Future<bool> clearExtendedTextDiskCachedImages({Duration duration}) async
+```
+
 [more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/custom_image_demo.dart)
 
 ## custom background (refer to issue [24335](https://github.com/flutter/flutter/issues/24335)/[24337](https://github.com/flutter/flutter/issues/24337) about background)
