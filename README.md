@@ -10,7 +10,7 @@ extended official text to quickly build special text like inline image or @someb
 
 extended text helps you to build speical text quickly.
 
-![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/special_text.png)
+![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/special_text.jpg)
 
 for example, follwing code show how to create @xxxx in your text.
 
@@ -231,7 +231,7 @@ paintBackground: (BackgroundTextSpan backgroundTextSpan,
 
 ## custom overflow (refer to issue [26748](https://github.com/flutter/flutter/issues/26748))
 
-![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/overflow.png)
+![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/overflow.jpg)
 
 you can define your custom over flow textspan with overFlowTextSpan.
 
