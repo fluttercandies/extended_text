@@ -731,7 +731,6 @@ class ExtendedRenderParagraph extends RenderBox {
 //          Paint()
 //            ..blendMode = BlendMode.clear);
 //      canvas.restore();
-      canvas.drawRect(overFlowTextSpanRect, Paint()..color = Colors.white);
 
       textPainter.paint(
           canvas, Offset(finalOverflowOffset.dx, overFlowTextSpanOffset.dy));
