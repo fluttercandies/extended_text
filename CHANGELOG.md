@@ -1,3 +1,3 @@
-## [0.1.0] - TODO: Add release date.
+## [0.1.0]
 
-* TODO: Describe initial release.
+* suport inline image, custom background ,custom over flow.

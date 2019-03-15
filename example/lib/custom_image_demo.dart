@@ -158,10 +158,7 @@ class CustomImageDemo extends StatelessWidget {
           canvas,
           Offset(rect.left + (rect.width - textPainter.width) / 2.0,
               rect.top + (rect.height - textPainter.height) / 2.0));
-
-      // ..paint(canvas, rect.center);
     }
-
     return hasPlaceholder;
   }
 

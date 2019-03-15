@@ -1,5 +1,7 @@
 import 'package:extended_text/extended_text.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BackgroundTextDemo extends StatelessWidget {
   @override
@@ -15,6 +17,25 @@ class BackgroundTextDemo extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
+                Text.rich(TextSpan(children: <TextSpan>[
+                  TextSpan(
+                      text: "24335",
+                      style: TextStyle(color: Colors.blue),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          launch(
+                              "https://github.com/flutter/flutter/issues/24335");
+                        }),
+                  TextSpan(text: "/"),
+                  TextSpan(
+                      text: "24337",
+                      style: TextStyle(color: Colors.blue),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          launch(
+                              "https://github.com/flutter/flutter/issues/24337");
+                        }),
+                ])),
                 Text(
                   "official text background with color Alpha 255, chinese words are missing",
                 ),
