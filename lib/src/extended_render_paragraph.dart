@@ -687,7 +687,7 @@ class ExtendedRenderParagraph extends RenderBox {
       ///we will move the canvas, so rect top left should be (0,0)
       final Rect rect = Offset(0.0, 0.0) & size;
       var textPainter = overFlowTextSpan.layout(_textPainter);
-      assert(textPainter.width < rect.width,);
+      assert(textPainter.width <= rect.width,);
 
       canvas.save();
 

@@ -1,3 +1,3 @@
-## [0.1.1]
+## [0.1.2]
 
 * suport inline image, custom background ,custom over flow.
