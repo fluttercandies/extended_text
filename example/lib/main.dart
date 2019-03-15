@@ -62,7 +62,8 @@ class _MyHomePageState extends State<MyHomePage> {
     pages.add(Page(PageType.CustomImage, "custom inline-image in text"));
     pages.add(Page(PageType.BackgroundText,
         "workaround for issue 24335/24337 about background"));
-    pages.add(Page(PageType.CustomTextOverflow, "how to custom text overflow"));
+    pages.add(Page(PageType.CustomTextOverflow,
+        "workaround for issue 26748. how to custom text overflow"));
 
     listSourceRepository = new TuChongRepository();
     listSourceRepository.loadData().then((result) {

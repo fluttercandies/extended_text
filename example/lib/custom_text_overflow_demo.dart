@@ -22,20 +22,25 @@ class CustomTextOverflowDemo extends StatelessWidget {
                         "\n\nIt's my pleasure to invite you to join \$FlutterCandies\$ if you want to improve flutter .[love]"
                         "\n\nif you meet any problem, please let me konw @zmtzawqlp .[sun_glasses] "
                         "\n notice: fail to clear text under overflow span, with BlendMode.clear. "
-                        "so paint a backgounrd (Theme.of(context).canvasColor) over text. let me know if you have any idea.I'm overflow text.I'm overflow text.I'm overflow text.I'm overflow text.",
+                        "so paint a backgounrd (Theme.of(context).canvasColor) over text. relate to \$issue 26748\$ . let me know if you have any idea.I'm overflow text.I'm overflow text.I'm overflow text.I'm overflow text.",
                     onSpecialTextTap: (String data) {
                       if (data.startsWith("\$")) {
-                        launch("https://github.com/fluttercandies");
+                        if (data.contains("issue")) {
+                          launch(
+                              "https://github.com/flutter/flutter/issues/26748");
+                        } else {
+                          launch("https://github.com/fluttercandies");
+                        }
                       } else if (data.startsWith("@")) {
                         launch("mailto:zmtzawqlp@live.com");
                       }
                     },
                     specialTextSpanBuilder: MySpecialTextSpanBuilder(),
-                    overflow: TextOverflow.ellipsis,
+                    //overflow: TextOverflow.ellipsis,
                     overFlowTextSpan: OverFlowTextSpan(children: <TextSpan>[
                       TextSpan(text: '  \u2026  '),
                       TextSpan(
-                          text: "more",
+                          text: "more detail",
                           style: TextStyle(
                             color: Colors.blue,
                           ),
@@ -45,7 +50,7 @@ class CustomTextOverflowDemo extends StatelessWidget {
                                   "https://github.com/fluttercandies/extended_text");
                             })
                     ], background: Theme.of(context).canvasColor),
-                    maxLines: 12,
+                    maxLines: 13,
                   ),
                 ])));
   }
