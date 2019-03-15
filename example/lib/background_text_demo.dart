@@ -140,15 +140,15 @@ class BackgroundTextDemo extends StatelessWidget {
                           }
 
                           ///endOffset.y has deviation,so we calculate with text height
-                          var leftLines =
+                          var fullLinesAndLastLine =
                               ((endOffset.dy - offset.dy) / painter.height)
                                   .round();
 
                           double y = offset.dy;
-                          for (int i = 0; i < leftLines; i++) {
+                          for (int i = 0; i < fullLinesAndLastLine; i++) {
                             y += painter.height;
                             //last line
-                            if (i == leftLines - 1) {
+                            if (i == fullLinesAndLastLine - 1) {
                               Rect lastLineRect = Offset(0.0, y) &
                                   Size(endOffset.dx, painter.height);
                               if (backgroundTextSpan.clipBorderRadius != null) {
