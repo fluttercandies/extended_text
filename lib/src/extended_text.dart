@@ -1,6 +1,7 @@
 import 'package:extended_text/extended_text.dart';
 import 'package:extended_text/src/extended_rich_text.dart';
 import 'package:extended_text/src/extended_text_utils.dart';
+import 'package:extended_text/src/over_flow_text_span.dart';
 import 'package:extended_text/src/special_text_span_builder.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,8 @@ class ExtendedText extends StatelessWidget {
       this.maxLines,
       this.semanticsLabel,
       this.specialTextSpanBuilder,
-      this.onSpecialTextTap})
+      this.onSpecialTextTap,
+      this.overFlowTextSpan})
       : assert(data != null),
         textSpan = null,
         super(key: key);
@@ -41,10 +43,14 @@ class ExtendedText extends StatelessWidget {
     this.maxLines,
     this.semanticsLabel,
     this.onSpecialTextTap,
+    this.overFlowTextSpan,
   })  : assert(textSpan != null),
         data = null,
         specialTextSpanBuilder = null,
         super(key: key);
+
+  /// the custom text over flow TextSpan
+  final OverFlowTextSpan overFlowTextSpan;
 
   /// The text to display.
   ///
@@ -163,6 +169,18 @@ class ExtendedText extends StatelessWidget {
 
     handleImageSpan(<TextSpan>[innerTextSpan], context);
 
+    OverFlowTextSpan effectiveOverFlowTextSpan;
+    if (overFlowTextSpan != null) {
+      effectiveOverFlowTextSpan = OverFlowTextSpan(
+        recognizer: overFlowTextSpan.recognizer,
+        background:
+            overFlowTextSpan.background ?? Theme.of(context).canvasColor,
+        text: overFlowTextSpan.text,
+        style: overFlowTextSpan.style ?? effectiveTextStyle,
+        children: overFlowTextSpan.children,
+      );
+    }
+
     Widget result = ExtendedRichText(
       textAlign: textAlign ?? defaultTextStyle.textAlign ?? TextAlign.start,
       textDirection:
@@ -174,6 +192,7 @@ class ExtendedText extends StatelessWidget {
       textScaleFactor: textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
       maxLines: maxLines ?? defaultTextStyle.maxLines,
       text: innerTextSpan,
+      overFlowTextSpan: effectiveOverFlowTextSpan,
     );
     if (semanticsLabel != null) {
       result = Semantics(
@@ -189,7 +208,7 @@ class ExtendedText extends StatelessWidget {
   void handleImageSpan(List<TextSpan> textSpan, BuildContext context) {
     textSpan.forEach((ts) {
       if (ts is ImageSpan) {
-        ts.resolveImage(context: context);
+        ts.createimageConfiguration(context);
       } else if (ts.children != null) {
         handleImageSpan(ts.children, context);
       }

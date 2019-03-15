@@ -68,13 +68,13 @@ class ImageSpan extends TextSpan {
                   imageHeight + (margin == null ? 0 : margin.vertical)),
             ));
 
-  void resolveImage({BuildContext context, ImageListener listener}) {
-    imageSpanResolver.resolveImage(
-        context: context,
-        listener: listener,
-        image: image,
-        imageWidth: imageWidth,
-        imageHeight: imageHeight);
+  void createimageConfiguration(BuildContext context) {
+    imageSpanResolver.createimageConfiguration(
+        context, imageWidth, imageHeight);
+  }
+
+  void resolveImage({ImageListener listener}) {
+    imageSpanResolver.resolveImage(listener: listener, image: image);
   }
 
   void dispose() {
@@ -120,17 +120,15 @@ class ImageSpanResolver {
 //      _resolveImage();
 //  }
 
-  void resolveImage(
-      {BuildContext context,
-      ImageListener listener,
-      ImageProvider image,
-      double imageWidth,
-      double imageHeight}) {
-    if (context != null)
-      _imageConfiguration = createLocalImageConfiguration(context,
-          size: (imageWidth != null && imageHeight != null)
-              ? Size(imageWidth, imageHeight)
-              : null);
+  void createimageConfiguration(
+      BuildContext context, double imageWidth, double imageHeight) {
+    _imageConfiguration = createLocalImageConfiguration(context,
+        size: (imageWidth != null && imageHeight != null)
+            ? Size(imageWidth, imageHeight)
+            : null);
+  }
+
+  void resolveImage({ImageListener listener, ImageProvider image}) {
     assert(_imageConfiguration != null);
     if (listener != null) _listener = listener;
     final ImageStream newStream = image.resolve(_imageConfiguration);

@@ -1,5 +1,6 @@
 import 'package:example/background_text_demo.dart';
 import 'package:example/common/tu_chong_repository.dart';
+import 'package:example/custom_text_overflow_demo.dart';
 import 'package:example/custom_image_demo.dart';
 import 'package:example/special_text/my_special_text_span_builder.dart';
 import 'package:example/text_demo.dart';
@@ -61,6 +62,9 @@ class _MyHomePageState extends State<MyHomePage> {
     pages.add(Page(PageType.CustomImage, "custom inline-image in text"));
     pages.add(Page(PageType.BackgroundText,
         "workaround for issue 24335/24337 about background"));
+    pages.add(Page(PageType.CustomTextOverflow,
+        "workaround for issue 24335/24337 about background"));
+
     listSourceRepository = new TuChongRepository();
     listSourceRepository.loadData().then((result) {
       if (listSourceRepository.length > 0) {
@@ -111,6 +115,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 case PageType.BackgroundText:
                   pageWidget = new BackgroundTextDemo();
                   break;
+                case PageType.CustomTextOverflow:
+                  pageWidget = new CustomTextOverflowDemo();
+                  break;
                 default:
                   break;
               }
@@ -137,11 +144,7 @@ class Page {
   Page(this.type, this.description);
 }
 
-enum PageType {
-  Text,
-  CustomImage,
-  BackgroundText,
-}
+enum PageType { Text, CustomImage, BackgroundText, CustomTextOverflow }
 
 List<String> _imageTestUrls;
 List<String> get imageTestUrls =>

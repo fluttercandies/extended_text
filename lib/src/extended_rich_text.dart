@@ -1,4 +1,5 @@
 import 'package:extended_text/src/extended_render_paragraph.dart';
+import 'package:extended_text/src/over_flow_text_span.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -17,23 +18,27 @@ class ExtendedRichText extends LeafRenderObjectWidget {
   ///
   /// The [textDirection], if null, defaults to the ambient [Directionality],
   /// which in that case must not be null.
-  const ExtendedRichText({
-    Key key,
-    @required this.text,
-    this.textAlign = TextAlign.start,
-    this.textDirection,
-    this.softWrap = true,
-    this.overflow = TextOverflow.clip,
-    this.textScaleFactor = 1.0,
-    this.maxLines,
-    this.locale,
-  })  : assert(text != null),
+  const ExtendedRichText(
+      {Key key,
+      @required this.text,
+      this.textAlign = TextAlign.start,
+      this.textDirection,
+      this.softWrap = true,
+      this.overflow = TextOverflow.clip,
+      this.textScaleFactor = 1.0,
+      this.maxLines,
+      this.locale,
+      this.overFlowTextSpan})
+      : assert(text != null),
         assert(textAlign != null),
         assert(softWrap != null),
         assert(overflow != null),
         assert(textScaleFactor != null),
         assert(maxLines == null || maxLines > 0),
         super(key: key);
+
+  /// the custom text over flow TextSpan
+  final OverFlowTextSpan overFlowTextSpan;
 
   /// The text to display in this widget.
   final TextSpan text;
@@ -91,16 +96,19 @@ class ExtendedRichText extends LeafRenderObjectWidget {
   @override
   ExtendedRenderParagraph createRenderObject(BuildContext context) {
     assert(textDirection != null || debugCheckHasDirectionality(context));
-    return ExtendedRenderParagraph(
-      text,
-      textAlign: textAlign,
-      textDirection: textDirection ?? Directionality.of(context),
-      softWrap: softWrap,
-      overflow: overflow,
-      textScaleFactor: textScaleFactor,
-      maxLines: maxLines,
-      locale: locale ?? Localizations.localeOf(context, nullOk: true),
-    );
+    return ExtendedRenderParagraph(text,
+        textAlign: textAlign,
+        textDirection: textDirection ?? Directionality.of(context),
+        softWrap: softWrap,
+        overflow: overflow,
+        textScaleFactor: textScaleFactor,
+        maxLines: maxLines,
+        locale: locale ??
+            Localizations.localeOf(
+              context,
+              nullOk: true,
+            ),
+        overFlowTextSpan: overFlowTextSpan);
   }
 
   @override
@@ -115,7 +123,8 @@ class ExtendedRichText extends LeafRenderObjectWidget {
       ..overflow = overflow
       ..textScaleFactor = textScaleFactor
       ..maxLines = maxLines
-      ..locale = locale ?? Localizations.localeOf(context, nullOk: true);
+      ..locale = locale ?? Localizations.localeOf(context, nullOk: true)
+      ..overFlowTextSpan = overFlowTextSpan;
   }
 
   @override

@@ -1,5 +1,6 @@
 import 'package:extended_text/src/background_text_span.dart';
 import 'package:extended_text/src/image_span.dart';
+import 'package:extended_text/src/over_flow_text_span.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ class ExtendedRenderParagraph extends RenderBox {
     double textScaleFactor = 1.0,
     int maxLines,
     Locale locale,
+    OverFlowTextSpan overFlowTextSpan,
   })  : assert(text != null),
         assert(text.debugAssertIsValid()),
         assert(textAlign != null),
@@ -35,16 +37,35 @@ class ExtendedRenderParagraph extends RenderBox {
         assert(textScaleFactor != null),
         assert(maxLines == null || maxLines > 0),
         _softWrap = softWrap,
-        _overflow = overflow,
+        _overflow = overFlowTextSpan != null ? TextOverflow.clip : overflow,
+        _oldOverflow = overflow,
         _textPainter = TextPainter(
           text: text,
           textAlign: textAlign,
           textDirection: textDirection,
           textScaleFactor: textScaleFactor,
           maxLines: maxLines,
-          ellipsis: overflow == TextOverflow.ellipsis ? _kEllipsis : null,
+          ellipsis: overFlowTextSpan != null
+              ? null
+              : (overflow == TextOverflow.ellipsis ? _kEllipsis : null),
           locale: locale,
-        );
+        ),
+        _overFlowTextSpan = overFlowTextSpan;
+
+  /// the custom text over flow TextSpan
+  OverFlowTextSpan _overFlowTextSpan;
+  final TextOverflow _oldOverflow;
+  OverFlowTextSpan get overFlowTextSpan => _overFlowTextSpan;
+  set overFlowTextSpan(TextSpan value) {
+    if (value != _overFlowTextSpan) {
+      if (value != null) {
+        overflow = TextOverflow.clip;
+      } else {
+        overflow = _oldOverflow;
+      }
+      _overFlowTextSpan = value;
+    }
+  }
 
   final TextPainter _textPainter;
 
@@ -226,6 +247,18 @@ class ExtendedRenderParagraph extends RenderBox {
     if (event is! PointerDownEvent) return;
     _layoutTextWithConstraints(constraints);
     final Offset offset = entry.localPosition;
+    if (overFlowTextSpan != null) {
+      final TextPosition position =
+          overFlowTextSpan.textPainterHelper.getPositionForOffset(offset);
+      final TextSpan span =
+          overFlowTextSpan.textPainterHelper.getSpanForPosition(position);
+
+      if (span?.recognizer != null) {
+        span.recognizer.addPointer(event);
+        return;
+      }
+    }
+
     final TextPosition position = _textPainter.getPositionForOffset(offset);
     final TextSpan span = _textPainter.text.getSpanForPosition(position);
     span?.recognizer?.addPointer(event);
@@ -309,8 +342,9 @@ class ExtendedRenderParagraph extends RenderBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    _paintImage(context, offset);
+    _paintSpecialText(context, offset);
     _paint(context, offset);
+    _paintTextOverflow(context, offset);
   }
 
   void _paint(PaintingContext context, Offset offset) {
@@ -347,6 +381,7 @@ class ExtendedRenderParagraph extends RenderBox {
       canvas.clipRect(bounds);
     }
     _textPainter.paint(canvas, offset);
+
     if (_hasVisualOverflow) {
       if (_overflowShader != null) {
         canvas.translate(offset.dx, offset.dy);
@@ -557,15 +592,20 @@ class ExtendedRenderParagraph extends RenderBox {
   void detach() {
     // TODO: implement detach
     super.detach();
-    if (text.children != null)
-      text.children.forEach((ts) {
-        if (ts is ImageSpan) {
-          ts.dispose();
-        }
-      });
+    _disposeImageSpan(<TextSpan>[text]);
   }
 
-  void _paintImage(PaintingContext context, Offset offset) {
+  void _disposeImageSpan(List<TextSpan> textSpan) {
+    textSpan.forEach((ts) {
+      if (ts is ImageSpan) {
+        ts.dispose();
+      } else if (ts.children != null) {
+        _disposeImageSpan(ts.children);
+      }
+    });
+  }
+
+  void _paintSpecialText(PaintingContext context, Offset offset) {
     final Canvas canvas = context.canvas;
 
     canvas.save();
@@ -575,20 +615,23 @@ class ExtendedRenderParagraph extends RenderBox {
 
     ///we have move the canvas, so rect top left should be (0,0)
     final Rect rect = Offset(0.0, 0.0) & size;
-    _paintImageChildren(<TextSpan>[text], canvas, rect);
+    _paintSpecialTextChildren(<TextSpan>[text], canvas, rect);
     canvas.restore();
   }
 
-  void _paintImageChildren(List<TextSpan> textSpans, Canvas canvas, Rect rect,
+  void _paintSpecialTextChildren(
+      List<TextSpan> textSpans, Canvas canvas, Rect rect,
       {int textOffset: 0}) {
     for (TextSpan ts in textSpans) {
       Offset topLeftOffset = getOffsetForCaret(
-        TextPosition(offset: textOffset, affinity: TextAffinity.downstream),
+        TextPosition(offset: textOffset),
         rect,
       );
       //skip invalid or overflow
       if (topLeftOffset == null ||
-          (textOffset != 0 && topLeftOffset == Offset.zero)) return;
+          (textOffset != 0 && topLeftOffset == Offset.zero)) {
+        return;
+      }
 
       if (ts is ImageSpan) {
         ///imageSpanTransparentPlaceholder \u200B has no width, and we define image width by
@@ -609,29 +652,111 @@ class ExtendedRenderParagraph extends RenderBox {
           });
         }
       } else if (ts is BackgroundTextSpan) {
-        var painter = TextPainter(
-            text: ts,
-            textAlign: _textPainter.textAlign,
-            textScaleFactor: _textPainter.textScaleFactor,
-            textDirection: _textPainter.textDirection,
-            locale: _textPainter.locale)
-          ..layout();
+        var painter = ts.layout(_textPainter);
         Rect textRect = topLeftOffset & painter.size;
         Offset endOffset;
         if (textRect.right > rect.right) {
-          endOffset = getOffsetForCaret(
-            TextPosition(
-                offset: textOffset + ts.toPlainText().length,
-                affinity: TextAffinity.upstream),
-            rect,
-          );
+          int endTextOffset = textOffset + ts.toPlainText().length;
+          endOffset = _findEndOffset(rect, endTextOffset);
         }
 
-        ts.paint(canvas, topLeftOffset, painter, rect, endOffset: endOffset);
+        ts.paint(canvas, topLeftOffset, rect, endOffset: endOffset);
       } else if (ts.children != null) {
-        _paintImageChildren(ts.children, canvas, rect, textOffset: textOffset);
+        _paintSpecialTextChildren(ts.children, canvas, rect,
+            textOffset: textOffset);
       }
       textOffset += ts.toPlainText().length;
     }
+  }
+
+  Offset _findEndOffset(Rect rect, int endTextOffset) {
+    Offset endOffset = getOffsetForCaret(
+      TextPosition(offset: endTextOffset, affinity: TextAffinity.upstream),
+      rect,
+    );
+    //overflow
+    if (endOffset == null || (endTextOffset != 0 && endOffset == Offset.zero)) {
+      return _findEndOffset(rect, endTextOffset - 1);
+    }
+    return endOffset;
+  }
+
+  void _paintTextOverflow(PaintingContext context, Offset offset) {
+    if (_hasVisualOverflow && overFlowTextSpan != null) {
+      final Canvas canvas = context.canvas;
+
+      ///we will move the canvas, so rect top left should be (0,0)
+      final Rect rect = Offset(0.0, 0.0) & size;
+      var textPainter = overFlowTextSpan.layout(_textPainter);
+      assert(textPainter.width < rect.width,);
+
+      canvas.save();
+
+      ///move to extended text
+      canvas.translate(offset.dx, offset.dy);
+
+      final Offset overFlowTextSpanOffset = Offset(
+          rect.width - textPainter.width, rect.height - textPainter.height);
+
+      ///find TextPosition near overflow
+      TextPosition overflowOffset =
+          getPositionForOffset(overFlowTextSpanOffset);
+
+      ///find overflow TextPosition that not clip the original text
+      Offset finalOverflowOffset = _findFinalOverflowOffset(
+          rect, rect.width - textPainter.width, overflowOffset.offset);
+
+      final TextPosition position = getPositionForOffset(finalOverflowOffset);
+
+      ///find last TextSpan
+      final TextSpan lastTextSpan =
+          _textPainter.text.getSpanForPosition(position);
+      TextPainter lastTextSpanPainter = TextPainter(
+        text: lastTextSpan,
+        textDirection: textDirection,
+        textScaleFactor: textScaleFactor,
+        locale: locale,
+      )..layout();
+
+      final Rect overFlowTextSpanRect = finalOverflowOffset &
+          Size(rect.width - finalOverflowOffset.dx, lastTextSpanPainter.height);
+
+      canvas.drawRect(
+          overFlowTextSpanRect, Paint()..color = overFlowTextSpan.background);
+
+      ///why BlendMode.clear the text?
+//      canvas.saveLayer(overFlowTextSpanRect, Paint());
+//      canvas.drawRect(
+//          overFlowTextSpanRect,
+//          Paint()
+//            ..blendMode = BlendMode.clear);
+//      canvas.restore();
+      canvas.drawRect(overFlowTextSpanRect, Paint()..color = Colors.white);
+
+      textPainter.paint(
+          canvas, Offset(finalOverflowOffset.dx, overFlowTextSpanOffset.dy));
+
+      overFlowTextSpan.textPainterHelper.saveOffset(Offset(
+          offset.dx + finalOverflowOffset.dx,
+          offset.dy + overFlowTextSpanOffset.dy));
+
+      canvas.restore();
+    }
+  }
+
+  Offset _findFinalOverflowOffset(Rect rect, double x, int endTextOffset) {
+    Offset endOffset = getOffsetForCaret(
+      TextPosition(offset: endTextOffset, affinity: TextAffinity.upstream),
+      rect,
+    );
+    //overflow
+    if (endOffset == null || (endTextOffset != 0 && endOffset == Offset.zero)) {
+      return _findEndOffset(rect, endTextOffset - 1);
+    }
+
+    if (endOffset.dx > x) {
+      return _findEndOffset(rect, endTextOffset - 1);
+    }
+    return endOffset;
   }
 }
