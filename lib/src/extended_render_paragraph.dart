@@ -609,6 +609,7 @@ class ExtendedRenderParagraph extends RenderBox {
     final Canvas canvas = context.canvas;
 
     canvas.save();
+
     ///move to extended text
     canvas.translate(offset.dx, offset.dy);
 
@@ -749,11 +750,11 @@ class ExtendedRenderParagraph extends RenderBox {
     );
     //overflow
     if (endOffset == null || (endTextOffset != 0 && endOffset == Offset.zero)) {
-      return _findEndOffset(rect, endTextOffset - 1);
+      return _findFinalOverflowOffset(rect, x, endTextOffset - 1);
     }
 
     if (endOffset.dx > x) {
-      return _findEndOffset(rect, endTextOffset - 1);
+      return _findFinalOverflowOffset(rect, x, endTextOffset - 1);
     }
     return endOffset;
   }
