@@ -2,11 +2,9 @@ import 'package:example/background_text_demo.dart';
 import 'package:example/common/tu_chong_repository.dart';
 import 'package:example/custom_text_overflow_demo.dart';
 import 'package:example/custom_image_demo.dart';
-import 'package:example/special_text/my_special_text_span_builder.dart';
 import 'package:example/text_demo.dart';
 import 'package:flutter/material.dart';
 import 'package:extended_text/extended_text.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 void main() => runApp(MyApp());
 

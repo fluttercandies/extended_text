@@ -724,7 +724,7 @@ class ExtendedRenderParagraph extends RenderBox {
       canvas.drawRect(
           overFlowTextSpanRect, Paint()..color = overFlowTextSpan.background);
 
-      ///why BlendMode.clear the text?
+      ///why BlendMode.clear not clear the text
 //      canvas.saveLayer(overFlowTextSpanRect, Paint());
 //      canvas.drawRect(
 //          overFlowTextSpanRect,

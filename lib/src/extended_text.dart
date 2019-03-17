@@ -205,7 +205,8 @@ class ExtendedText extends StatelessWidget {
     return result;
   }
 
-  void _createImageConfiguration(List<TextSpan> textSpan, BuildContext context) {
+  void _createImageConfiguration(
+      List<TextSpan> textSpan, BuildContext context) {
     textSpan.forEach((ts) {
       if (ts is ImageSpan) {
         ts.createImageConfiguration(context);
