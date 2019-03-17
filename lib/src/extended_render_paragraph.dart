@@ -206,7 +206,8 @@ class ExtendedRenderParagraph extends RenderBox {
   }
 
   void _layoutText({double minWidth = 0.0, double maxWidth = double.infinity}) {
-    final bool widthMatters = softWrap || overflow == ExtendedTextOverflow.ellipsis;
+    final bool widthMatters =
+        softWrap || overflow == ExtendedTextOverflow.ellipsis;
     _textPainter.layout(
         minWidth: minWidth,
         maxWidth: widthMatters ? maxWidth : double.infinity);
