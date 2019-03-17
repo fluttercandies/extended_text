@@ -24,7 +24,7 @@ class ExtendedRichText extends LeafRenderObjectWidget {
       this.textAlign = TextAlign.start,
       this.textDirection,
       this.softWrap = true,
-      this.overflow = TextOverflow.clip,
+      this.overflow = ExtendedTextOverflow.clip,
       this.textScaleFactor = 1.0,
       this.maxLines,
       this.locale,
@@ -68,7 +68,7 @@ class ExtendedRichText extends LeafRenderObjectWidget {
   final bool softWrap;
 
   /// How visual overflow should be handled.
-  final TextOverflow overflow;
+  final ExtendedTextOverflow overflow;
 
   /// The number of font pixels for each logical pixel.
   ///
@@ -139,7 +139,7 @@ class ExtendedRichText extends LeafRenderObjectWidget {
         ifTrue: 'wrapping at box width',
         ifFalse: 'no wrapping except at line break characters',
         showName: true));
-    properties.add(EnumProperty<TextOverflow>('overflow', overflow,
+    properties.add(EnumProperty<ExtendedTextOverflow>('overflow', overflow,
         defaultValue: TextOverflow.clip));
     properties.add(
         DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: 1.0));
