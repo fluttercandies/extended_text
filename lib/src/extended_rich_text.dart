@@ -140,7 +140,7 @@ class ExtendedRichText extends LeafRenderObjectWidget {
         ifFalse: 'no wrapping except at line break characters',
         showName: true));
     properties.add(EnumProperty<ExtendedTextOverflow>('overflow', overflow,
-        defaultValue: TextOverflow.clip));
+        defaultValue: ExtendedTextOverflow.clip));
     properties.add(
         DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: 1.0));
     properties.add(IntProperty('maxLines', maxLines, ifNull: 'unlimited'));
