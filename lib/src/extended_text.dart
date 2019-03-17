@@ -1,4 +1,5 @@
 import 'package:extended_text/extended_text.dart';
+import 'package:extended_text/src/extended_render_paragraph.dart';
 import 'package:extended_text/src/extended_rich_text.dart';
 import 'package:extended_text/src/extended_text_utils.dart';
 import 'package:extended_text/src/over_flow_text_span.dart';
@@ -108,7 +109,7 @@ class ExtendedText extends StatelessWidget {
   final bool softWrap;
 
   /// How visual overflow should be handled.
-  final TextOverflow overflow;
+  final ExtendedTextOverflow overflow;
 
   /// The number of font pixels for each logical pixel.
   ///
@@ -237,7 +238,7 @@ class ExtendedText extends StatelessWidget {
         ifFalse: 'no wrapping except at line break characters',
         showName: true));
     properties.add(
-        EnumProperty<TextOverflow>('overflow', overflow, defaultValue: null));
+        EnumProperty<ExtendedTextOverflow>('overflow', overflow, defaultValue: null));
     properties.add(
         DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: null));
     properties.add(IntProperty('maxLines', maxLines, defaultValue: null));

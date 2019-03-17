@@ -89,7 +89,7 @@ class BackgroundTextDemo extends StatelessWidget {
                     ),
                   ]),
                   maxLines: 8,
-                  overflow: TextOverflow.ellipsis,
+                  overflow: ExtendedTextOverflow.ellipsis,
                 ),
                 Container(
                   height: 20.0,

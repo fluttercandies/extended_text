@@ -113,7 +113,7 @@ class CustomImageDemo extends StatelessWidget {
                 imageWidth: 60.0,
                 imageHeight: 60.0),
           ]),
-          overflow: TextOverflow.ellipsis,
+          overflow: ExtendedTextOverflow.ellipsis,
           //style: TextStyle(background: Paint()..color = Colors.red),
           maxLines: 10,
         ),

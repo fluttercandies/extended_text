@@ -7,6 +7,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:ui' as ui show Gradient, Shader, TextBox;
 
+/// How overflowing text should be handled.
+enum ExtendedTextOverflow {
+  /// Clip the overflowing text to fix its container.
+  clip,
+
+  /// Fade the overflowing text to transparent.
+  fade,
+
+  /// Use an ellipsis to indicate that the text has overflowed.
+  ellipsis,
+}
+
 const String _kEllipsis = '\u2026';
 
 /// A render object that displays a paragraph of text
@@ -23,7 +35,7 @@ class ExtendedRenderParagraph extends RenderBox {
     TextAlign textAlign = TextAlign.start,
     @required TextDirection textDirection,
     bool softWrap = true,
-    TextOverflow overflow = TextOverflow.clip,
+    ExtendedTextOverflow overflow = ExtendedTextOverflow.clip,
     double textScaleFactor = 1.0,
     int maxLines,
     Locale locale,
@@ -37,7 +49,8 @@ class ExtendedRenderParagraph extends RenderBox {
         assert(textScaleFactor != null),
         assert(maxLines == null || maxLines > 0),
         _softWrap = softWrap,
-        _overflow = overFlowTextSpan != null ? TextOverflow.clip : overflow,
+        _overflow =
+            overFlowTextSpan != null ? ExtendedTextOverflow.clip : overflow,
         _oldOverflow = overflow,
         _textPainter = TextPainter(
           text: text,
@@ -54,12 +67,12 @@ class ExtendedRenderParagraph extends RenderBox {
 
   /// the custom text over flow TextSpan
   OverFlowTextSpan _overFlowTextSpan;
-  final TextOverflow _oldOverflow;
+  final ExtendedTextOverflow _oldOverflow;
   OverFlowTextSpan get overFlowTextSpan => _overFlowTextSpan;
   set overFlowTextSpan(TextSpan value) {
     if (value != _overFlowTextSpan) {
       if (value != null) {
-        overflow = TextOverflow.clip;
+        overflow = ExtendedTextOverflow.clip;
       } else {
         overflow = _oldOverflow;
       }
@@ -137,13 +150,14 @@ class ExtendedRenderParagraph extends RenderBox {
   }
 
   /// How visual overflow should be handled.
-  TextOverflow get overflow => _overflow;
-  TextOverflow _overflow;
-  set overflow(TextOverflow value) {
+  ExtendedTextOverflow get overflow => _overflow;
+  ExtendedTextOverflow _overflow;
+  set overflow(ExtendedTextOverflow value) {
     assert(value != null);
     if (_overflow == value) return;
     _overflow = value;
-    _textPainter.ellipsis = value == TextOverflow.ellipsis ? _kEllipsis : null;
+    _textPainter.ellipsis =
+        value == ExtendedTextOverflow.ellipsis ? _kEllipsis : null;
     markNeedsLayout();
   }
 
@@ -295,11 +309,11 @@ class ExtendedRenderParagraph extends RenderBox {
     _hasVisualOverflow = didOverflowWidth || didOverflowHeight;
     if (_hasVisualOverflow) {
       switch (_overflow) {
-        case TextOverflow.clip:
-        case TextOverflow.ellipsis:
+        case ExtendedTextOverflow.clip:
+        case ExtendedTextOverflow.ellipsis:
           _overflowShader = null;
           break;
-        case TextOverflow.fade:
+        case ExtendedTextOverflow.fade:
           assert(textDirection != null);
           final TextPainter fadeSizePainter = TextPainter(
             text: TextSpan(style: _textPainter.text.style, text: '\u2026'),
@@ -580,7 +594,7 @@ class ExtendedRenderParagraph extends RenderBox {
         ifTrue: 'wrapping at box width',
         ifFalse: 'no wrapping except at line break characters',
         showName: true));
-    properties.add(EnumProperty<TextOverflow>('overflow', overflow));
+    properties.add(EnumProperty<ExtendedTextOverflow>('overflow', overflow));
     properties.add(
         DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: 1.0));
     properties

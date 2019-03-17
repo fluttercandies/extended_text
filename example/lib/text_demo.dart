@@ -24,7 +24,7 @@ class TextDemo extends StatelessWidget {
             }
           },
           specialTextSpanBuilder: MySpecialTextSpanBuilder(),
-          overflow: TextOverflow.ellipsis,
+          overflow: ExtendedTextOverflow.ellipsis,
           //style: TextStyle(background: Paint()..color = Colors.red),
           maxLines: 10,
         ),
