@@ -60,7 +60,7 @@ class ExtendedRenderParagraph extends RenderBox {
           maxLines: maxLines,
           ellipsis: overFlowTextSpan != null
               ? null
-              : (overflow == TextOverflow.ellipsis ? _kEllipsis : null),
+              : (overflow == ExtendedTextOverflow.ellipsis ? _kEllipsis : null),
           locale: locale,
         ),
         _overFlowTextSpan = overFlowTextSpan;
@@ -206,7 +206,7 @@ class ExtendedRenderParagraph extends RenderBox {
   }
 
   void _layoutText({double minWidth = 0.0, double maxWidth = double.infinity}) {
-    final bool widthMatters = softWrap || overflow == TextOverflow.ellipsis;
+    final bool widthMatters = softWrap || overflow == ExtendedTextOverflow.ellipsis;
     _textPainter.layout(
         minWidth: minWidth,
         maxWidth: widthMatters ? maxWidth : double.infinity);

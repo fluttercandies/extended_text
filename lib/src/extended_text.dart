@@ -237,8 +237,8 @@ class ExtendedText extends StatelessWidget {
         ifTrue: 'wrapping at box width',
         ifFalse: 'no wrapping except at line break characters',
         showName: true));
-    properties.add(
-        EnumProperty<ExtendedTextOverflow>('overflow', overflow, defaultValue: null));
+    properties.add(EnumProperty<ExtendedTextOverflow>('overflow', overflow,
+        defaultValue: null));
     properties.add(
         DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: null));
     properties.add(IntProperty('maxLines', maxLines, defaultValue: null));
