@@ -1,4 +1,4 @@
-## [0.1.9]
+## [0.2.0]
 
 * use ExtendedTextOverflow to replace TextOverflow(new flutter sdk TextOverflow has new value TextOverflow.visible)
 
