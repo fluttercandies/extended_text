@@ -262,7 +262,7 @@ class ExtendedRenderParagraph extends RenderBox {
     if (event is! PointerDownEvent) return;
     _layoutTextWithConstraints(constraints);
     final Offset offset = entry.localPosition;
-    if (overFlowTextSpan != null) {
+    if (_hasVisualOverflow && overFlowTextSpan != null) {
       final TextPosition position =
           overFlowTextSpan.textPainterHelper.getPositionForOffset(offset);
       final TextSpan span =
