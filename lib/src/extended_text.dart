@@ -182,6 +182,17 @@ class ExtendedText extends StatelessWidget {
       );
     }
 
+    ExtendedTextOverflow extendedTextOverflow = overflow;
+    if (extendedTextOverflow == null) {
+      if (defaultTextStyle.overflow == TextOverflow.ellipsis) {
+        extendedTextOverflow = ExtendedTextOverflow.ellipsis;
+      } else if (defaultTextStyle.overflow == TextOverflow.clip) {
+        extendedTextOverflow = ExtendedTextOverflow.clip;
+      } else if (defaultTextStyle.overflow == TextOverflow.fade) {
+        extendedTextOverflow = ExtendedTextOverflow.fade;
+      }
+    }
+
     Widget result = ExtendedRichText(
       textAlign: textAlign ?? defaultTextStyle.textAlign ?? TextAlign.start,
       textDirection:
@@ -189,7 +200,7 @@ class ExtendedText extends StatelessWidget {
       locale:
           locale, // RichText uses Localizations.localeOf to obtain a default if this is null
       softWrap: softWrap ?? defaultTextStyle.softWrap,
-      overflow: overflow ?? defaultTextStyle.overflow,
+      overflow: extendedTextOverflow,
       textScaleFactor: textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
       maxLines: maxLines ?? defaultTextStyle.maxLines,
       text: innerTextSpan,
