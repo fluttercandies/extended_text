@@ -714,8 +714,8 @@ class ExtendedRenderParagraph extends RenderBox {
           rect.width - textPainter.width, rect.height - textPainter.height);
 
       ///find TextPosition near overflow
-      TextPosition overflowOffset =
-          getPositionForOffset(overFlowTextSpanOffset);
+      TextPosition overflowOffset = getPositionForOffset(
+          Offset(rect.width - textPainter.width, rect.height));
 
       ///find overflow TextPosition that not clip the original text
       Offset finalOverflowOffset = _findFinalOverflowOffset(
