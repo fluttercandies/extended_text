@@ -194,7 +194,7 @@ class BackgroundTextDemo extends StatelessWidget {
                             canvas.clipPath(Path()
                               ..addRRect(backgroundTextSpan.clipBorderRadius
                                   .resolve(painter.textDirection)
-                                  .toRRect(rect)));
+                                  .toRRect(textRect)));
                           }
 
                           canvas.drawRect(
