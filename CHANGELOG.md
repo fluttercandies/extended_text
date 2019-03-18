@@ -1,3 +1,8 @@
+## [0.2.3]
+
+* add TextPainter wholeTextPainter for BackgroundTextSpan's paintBackground call back,so that you can get info for
+whole text painter. 
+
 ## [0.2.2]
 
 * fix issue about find TextPosition near overflow is not accurate.

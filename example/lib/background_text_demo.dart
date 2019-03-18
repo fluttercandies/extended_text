@@ -115,7 +115,8 @@ class BackgroundTextDemo extends StatelessWidget {
                           Offset offset,
                           TextPainter painter,
                           Rect rect,
-                          {Offset endOffset}) {
+                          {Offset endOffset,
+                          TextPainter wholeTextPainter}) {
                         Rect textRect = offset & painter.size;
 
                         ///top-right

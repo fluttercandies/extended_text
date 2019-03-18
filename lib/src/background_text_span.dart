@@ -42,7 +42,8 @@ class BackgroundTextSpan extends TextSpan {
   }
 
   ///rect: all text size
-  paint(Canvas canvas, Offset offset, Rect rect, {Offset endOffset}) {
+  void paint(Canvas canvas, Offset offset, Rect rect,
+      {Offset endOffset, TextPainter wholeTextPainter}) {
     assert(_textPainterHelper.painter != null);
 
     if (paintBackground != null) {
@@ -130,7 +131,9 @@ class BackgroundTextSpan extends TextSpan {
 }
 
 ///if you don't want use default, please return true.
-///endOffset the text top-right Offfset
+///endOffset is the text top-right Offfset
+///allTextPainter is the text painter of extended text.
+///painter is current background text painter
 typedef PaintBackground = bool Function(BackgroundTextSpan backgroundTextSpan,
     Canvas canvas, Offset offset, TextPainter painter, Rect rect,
-    {Offset endOffset});
+    {Offset endOffset, TextPainter wholeTextPainter});
