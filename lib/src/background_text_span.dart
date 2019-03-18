@@ -118,7 +118,7 @@ class BackgroundTextSpan extends TextSpan {
         canvas.clipPath(Path()
           ..addRRect(clipBorderRadius
               .resolve(_textPainterHelper.painter.textDirection)
-              .toRRect(rect)));
+              .toRRect(textRect)));
       }
 
       canvas.drawRect(textRect, background);

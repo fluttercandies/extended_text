@@ -1,3 +1,7 @@
+## [0.2.5]
+
+* fix issue that BackgroundTextSpan has error clip.
+
 ## [0.2.4]
 
 * add TextPainter wholeTextPainter for BackgroundTextSpan's paintBackground call back,so that you can get info for
@@ -5,7 +9,7 @@ whole text painter.
 
 ## [0.2.2]
 
-* fix issue about find TextPosition near overflow is not accurate.
+* fix issue that find TextPosition near overflow is not accurate.
 
 ## [0.2.1]
 
