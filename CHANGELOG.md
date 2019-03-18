@@ -1,4 +1,4 @@
-## [0.2.3]
+## [0.2.4]
 
 * add TextPainter wholeTextPainter for BackgroundTextSpan's paintBackground call back,so that you can get info for
 whole text painter. 

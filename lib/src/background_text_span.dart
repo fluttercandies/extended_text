@@ -49,7 +49,7 @@ class BackgroundTextSpan extends TextSpan {
     if (paintBackground != null) {
       bool handle = paintBackground(
               this, canvas, offset, _textPainterHelper.painter, rect,
-              endOffset: endOffset) ??
+              endOffset: endOffset, wholeTextPainter: wholeTextPainter) ??
           false;
       if (handle) return;
     }
