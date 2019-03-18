@@ -675,7 +675,8 @@ class ExtendedRenderParagraph extends RenderBox {
           endOffset = _findEndOffset(rect, endTextOffset);
         }
 
-        ts.paint(canvas, topLeftOffset, rect, endOffset: endOffset);
+        ts.paint(canvas, topLeftOffset, rect,
+            endOffset: endOffset, wholeTextPainter: _textPainter);
       } else if (ts.children != null) {
         _paintSpecialTextChildren(ts.children, canvas, rect,
             textOffset: textOffset);
