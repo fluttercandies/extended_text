@@ -159,18 +159,18 @@ class ImageSpanResolver {
 
   void _listenToStream() {
     if (_isListeningToStream) return;
-    _imageStream.addListener(_handleImageChanged);
+    _imageStream?.addListener(_handleImageChanged);
     _isListeningToStream = true;
   }
 
   void _stopListeningToStream() {
     if (!_isListeningToStream) return;
-    _imageStream.removeListener(_handleImageChanged);
+    _imageStream?.removeListener(_handleImageChanged);
     _isListeningToStream = false;
   }
 
   void dispose() {
-    assert(_imageStream != null);
+    //assert(_imageStream != null);
     _stopListeningToStream();
     //super.dispose();
   }
