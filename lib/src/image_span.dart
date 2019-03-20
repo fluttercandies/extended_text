@@ -33,10 +33,10 @@ class ImageSpan extends TextSpan {
 
   ///you can paint your placeholder or clip
   ///any thing you want
-  final BeforePaintImage beforePaintImage;
+  final BeforePaintTextImage beforePaintImage;
 
   ///you can paint border,shadow etc
-  final AfterPaintImage afterPaintImage;
+  final AfterPaintTextImage afterPaintImage;
 
   final BoxFit fit;
 
@@ -179,10 +179,10 @@ class ImageSpanResolver {
 ///[rect] rect is not margin
 ///if you have handle placeholder or paint image(clip) you can return true,  it will not paint original image,
 ///you will have the channce to draw your placeholder before paint image
-typedef BeforePaintImage = bool Function(
+typedef BeforePaintTextImage = bool Function(
     Canvas canvas, Rect rect, ImageSpan imageSpan);
 
 ///[rect] rect is not include margin
 ///you can paint border,shadow etc at this moment
-typedef AfterPaintImage = void Function(
+typedef AfterPaintTextImage = void Function(
     Canvas canvas, Rect rect, ImageSpan imageSpan);
