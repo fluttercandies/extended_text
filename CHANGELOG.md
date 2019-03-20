@@ -1,3 +1,8 @@
+## [0.2.6]
+
+* change BeforePaintImage function to BeforePaintTextImage 
+  change AfterPaintImage function to AfterPaintTextImage 
+
 ## [0.2.5]
 
 * fix issue that BackgroundTextSpan has error clip.
