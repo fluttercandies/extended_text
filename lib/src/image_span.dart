@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+/// get idea from https://github.com/bytedance/RealRichText about Inline-Image-In-Text
+/// update by zmtzawqlp@live.com
+
 ///[imageSpanTransparentPlaceholder] width is zero,
 ///so that we can define letterSpacing as Image Span width
 const String imageSpanTransparentPlaceholder = "\u200B";
