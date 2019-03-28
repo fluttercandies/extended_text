@@ -1,4 +1,4 @@
-## [0.2.6]
+## [0.2.7]
 
 * change BeforePaintImage function to BeforePaintTextImage 
   change AfterPaintImage function to AfterPaintTextImage 

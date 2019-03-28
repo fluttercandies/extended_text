@@ -7,6 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:ui' as ui show Gradient, Shader, TextBox;
 
+/// get idea from https://github.com/bytedance/RealRichText about Inline-Image-In-Text
+/// update by zmtzawqlp@live.com
+
 /// How overflowing text should be handled.
 enum ExtendedTextOverflow {
   /// Clip the overflowing text to fix its container.
