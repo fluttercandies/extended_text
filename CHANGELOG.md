@@ -1,3 +1,7 @@
+## [0.2.8]
+
+* change SpecialTextGestureTapCallback input from string to dynamic
+ 
 ## [0.2.7]
 
 * change BeforePaintImage function to BeforePaintTextImage 

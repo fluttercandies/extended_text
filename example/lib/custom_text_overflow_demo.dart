@@ -23,15 +23,15 @@ class CustomTextOverflowDemo extends StatelessWidget {
                         "\n\nif you meet any problem, please let me konw @zmtzawqlp .[sun_glasses] "
                         "\n notice: fail to clear text under overflow span, with BlendMode.clear. "
                         "so paint a backgounrd (Theme.of(context).canvasColor) over text. relate to \$issue 26748\$ . let me know if you have any idea.I'm overflow text.I'm overflow text.I'm overflow text.I'm overflow text.",
-                    onSpecialTextTap: (String data) {
-                      if (data.startsWith("\$")) {
-                        if (data.contains("issue")) {
+                    onSpecialTextTap: (dynamic parameter) {
+                      if (parameter.startsWith("\$")) {
+                        if (parameter.contains("issue")) {
                           launch(
                               "https://github.com/flutter/flutter/issues/26748");
                         } else {
                           launch("https://github.com/fluttercandies");
                         }
-                      } else if (data.startsWith("@")) {
+                      } else if (parameter.startsWith("@")) {
                         launch("mailto:zmtzawqlp@live.com");
                       }
                     },
