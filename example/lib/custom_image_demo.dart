@@ -13,7 +13,9 @@ class CustomImageDemo extends StatelessWidget {
         padding: EdgeInsets.all(20.0),
         child: ExtendedText.rich(
           TextSpan(children: <TextSpan>[
-            ImageSpan(CachedNetworkImage(imageTestUrls.first), beforePaintImage:
+            ImageSpan(
+                CachedNetworkImage(imageTestUrls.first, clearFailedCache: true),
+                beforePaintImage:
                     (Canvas canvas, Rect rect, ImageSpan imageSpan) {
               bool hasPlaceholder = drawPlaceholder(canvas, rect, imageSpan);
               if (!hasPlaceholder) {
@@ -27,9 +29,11 @@ class CustomImageDemo extends StatelessWidget {
             TextSpan(text: "This is an image with placeholder.\n"),
             TextSpan(text: "This is an image with border"),
             ImageSpan(
-                CachedNetworkImage(imageTestUrls.length > 1
-                    ? imageTestUrls[1]
-                    : imageTestUrls.first),
+                CachedNetworkImage(
+                    imageTestUrls.length > 1
+                        ? imageTestUrls[1]
+                        : imageTestUrls.first,
+                    clearFailedCache: true),
                 beforePaintImage:
                     (Canvas canvas, Rect rect, ImageSpan imageSpan) {
               bool hasPlaceholder = drawPlaceholder(canvas, rect, imageSpan);
@@ -50,9 +54,11 @@ class CustomImageDemo extends StatelessWidget {
                 imageHeight: 60.0),
             TextSpan(text: "This is an image with borderRadius"),
             ImageSpan(
-                CachedNetworkImage(imageTestUrls.length > 2
-                    ? imageTestUrls[2]
-                    : imageTestUrls.first),
+                CachedNetworkImage(
+                    imageTestUrls.length > 2
+                        ? imageTestUrls[2]
+                        : imageTestUrls.first,
+                    clearFailedCache: true),
                 beforePaintImage:
                     (Canvas canvas, Rect rect, ImageSpan imageSpan) {
               canvas.save();
@@ -83,9 +89,11 @@ class CustomImageDemo extends StatelessWidget {
                 imageHeight: 60.0),
             TextSpan(text: "This is an circle image with border"),
             ImageSpan(
-                CachedNetworkImage(imageTestUrls.length > 3
-                    ? imageTestUrls[3]
-                    : imageTestUrls.first),
+                CachedNetworkImage(
+                    imageTestUrls.length > 3
+                        ? imageTestUrls[3]
+                        : imageTestUrls.first,
+                    clearFailedCache: true),
                 beforePaintImage:
                     (Canvas canvas, Rect rect, ImageSpan imageSpan) {
               canvas.save();

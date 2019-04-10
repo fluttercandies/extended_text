@@ -22,7 +22,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   url_launcher: ^5.0.2
   loading_more_list: ^0.3.0
-  http_client_helper: ^0.1.6
+  http_client_helper: ^0.1.9
 
 dev_dependencies:
   flutter_test:

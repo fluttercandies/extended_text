@@ -1,3 +1,9 @@
+## [0.3.0]
+
+* add clearFailedCache parameter for CachedNetworkImage
+  add clearLoadFailedImageMemoryCache method
+  both them are used to clear image load failed memory cache, so that image will be reloaded
+
 ## [0.2.9]
 
 * update path_provider version from 0.4.1 to 0.5.0+1

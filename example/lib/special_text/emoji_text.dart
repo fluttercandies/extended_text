@@ -1,7 +1,5 @@
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/painting/text_span.dart';
-import 'package:flutter/src/painting/text_style.dart';
 
 ///emoji/image text
 class EmojiText extends SpecialText {

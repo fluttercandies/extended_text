@@ -1,3 +1,4 @@
+import 'package:extended_text/src/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 /// get idea from https://github.com/bytedance/RealRichText about Inline-Image-In-Text
@@ -134,6 +135,10 @@ class ImageSpanResolver {
   void resolveImage({ImageListener listener, ImageProvider image}) {
     assert(_imageConfiguration != null);
     if (listener != null) _listener = listener;
+    if (image is CachedNetworkImage && image.clearFailedCache) {
+      clearLoadFailedImageMemoryCache(image: image);
+    }
+
     final ImageStream newStream = image.resolve(_imageConfiguration);
     assert(newStream != null);
     _updateSourceStream(newStream);

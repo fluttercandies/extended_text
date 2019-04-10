@@ -159,7 +159,7 @@ it's simple to create a loading placeholder.
 
 ```dart
 ImageSpan(CachedNetworkImage(imageTestUrls.first), beforePaintImage:
-                    (Canvas canvas, Rect rect, ImageSpan imageSpan) {
+                    (Canvas canvas, Rect rect, ImageSpan imageSpan, clearFailedCache: true) {
               bool hasPlaceholder = drawPlaceholder(canvas, rect, imageSpan);
               if (!hasPlaceholder) {
                 clearRect(rect, canvas);
@@ -203,20 +203,39 @@ bool drawPlaceholder(Canvas canvas, Rect rect, ImageSpan imageSpan) {
 ```
 
 if you want cache the network image, you can use CachedNetworkImage and clear them with clearExtendedTextDiskCachedImages
-``` dart
- CachedNetworkImage(this.url,
+```dart
+  CachedNetworkImage(this.url,
       {this.scale = 1.0,
       this.headers,
       this.cache: false,
       this.retries = 3,
       this.timeLimit,
-      this.timeRetry = const Duration(milliseconds: 100)})
+      this.timeRetry = const Duration(milliseconds: 100),
+      this.clearFailedCache: false})
       : assert(url != null),
         assert(scale != null);
+```
 
+```dart
 /// Clear the disk cache directory then return if it succeed.
 ///  <param name="duration">timespan to compute whether file has expired or not</param>
 Future<bool> clearExtendedTextDiskCachedImages({Duration duration}) async
+```
+
+if network image was loaded failed, and you want to reload it next time,
+you can set clearFailedCache= true or use clearLoadFailedImageMemoryCache method
+
+```dart
+/// clear load failed image in memory so that it will reload
+void clearLoadFailedImageMemoryCache({CachedNetworkImage image}) {
+  if (image != null) {
+    if (_failedImageCache.remove(image)) image.evict();
+  } else {
+    _failedImageCache.forEach((image) {
+      if (_failedImageCache.remove(image)) image.evict();
+    });
+  }
+}
 ```
 
 [more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/custom_image_demo.dart)

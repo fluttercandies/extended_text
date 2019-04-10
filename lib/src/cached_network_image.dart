@@ -25,7 +25,8 @@ class CachedNetworkImage extends ImageProvider<CachedNetworkImage> {
       this.cache: false,
       this.retries = 3,
       this.timeLimit,
-      this.timeRetry = const Duration(milliseconds: 100)})
+      this.timeRetry = const Duration(milliseconds: 100),
+      this.clearFailedCache: false})
       : assert(url != null),
         assert(scale != null);
 
@@ -49,6 +50,9 @@ class CachedNetworkImage extends ImageProvider<CachedNetworkImage> {
 
   /// The HTTP headers that will be used with [HttpClient.get] to fetch image from network.
   final Map<String, String> headers;
+
+  ///clear memory cache and reload image
+  final bool clearFailedCache;
 
   bool loadFailed = false;
 
@@ -100,6 +104,9 @@ class CachedNetworkImage extends ImageProvider<CachedNetworkImage> {
 
     if (reuslt == null) {
       loadFailed = true;
+      if (!_failedImageCache.contains(this)) {
+        _failedImageCache.add(this);
+      }
       reuslt = await ui.instantiateImageCodec(kTransparentImage);
     }
 
@@ -186,4 +193,18 @@ Future<bool> clearExtendedTextDiskCachedImages({Duration duration}) async {
     return false;
   }
   return true;
+}
+
+///load failed image in memory
+List<CachedNetworkImage> _failedImageCache = List<CachedNetworkImage>();
+
+/// clear load failed image in memory so that it will reload
+void clearLoadFailedImageMemoryCache({CachedNetworkImage image}) {
+  if (image != null) {
+    if (_failedImageCache.remove(image)) image.evict();
+  } else {
+    _failedImageCache.forEach((image) {
+      if (_failedImageCache.remove(image)) image.evict();
+    });
+  }
 }
