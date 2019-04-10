@@ -1,8 +1,6 @@
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/painting/text_span.dart';
-import 'package:flutter/src/painting/text_style.dart';
 
 class AtText extends SpecialText {
   static const String flag = "@";
