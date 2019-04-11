@@ -1,4 +1,4 @@
-## [0.3.0]
+## [0.3.1]
 
 * add clearFailedCache parameter for CachedNetworkImage
   add clearLoadFailedImageMemoryCache method

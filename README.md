@@ -4,7 +4,7 @@
 
 extended official text to quickly build special text like inline image or @somebody,it also provide custom background,custom over flow.
 
-[Chinese bolg  inline image](https://juejin.im/post/5c8be0d06fb9a049a42ff067)
+[Chinese blog](https://juejin.im/post/5c8be0d06fb9a049a42ff067)
 
 ## Speical text
 
