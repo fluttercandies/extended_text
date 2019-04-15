@@ -1,3 +1,7 @@
+## [0.3.2]
+
+* fix issue that tap exception throw(https://github.com/fluttercandies/extended_text/issues/3)
+
 ## [0.3.1]
 
 * add clearFailedCache parameter for CachedNetworkImage
