@@ -1,6 +1,6 @@
-## [0.3.2]
+## [0.3.3]
 
-* fix issue that tap exception throw(https://github.com/fluttercandies/extended_text/issues/3)
+* fix issue that tap exception throw when use OverFlowTextSpan
 
 ## [0.3.1]
 
