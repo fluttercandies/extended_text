@@ -80,6 +80,7 @@ class ExtendedRenderParagraph extends RenderBox {
         overflow = _oldOverflow;
       }
       _overFlowTextSpan = value;
+      markNeedsPaint();
     }
   }
 

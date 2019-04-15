@@ -11,47 +11,52 @@ class CustomTextOverflowDemo extends StatelessWidget {
         appBar: AppBar(
           title: Text("custom text over flow"),
         ),
-        body: Container(
-            padding: EdgeInsets.all(20.0),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  ExtendedText(
-                    "[love]Extended text help you to build rich text quickly. any special text you will have with extended text. "
-                        "\n\nIt's my pleasure to invite you to join \$FlutterCandies\$ if you want to improve flutter .[love]"
-                        "\n\nif you meet any problem, please let me konw @zmtzawqlp .[sun_glasses] "
-                        "\n notice: fail to clear text under overflow span, with BlendMode.clear. "
-                        "so paint a backgounrd (Theme.of(context).canvasColor) over text. relate to \$issue 26748\$ . let me know if you have any idea.I'm overflow text.I'm overflow text.I'm overflow text.I'm overflow text.",
-                    onSpecialTextTap: (dynamic parameter) {
-                      if (parameter.startsWith("\$")) {
-                        if (parameter.contains("issue")) {
-                          launch(
-                              "https://github.com/flutter/flutter/issues/26748");
-                        } else {
-                          launch("https://github.com/fluttercandies");
-                        }
-                      } else if (parameter.startsWith("@")) {
-                        launch("mailto:zmtzawqlp@live.com");
-                      }
-                    },
-                    specialTextSpanBuilder: MySpecialTextSpanBuilder(),
-                    //overflow: TextOverflow.ellipsis,
-                    overFlowTextSpan: OverFlowTextSpan(children: <TextSpan>[
-                      TextSpan(text: '  \u2026  '),
-                      TextSpan(
-                          text: "more detail",
-                          style: TextStyle(
-                            color: Colors.blue,
-                          ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
+        body: ListView.builder(
+          itemBuilder: (c, index) {
+            return Container(
+                padding: EdgeInsets.all(20.0),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      ExtendedText(
+                        "[love]Extended text help you to build rich text quickly. any special text you will have with extended text. "
+                            "\n\nIt's my pleasure to invite you to join \$FlutterCandies\$ if you want to improve flutter .[love]"
+                            "\n\nif you meet any problem, please let me konw @zmtzawqlp .[sun_glasses] "
+                            "\n notice: fail to clear text under overflow span, with BlendMode.clear. "
+                            "so paint a backgounrd (Theme.of(context).canvasColor) over text. relate to \$issue 26748\$ . let me know if you have any idea.I'm overflow text.I'm overflow text.I'm overflow text.I'm overflow text.",
+                        onSpecialTextTap: (dynamic parameter) {
+                          if (parameter.startsWith("\$")) {
+                            if (parameter.contains("issue")) {
                               launch(
-                                  "https://github.com/fluttercandies/extended_text");
-                            })
-                    ], background: Theme.of(context).canvasColor),
-                    maxLines: 13,
-                  ),
-                ])));
+                                  "https://github.com/flutter/flutter/issues/26748");
+                            } else {
+                              launch("https://github.com/fluttercandies");
+                            }
+                          } else if (parameter.startsWith("@")) {
+                            launch("mailto:zmtzawqlp@live.com");
+                          }
+                        },
+                        specialTextSpanBuilder: MySpecialTextSpanBuilder(),
+                        //overflow: TextOverflow.ellipsis,
+                        overFlowTextSpan: OverFlowTextSpan(children: <TextSpan>[
+                          TextSpan(text: '  \u2026  '),
+                          TextSpan(
+                              text: "more detail",
+                              style: TextStyle(
+                                color: Colors.blue,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  launch(
+                                      "https://github.com/fluttercandies/extended_text");
+                                })
+                        ], background: Theme.of(context).canvasColor),
+                        maxLines: 13,
+                      ),
+                    ]));
+          },
+          itemCount: 50,
+        ));
   }
 }
