@@ -1,4 +1,4 @@
-## [0.3.3]
+## [0.3.4]
 
 * fix issue that tap exception throw when use OverFlowTextSpan
 
