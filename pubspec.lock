@@ -37,12 +37,19 @@ packages:
     source: hosted
     version: "2.1.1"
   crypto:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: crypto
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.0.6"
+  extended_text_library:
+    dependency: "direct main"
+    description:
+      name: extended_text_library
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.1.1"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -61,7 +68,7 @@ packages:
     source: hosted
     version: "0.12.0+1"
   http_client_helper:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: http_client_helper
       url: "https://pub.flutter-io.cn"
@@ -96,7 +103,7 @@ packages:
     source: hosted
     version: "1.6.2"
   path_provider:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: path_provider
       url: "https://pub.flutter-io.cn"
@@ -164,7 +171,7 @@ packages:
     source: hosted
     version: "0.2.4"
   transparent_image:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: transparent_image
       url: "https://pub.flutter-io.cn"

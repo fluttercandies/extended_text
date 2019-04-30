@@ -45,6 +45,5 @@ class EmojiUitl {
   EmojiUitl._() {
     _emojiMap["[love]"] = "$_emojiFilePath/love.png";
     _emojiMap["[sun_glasses]"] = "$_emojiFilePath/sun_glasses.png";
-    _emojiMap["[tears]"] = "$_emojiFilePath/tears.png";
   }
 }
