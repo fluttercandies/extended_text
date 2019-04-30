@@ -1,3 +1,7 @@
+## [0.3.5]
+
+* import extended_text_library
+
 ## [0.3.4]
 
 * fix issue that tap exception throw when use OverFlowTextSpan

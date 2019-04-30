@@ -1,6 +1,6 @@
 import 'package:extended_text/src/background_text_span.dart';
-import 'package:extended_text/src/image_span.dart';
 import 'package:extended_text/src/over_flow_text_span.dart';
+import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -708,7 +708,9 @@ class ExtendedRenderParagraph extends RenderBox {
       ///we will move the canvas, so rect top left should be (0,0)
       final Rect rect = Offset(0.0, 0.0) & size;
       var textPainter = overFlowTextSpan.layout(_textPainter);
-      assert(textPainter.width <= rect.width,);
+      assert(
+        textPainter.width <= rect.width,
+      );
 
       canvas.save();
 

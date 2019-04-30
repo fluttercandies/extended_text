@@ -1,9 +1,7 @@
 import 'package:extended_text/extended_text.dart';
 import 'package:extended_text/src/extended_render_paragraph.dart';
 import 'package:extended_text/src/extended_rich_text.dart';
-import 'package:extended_text/src/extended_text_utils.dart';
 import 'package:extended_text/src/over_flow_text_span.dart';
-import 'package:extended_text/src/special_text_span_builder.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
