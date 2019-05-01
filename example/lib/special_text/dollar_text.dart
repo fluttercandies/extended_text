@@ -10,9 +10,9 @@ class DollarText extends SpecialText {
   @override
   TextSpan finishText() {
     // TODO: implement finishText
-    final String atText = getContent();
+    final String text = getContent();
     return TextSpan(
-        text: atText,
+        text: text,
         style: textStyle?.copyWith(color: Colors.orange),
         recognizer: TapGestureRecognizer()
           ..onTap = () {
