@@ -1,4 +1,4 @@
-## [0.3.6]
+## [0.3.7]
 
 * import extended_text_library
 
