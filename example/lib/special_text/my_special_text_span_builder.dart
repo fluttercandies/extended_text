@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 class MySpecialTextSpanBuilder extends SpecialTextSpanBuilder {
   @override
   SpecialText createSpecialText(String flag,
-      {TextStyle textStyle, SpecialTextGestureTapCallback onTap}) {
+      {TextStyle textStyle, SpecialTextGestureTapCallback onTap, int start}) {
     if (flag == null || flag == "") return null;
     // TODO: implement createSpecialText
 
