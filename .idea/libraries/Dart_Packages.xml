@@ -54,6 +54,7 @@
         <entry key="extended_text_library">
           <value>
             <list>
+              <option value="$USER_HOME$/AppData/Roaming/Pub/Cache/hosted/pub.flutter-io.cn/extended_text_library-0.1.4/lib" />
               <option value="$USER_HOME$/AppData/Roaming/Pub/Cache/hosted/pub.flutter-io.cn/extended_text_library-0.1.3/lib" />
             </list>
           </value>
@@ -230,6 +231,7 @@
       <root url="file://$USER_HOME$/AppData/Roaming/Pub/Cache/hosted/pub.flutter-io.cn/crypto-2.0.6/lib" />
       <root url="file://$USER_HOME$/AppData/Roaming/Pub/Cache/hosted/pub.flutter-io.cn/cupertino_icons-0.1.2/lib" />
       <root url="file://$USER_HOME$/AppData/Roaming/Pub/Cache/hosted/pub.flutter-io.cn/extended_text_library-0.1.3/lib" />
+      <root url="file://$USER_HOME$/AppData/Roaming/Pub/Cache/hosted/pub.flutter-io.cn/extended_text_library-0.1.4/lib" />
       <root url="file://$USER_HOME$/AppData/Roaming/Pub/Cache/hosted/pub.flutter-io.cn/http-0.12.0+1/lib" />
       <root url="file://$USER_HOME$/AppData/Roaming/Pub/Cache/hosted/pub.flutter-io.cn/http_client_helper-0.1.9/lib" />
       <root url="file://$USER_HOME$/AppData/Roaming/Pub/Cache/hosted/pub.flutter-io.cn/http_parser-3.1.3/lib" />
