@@ -1,4 +1,3 @@
-import 'package:extended_text/src/background_text_span.dart';
 import 'package:extended_text/src/over_flow_text_span.dart';
 import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/foundation.dart';
