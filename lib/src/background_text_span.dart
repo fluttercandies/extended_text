@@ -128,6 +128,43 @@ class BackgroundTextSpan extends TextSpan {
       }
     }
   }
+
+  @override
+  bool operator ==(dynamic other) {
+    if (identical(this, other)) return true;
+    if (other.runtimeType != runtimeType) return false;
+    final BackgroundTextSpan typedOther = other;
+    return typedOther.text == text &&
+        typedOther.style == style &&
+        typedOther.recognizer == recognizer &&
+        typedOther.background == background &&
+        typedOther.clipBorderRadius == clipBorderRadius &&
+        typedOther.paintBackground == paintBackground;
+  }
+
+  @override
+  int get hashCode => hashValues(
+        style,
+        text,
+        recognizer,
+        background,
+        clipBorderRadius,
+        paintBackground,
+      );
+
+  @override
+  RenderComparison compareTo(TextSpan other) {
+    if (other is BackgroundTextSpan) {
+      if (other.background != background ||
+          other.clipBorderRadius != clipBorderRadius ||
+          other.paintBackground != paintBackground) {
+        return RenderComparison.paint;
+      }
+    }
+
+    // TODO: implement compareTo
+    return super.compareTo(other);
+  }
 }
 
 ///if you don't want use default, please return true.

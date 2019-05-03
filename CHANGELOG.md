@@ -1,3 +1,8 @@
+## [0.3.9]
+
+* override compareTo method in BackgroundTextSpan and OverFlowTextSpan to
+  fix issue that it was error rendering
+
 ## [0.3.8]
 
 * import extended_text_library
