@@ -1,3 +1,7 @@
+## [0.4.0]
+
+* update extended_text_library for BackgroundTextSpan
+
 ## [0.3.9]
 
 * override compareTo method in BackgroundTextSpan and OverFlowTextSpan to
