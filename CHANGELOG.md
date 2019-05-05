@@ -1,3 +1,7 @@
+## [0.4.1]
+
+* update extended_text_library for cache folder is changed
+
 ## [0.4.0]
 
 * update extended_text_library for BackgroundTextSpan
