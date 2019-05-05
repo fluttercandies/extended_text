@@ -1,4 +1,4 @@
-## [0.4.1]
+## [0.4.2]
 
 * update extended_text_library for cache folder is changed
 
