@@ -1,6 +1,7 @@
 import 'package:example/main.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
+import 'package:extended_image_library/extended_image_library.dart';
 
 class CustomImageDemo extends StatelessWidget {
   @override
@@ -14,14 +15,19 @@ class CustomImageDemo extends StatelessWidget {
         child: ExtendedText.rich(
           TextSpan(children: <TextSpan>[
             ImageSpan(
-                CachedNetworkImage(imageTestUrls.first, clearFailedCache: true),
-                beforePaintImage:
+                ExtendedNetworkImageProvider(
+                  imageTestUrls.first,
+                ),
+                clearMemoryCacheIfFailed: true, beforePaintImage:
                     (Canvas canvas, Rect rect, ImageSpan imageSpan) {
               bool hasPlaceholder = drawPlaceholder(canvas, rect, imageSpan);
               if (!hasPlaceholder) {
                 clearRect(rect, canvas);
               }
               return false;
+            }, afterPaintImage:
+                    (Canvas canvas, Rect rect, ImageSpan imageSpan) {
+              drawLoadFailed(canvas, rect, imageSpan);
             },
                 margin: EdgeInsets.only(right: 10.0),
                 imageWidth: 80.0,
@@ -29,12 +35,12 @@ class CustomImageDemo extends StatelessWidget {
             TextSpan(text: "This is an image with placeholder.\n"),
             TextSpan(text: "This is an image with border"),
             ImageSpan(
-                CachedNetworkImage(
-                    imageTestUrls.length > 1
-                        ? imageTestUrls[1]
-                        : imageTestUrls.first,
-                    clearFailedCache: true),
-                beforePaintImage:
+                ExtendedNetworkImageProvider(
+                  imageTestUrls.length > 1
+                      ? imageTestUrls[1]
+                      : imageTestUrls.first,
+                ),
+                clearMemoryCacheIfFailed: true, beforePaintImage:
                     (Canvas canvas, Rect rect, ImageSpan imageSpan) {
               bool hasPlaceholder = drawPlaceholder(canvas, rect, imageSpan);
 
@@ -45,6 +51,7 @@ class CustomImageDemo extends StatelessWidget {
               return false;
             }, afterPaintImage:
                     (Canvas canvas, Rect rect, ImageSpan imageSpan) {
+              drawLoadFailed(canvas, rect, imageSpan);
               Border.all(color: Colors.red, width: 1)
                   .paint(canvas, rect, shape: BoxShape.rectangle);
             },
@@ -54,12 +61,12 @@ class CustomImageDemo extends StatelessWidget {
                 imageHeight: 60.0),
             TextSpan(text: "This is an image with borderRadius"),
             ImageSpan(
-                CachedNetworkImage(
-                    imageTestUrls.length > 2
-                        ? imageTestUrls[2]
-                        : imageTestUrls.first,
-                    clearFailedCache: true),
-                beforePaintImage:
+                ExtendedNetworkImageProvider(
+                  imageTestUrls.length > 2
+                      ? imageTestUrls[2]
+                      : imageTestUrls.first,
+                ),
+                clearMemoryCacheIfFailed: true, beforePaintImage:
                     (Canvas canvas, Rect rect, ImageSpan imageSpan) {
               canvas.save();
               canvas.clipPath(Path()
@@ -78,6 +85,7 @@ class CustomImageDemo extends StatelessWidget {
               return false;
             }, afterPaintImage:
                     (Canvas canvas, Rect rect, ImageSpan imageSpan) {
+              drawLoadFailed(canvas, rect, imageSpan);
               Border.all(color: Colors.red, width: 1).paint(canvas, rect,
                   shape: BoxShape.rectangle,
                   borderRadius: BorderRadius.all(Radius.circular(5.0)));
@@ -89,12 +97,12 @@ class CustomImageDemo extends StatelessWidget {
                 imageHeight: 60.0),
             TextSpan(text: "This is an circle image with border"),
             ImageSpan(
-                CachedNetworkImage(
-                    imageTestUrls.length > 3
-                        ? imageTestUrls[3]
-                        : imageTestUrls.first,
-                    clearFailedCache: true),
-                beforePaintImage:
+                ExtendedNetworkImageProvider(
+                  imageTestUrls.length > 3
+                      ? imageTestUrls[3]
+                      : imageTestUrls.first,
+                ),
+                clearMemoryCacheIfFailed: true, beforePaintImage:
                     (Canvas canvas, Rect rect, ImageSpan imageSpan) {
               canvas.save();
 
@@ -112,6 +120,7 @@ class CustomImageDemo extends StatelessWidget {
               return false;
             }, afterPaintImage:
                     (Canvas canvas, Rect rect, ImageSpan imageSpan) {
+              drawLoadFailed(canvas, rect, imageSpan);
               Border.all(color: Colors.orange, width: 1)
                   .paint(canvas, rect, shape: BoxShape.circle);
               canvas.restore();
@@ -132,7 +141,7 @@ class CustomImageDemo extends StatelessWidget {
           clearMemoryImageCache();
 
           ///clear local cahced
-          clearExtendedTextDiskCachedImages().then((bool done) {
+          clearDiskCachedImages().then((bool done) {
 //            showToast(done ? "clear succeed" : "clear failed",
 //                position: ToastPosition(align: Alignment.center));
             print(done);
@@ -177,5 +186,28 @@ class CustomImageDemo extends StatelessWidget {
     canvas.saveLayer(rect, Paint());
     canvas.drawRect(rect, Paint()..blendMode = BlendMode.clear);
     canvas.restore();
+  }
+
+  bool drawLoadFailed(Canvas canvas, Rect rect, ImageSpan imageSpan) {
+    bool loadFailed = imageSpan.imageSpanResolver.loadFailed;
+
+    if (loadFailed) {
+      //canvas.drawRect(rect, Paint()..color = Colors.grey);
+      var textPainter = TextPainter(
+          text: TextSpan(
+              text: "failed",
+              style: TextStyle(fontSize: 10.0, color: Colors.red)),
+          textAlign: TextAlign.center,
+          textScaleFactor: 1,
+          textDirection: TextDirection.ltr,
+          maxLines: 1)
+        ..layout(maxWidth: rect.width);
+
+      textPainter.paint(
+          canvas,
+          Offset(rect.left + (rect.width - textPainter.width) / 2.0,
+              rect.top + (rect.height - textPainter.height) / 2.0));
+    }
+    return loadFailed;
   }
 }

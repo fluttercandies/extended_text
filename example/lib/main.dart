@@ -3,8 +3,8 @@ import 'package:example/common/tu_chong_repository.dart';
 import 'package:example/custom_text_overflow_demo.dart';
 import 'package:example/custom_image_demo.dart';
 import 'package:example/text_demo.dart';
+import 'package:extended_image_library/extended_image_library.dart';
 import 'package:flutter/material.dart';
-import 'package:extended_text/extended_text.dart';
 
 void main() => runApp(MyApp());
 
@@ -42,7 +42,7 @@ class _MyHomePageState extends State<MyHomePage> {
   TuChongRepository listSourceRepository;
   @override
   void initState() {
-    clearExtendedTextDiskCachedImages();
+    clearMemoryImageCache();
     // TODO: implement initState
     pages.add(Page(PageType.Text, "quickly build special text"));
     pages.add(Page(PageType.CustomImage, "custom inline-image in text"));
@@ -136,7 +136,3 @@ List<String> _imageTestUrls;
 List<String> get imageTestUrls =>
     _imageTestUrls ??
     <String>["https://photo.tuchong.com/4870004/f/298584322.jpg"];
-
-void clearMemoryImageCache() {
-  PaintingBinding.instance.imageCache.clear();
-}
