@@ -1,3 +1,7 @@
+## [0.4.4]
+
+* add GestureRecognizer for ImageSpan
+
 ## [0.4.3]
 
 * handle image span load failed
