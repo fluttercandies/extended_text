@@ -23,6 +23,9 @@ dependencies:
   url_launcher: ^5.0.2
   loading_more_list: ^0.3.5
   http_client_helper: ^0.1.9
+  oktoast: ^2.1.4
+  extended_image: ^0.3.2
+  image_picker_saver: ^0.1.0
 
 dev_dependencies:
   flutter_test:
