@@ -5,6 +5,7 @@ import 'package:example/custom_image_demo.dart';
 import 'package:example/text_demo.dart';
 import 'package:extended_image_library/extended_image_library.dart';
 import 'package:flutter/material.dart';
+import 'package:oktoast/oktoast.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,7 +13,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return OKToast(
+        child: MaterialApp(
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -26,7 +28,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: MyHomePage(),
-    );
+    ));
   }
 }
 
