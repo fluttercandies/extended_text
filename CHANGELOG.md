@@ -1,6 +1,7 @@
 ## [0.4.4]
 
 * add GestureRecognizer for ImageSpan
+* add demo to show image in photo view
 
 ## [0.4.3]
 

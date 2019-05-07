@@ -1,7 +1,10 @@
 import 'package:example/main.dart';
 import 'package:extended_text/extended_text.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:extended_image_library/extended_image_library.dart';
+
+import 'common/pic_swiper.dart';
 
 class CustomImageDemo extends StatelessWidget {
   @override
@@ -14,6 +17,7 @@ class CustomImageDemo extends StatelessWidget {
         padding: EdgeInsets.all(20.0),
         child: ExtendedText.rich(
           TextSpan(children: <TextSpan>[
+            TextSpan(text: "click image show it in photo view.\n"),
             ImageSpan(
                 ExtendedNetworkImageProvider(
                   imageTestUrls.first,
@@ -31,7 +35,11 @@ class CustomImageDemo extends StatelessWidget {
             },
                 margin: EdgeInsets.only(right: 10.0),
                 imageWidth: 80.0,
-                imageHeight: 60.0),
+                imageHeight: 60.0,
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    onTap(context, imageTestUrls.first, imageTestUrls);
+                  }),
             TextSpan(text: "This is an image with placeholder.\n"),
             TextSpan(text: "This is an image with border"),
             ImageSpan(
@@ -40,6 +48,15 @@ class CustomImageDemo extends StatelessWidget {
                       ? imageTestUrls[1]
                       : imageTestUrls.first,
                 ),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    onTap(
+                        context,
+                        imageTestUrls.length > 1
+                            ? imageTestUrls[1]
+                            : imageTestUrls.first,
+                        imageTestUrls);
+                  },
                 clearMemoryCacheIfFailed: true, beforePaintImage:
                     (Canvas canvas, Rect rect, ImageSpan imageSpan) {
               bool hasPlaceholder = drawPlaceholder(canvas, rect, imageSpan);
@@ -66,6 +83,15 @@ class CustomImageDemo extends StatelessWidget {
                       ? imageTestUrls[2]
                       : imageTestUrls.first,
                 ),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    onTap(
+                        context,
+                        imageTestUrls.length > 2
+                            ? imageTestUrls[2]
+                            : imageTestUrls.first,
+                        imageTestUrls);
+                  },
                 clearMemoryCacheIfFailed: true, beforePaintImage:
                     (Canvas canvas, Rect rect, ImageSpan imageSpan) {
               canvas.save();
@@ -102,6 +128,15 @@ class CustomImageDemo extends StatelessWidget {
                       ? imageTestUrls[3]
                       : imageTestUrls.first,
                 ),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    onTap(
+                        context,
+                        imageTestUrls.length > 3
+                            ? imageTestUrls[3]
+                            : imageTestUrls.first,
+                        imageTestUrls);
+                  },
                 clearMemoryCacheIfFailed: true, beforePaintImage:
                     (Canvas canvas, Rect rect, ImageSpan imageSpan) {
               canvas.save();
@@ -209,5 +244,14 @@ class CustomImageDemo extends StatelessWidget {
               rect.top + (rect.height - textPainter.height) / 2.0));
     }
     return loadFailed;
+  }
+
+  void onTap(BuildContext context, String url, List<String> list) {
+    Navigator.push(context, MaterialPageRoute(builder: (_) {
+      return PicSwiper(
+        list.indexOf(url),
+        list.map<PicSwiperItem>((f) => PicSwiperItem(f)).toList(),
+      );
+    }));
   }
 }
