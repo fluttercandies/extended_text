@@ -1,3 +1,7 @@
+## [0.4.6]
+
+* disabled informationCollector to keep backwards compatibility for now (ExtendedNetworkImageProvider)
+
 ## [0.4.5]
 
 * add GestureRecognizer for ImageSpan
