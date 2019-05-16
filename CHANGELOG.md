@@ -1,4 +1,4 @@
-## [0.4.6]
+## [0.4.7]
 
 * disabled informationCollector to keep backwards compatibility for now (ExtendedNetworkImageProvider)
 
