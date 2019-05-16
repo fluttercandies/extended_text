@@ -707,6 +707,8 @@ class ExtendedRenderParagraph extends RenderBox {
       ///we will move the canvas, so rect top left should be (0,0)
       final Rect rect = Offset(0.0, 0.0) & size;
       var textPainter = overFlowTextSpan.layout(_textPainter);
+
+      //overFlowTextSpan can't be more one line.
       assert(
         textPainter.width <= rect.width,
       );
@@ -739,8 +741,10 @@ class ExtendedRenderParagraph extends RenderBox {
         locale: locale,
       )..layout();
 
-      final Rect overFlowTextSpanRect = finalOverflowOffset &
-          Size(rect.width - finalOverflowOffset.dx, lastTextSpanPainter.height);
+      final Rect overFlowTextSpanRect = Offset(finalOverflowOffset.dx,
+              rect.height - lastTextSpanPainter.preferredLineHeight) &
+          Size(rect.width - finalOverflowOffset.dx,
+              lastTextSpanPainter.preferredLineHeight);
 
       canvas.drawRect(
           overFlowTextSpanRect, Paint()..color = overFlowTextSpan.background);
