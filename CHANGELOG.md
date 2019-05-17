@@ -1,3 +1,7 @@
+## [0.4.8]
+
+* fix wrong background rect of OverFlowTextSpan(issue 6)
+
 ## [0.4.7]
 
 * disabled informationCollector to keep backwards compatibility for now (ExtendedNetworkImageProvider)
