@@ -1,3 +1,9 @@
+## [0.5.0]
+
+* update extended_text_library
+1.remove caretIn parameter(SpecialTextSpan)
+2.deleteAll parameter has the same effect as caretIn parameter(SpecialTextSpan)
+
 ## [0.4.9]
 
 * fix wrong background rect of OverFlowTextSpan when over flow area has image span
