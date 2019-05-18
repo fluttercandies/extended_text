@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:ui' as ui show Gradient, Shader, TextBox;
+import 'dart:math';
 
 /// get idea from https://github.com/bytedance/RealRichText about Inline-Image-In-Text
 /// update by zmtzawqlp@live.com
@@ -721,30 +722,26 @@ class ExtendedRenderParagraph extends RenderBox {
       final Offset overFlowTextSpanOffset = Offset(
           rect.width - textPainter.width, rect.height - textPainter.height);
 
-      ///find TextPosition near overflow
-      TextPosition overflowOffset = getPositionForOffset(
-          Offset(rect.width - textPainter.width, rect.height));
+      ///find TextPosition near bottomRight
+      TextPosition lastOnePosition = getPositionForOffset(rect.bottomRight);
+
+      final TextSpan lastTextSpan =
+          _textPainter.text.getSpanForPosition(lastOnePosition);
 
       ///find overflow TextPosition that not clip the original text
       Offset finalOverflowOffset = _findFinalOverflowOffset(
-          rect, rect.width - textPainter.width, overflowOffset.offset);
+          rect: rect,
+          x: rect.width - textPainter.width,
+          endTextOffset: lastOnePosition.offset,
+          y: rect.bottom);
 
-      final TextPosition position = getPositionForOffset(finalOverflowOffset);
-
-      ///find last TextSpan
-      final TextSpan lastTextSpan =
-          _textPainter.text.getSpanForPosition(position);
-      TextPainter lastTextSpanPainter = TextPainter(
-        text: lastTextSpan,
-        textDirection: textDirection,
-        textScaleFactor: textScaleFactor,
-        locale: locale,
-      )..layout();
-
-      final Rect overFlowTextSpanRect = Offset(finalOverflowOffset.dx,
-              rect.height - lastTextSpanPainter.preferredLineHeight) &
-          Size(rect.width - finalOverflowOffset.dx,
-              lastTextSpanPainter.preferredLineHeight);
+      Offset bottomRight = rect.bottomRight;
+      if (lastTextSpan is ImageSpan) {
+        bottomRight =
+            Offset(bottomRight.dx + lastTextSpan.width / 2.0, bottomRight.dy);
+      }
+      final Rect overFlowTextSpanRect =
+          Rect.fromPoints(finalOverflowOffset, bottomRight);
 
       canvas.drawRect(
           overFlowTextSpanRect, Paint()..color = overFlowTextSpan.background);
@@ -768,19 +765,32 @@ class ExtendedRenderParagraph extends RenderBox {
     }
   }
 
-  Offset _findFinalOverflowOffset(Rect rect, double x, int endTextOffset) {
+  /// y find min y, so that over flow text will be covered
+  Offset _findFinalOverflowOffset(
+      {Rect rect, double x, int endTextOffset, double y}) {
     Offset endOffset = getOffsetForCaret(
       TextPosition(offset: endTextOffset, affinity: TextAffinity.upstream),
       rect,
     );
+
+    final TextPosition position = getPositionForOffset(endOffset);
+
+    ///handle image span
+    final TextSpan textSpan = _textPainter.text.getSpanForPosition(position);
+    if (textSpan is ImageSpan) {
+      endOffset = Offset(endOffset.dx - textSpan.width / 2.0, endOffset.dy);
+    }
+
     //overflow
     if (endOffset == null || (endTextOffset != 0 && endOffset == Offset.zero)) {
-      return _findFinalOverflowOffset(rect, x, endTextOffset - 1);
+      return _findFinalOverflowOffset(
+          rect: rect, x: x, endTextOffset: endTextOffset - 1, y: y);
     }
 
     if (endOffset.dx > x) {
-      return _findFinalOverflowOffset(rect, x, endTextOffset - 1);
+      return _findFinalOverflowOffset(
+          rect: rect, x: x, endTextOffset: endTextOffset - 1, y: endOffset.dy);
     }
-    return endOffset;
+    return Offset(endOffset.dx, min(y, endOffset.dy));
   }
 }

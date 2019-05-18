@@ -1,3 +1,7 @@
+## [0.4.9]
+
+* fix wrong background rect of OverFlowTextSpan when over flow area has image span
+
 ## [0.4.8]
 
 * fix wrong background rect of OverFlowTextSpan(issue 6)
