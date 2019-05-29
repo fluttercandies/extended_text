@@ -1,3 +1,7 @@
+## [0.5.1]
+
+* update path_provider 1.1.0
+
 ## [0.5.0]
 
 * update extended_text_library
