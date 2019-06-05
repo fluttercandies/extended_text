@@ -7,6 +7,8 @@ import 'package:flutter/rendering.dart';
 import 'dart:ui' as ui show Gradient, Shader, TextBox;
 import 'dart:math';
 
+import 'extended_text_typedef.dart';
+
 /// get idea from https://github.com/bytedance/RealRichText about Inline-Image-In-Text
 /// update by zmtzawqlp@live.com
 
@@ -43,6 +45,9 @@ class ExtendedRenderParagraph extends RenderBox {
     int maxLines,
     Locale locale,
     OverFlowTextSpan overFlowTextSpan,
+    this.onSelectionChanged,
+    Color selectionColor,
+    TextSelection selection,
   })  : assert(text != null),
         assert(text.debugAssertIsValid()),
         assert(textAlign != null),
@@ -51,6 +56,7 @@ class ExtendedRenderParagraph extends RenderBox {
         assert(overflow != null),
         assert(textScaleFactor != null),
         assert(maxLines == null || maxLines > 0),
+        _handleSpecialText = hasSpecialText(text),
         _softWrap = softWrap,
         _overflow =
             overFlowTextSpan != null ? ExtendedTextOverflow.clip : overflow,
@@ -66,7 +72,41 @@ class ExtendedRenderParagraph extends RenderBox {
               : (overflow == ExtendedTextOverflow.ellipsis ? _kEllipsis : null),
           locale: locale,
         ),
-        _overFlowTextSpan = overFlowTextSpan;
+        _overFlowTextSpan = overFlowTextSpan,
+        _selectionColor = selectionColor,
+        _selection = selection;
+
+  ///TextSelection
+
+  /// Called when the selection changes.
+  TextSelectionChangedHandler onSelectionChanged;
+
+  double get preferredLineHeight => _textPainter.preferredLineHeight;
+
+  bool _handleSpecialText = false;
+  bool get handleSpecialText => _handleSpecialText;
+
+  List<ui.TextBox> _selectionRects;
+
+  /// The region of text that is selected, if any.
+  TextSelection get selection => _selection;
+  TextSelection _selection;
+  set selection(TextSelection value) {
+    if (_selection == value) return;
+    _selection = value;
+    _selectionRects = null;
+    markNeedsPaint();
+    markNeedsSemanticsUpdate();
+  }
+
+  /// The color to use when painting the selection.
+  Color get selectionColor => _selectionColor;
+  Color _selectionColor;
+  set selectionColor(Color value) {
+    if (_selectionColor == value) return;
+    _selectionColor = value;
+    markNeedsPaint();
+  }
 
   /// the custom text over flow TextSpan
   OverFlowTextSpan _overFlowTextSpan;
@@ -90,6 +130,7 @@ class ExtendedRenderParagraph extends RenderBox {
   TextSpan get text => _textPainter.text;
   set text(TextSpan value) {
     assert(value != null);
+    _handleSpecialText = hasSpecialText(value);
     switch (_textPainter.text.compareTo(value)) {
       case RenderComparison.identical:
       case RenderComparison.metadata:
@@ -361,6 +402,7 @@ class ExtendedRenderParagraph extends RenderBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
+    _paintSelection(context, offset);
     _paintSpecialText(context, offset);
     _paint(context, offset);
     _paintTextOverflow(context, offset);
@@ -792,5 +834,437 @@ class ExtendedRenderParagraph extends RenderBox {
           rect: rect, x: x, endTextOffset: endTextOffset - 1, y: endOffset.dy);
     }
     return Offset(endOffset.dx, min(y, endOffset.dy));
+  }
+
+  ///selection
+
+  Offset _lastTapDownPosition;
+
+  ///
+  ///Offset _lastTapDownPosition;
+
+  /// If [ignorePointer] is false (the default) then this method is called by
+  /// the internal gesture recognizer's [TapGestureRecognizer.onTapDown]
+  /// callback.
+  ///
+  /// When [ignorePointer] is true, an ancestor widget must respond to tap
+  /// down events by calling this method.
+  void handleTapDown(TapDownDetails details) {
+    _lastTapDownPosition = details.globalPosition;
+  }
+
+  /// Selects the set words of a paragraph in a given range of global positions.
+  ///
+  /// The first and last endpoints of the selection will always be at the
+  /// beginning and end of a word respectively.
+  ///
+  /// {@macro flutter.rendering.editable.select}
+  void selectWordsInRange(
+      {@required Offset from,
+      Offset to,
+      @required SelectionChangedCause cause}) {
+    assert(cause != null);
+    assert(from != null);
+    _layoutTextWithConstraints(constraints);
+    if (onSelectionChanged != null) {
+      final TextPosition firstPosition =
+          _textPainter.getPositionForOffset(globalToLocal(from));
+
+      final TextSelection firstWord = _selectWordAtOffset(firstPosition);
+      final TextSelection lastWord = to == null
+          ? firstWord
+          : _selectWordAtOffset(
+              _textPainter.getPositionForOffset(globalToLocal(to)));
+
+      onSelectionChanged(
+        TextSelection(
+          baseOffset: firstWord.base.offset,
+          extentOffset: lastWord.extent.offset,
+          affinity: firstWord.affinity,
+        ),
+        this,
+        cause,
+      );
+    }
+  }
+
+  TextSelection _selectWordAtOffset(TextPosition position) {
+    ///zmt
+    final TextRange word = _textPainter.getWordBoundary(position);
+    TextSelection selection;
+    // When long-pressing past the end of the text, we want a collapsed cursor.
+    if (position.offset >= word.end) {
+      selection = TextSelection.fromPosition(position);
+    } else {
+      selection = TextSelection(baseOffset: word.start, extentOffset: word.end);
+    }
+    return handleSpecialText
+        ? convertTextPainterSelectionToTextInputSelection(text, selection)
+        : selection;
+//    if (position.offset >= word.end)
+//      return TextSelection.fromPosition(position);
+//    return TextSelection(baseOffset: word.start, extentOffset: word.end);
+  }
+
+  /// Move the selection to the beginning or end of a word.
+  ///
+  /// {@macro flutter.rendering.editable.select}
+  void selectWordEdge({@required SelectionChangedCause cause}) {
+    assert(cause != null);
+    _layoutTextWithConstraints(constraints);
+    assert(_lastTapDownPosition != null);
+    if (onSelectionChanged != null) {
+      final TextPosition position = _textPainter
+          .getPositionForOffset(globalToLocal(_lastTapDownPosition));
+
+      final TextRange word = _textPainter.getWordBoundary(position);
+      TextSelection selection;
+
+      ///zmt
+      if (position.offset - word.start <= 1) {
+        selection = handleSpecialText
+            ? convertTextPainterSelectionToTextInputSelection(
+                text,
+                TextSelection.collapsed(
+                    offset: word.start, affinity: TextAffinity.downstream))
+            : TextSelection.collapsed(
+                offset: word.start, affinity: TextAffinity.downstream);
+      } else {
+        selection = handleSpecialText
+            ? convertTextPainterSelectionToTextInputSelection(
+                text,
+                TextSelection.collapsed(
+                    offset: word.end, affinity: TextAffinity.upstream))
+            : TextSelection.collapsed(
+                offset: word.end, affinity: TextAffinity.upstream);
+      }
+      onSelectionChanged(
+        selection,
+        this,
+        cause,
+      );
+    }
+  }
+
+  /// Move selection to the location of the last tap down.
+  ///
+  /// {@template flutter.rendering.editable.select}
+  /// This method is mainly used to translate user inputs in global positions
+  /// into a [TextSelection]. When used in conjunction with a [EditableText],
+  /// the selection change is fed back into [TextEditingController.selection].
+  ///
+  /// If you have a [TextEditingController], it's generally easier to
+  /// programmatically manipulate its `value` or `selection` directly.
+  /// {@endtemplate}
+  void selectPosition({@required SelectionChangedCause cause}) {
+    selectPositionAt(from: _lastTapDownPosition, cause: cause);
+  }
+
+  /// Select text between the global positions [from] and [to].
+  void selectPositionAt(
+      {@required Offset from,
+      Offset to,
+      @required SelectionChangedCause cause}) {
+    assert(cause != null);
+    assert(from != null);
+    _layoutTextWithConstraints(constraints);
+    if (onSelectionChanged != null) {
+      TextPosition fromPosition =
+          _textPainter.getPositionForOffset(globalToLocal(from));
+      TextPosition toPosition = to == null
+          ? null
+          : _textPainter.getPositionForOffset(globalToLocal(to));
+
+      //zmt
+      if (handleSpecialText) {
+        fromPosition =
+            convertTextPainterPostionToTextInputPostion(text, fromPosition);
+        toPosition =
+            convertTextPainterPostionToTextInputPostion(text, toPosition);
+      }
+
+      int baseOffset = fromPosition.offset;
+      int extentOffset = fromPosition.offset;
+
+      if (toPosition != null) {
+        baseOffset = min(fromPosition.offset, toPosition.offset);
+        extentOffset = max(fromPosition.offset, toPosition.offset);
+      }
+
+      final TextSelection newSelection = TextSelection(
+        baseOffset: baseOffset,
+        extentOffset: extentOffset,
+        affinity: fromPosition.affinity,
+      );
+      // Call [onSelectionChanged] only when the selection actually changed.
+      if (newSelection != _selection) {
+        onSelectionChanged(newSelection, this, cause);
+      }
+    }
+  }
+
+  /// Select a word around the location of the last tap down.
+  ///
+  /// {@macro flutter.rendering.editable.select}
+  void selectWord({@required SelectionChangedCause cause}) {
+    selectWordsInRange(from: _lastTapDownPosition, cause: cause);
+  }
+
+  void _paintSelection(PaintingContext context, Offset effectiveOffset) {
+    if (_selection == null) return;
+    bool showSelection = false;
+
+    ///zmt
+    var actualSelection = handleSpecialText
+        ? convertTextInputSelectionToTextPainterSelection(text, _selection)
+        : _selection;
+
+    if (!actualSelection.isCollapsed && _selectionColor != null) {
+      showSelection = true;
+      _updateSelectionExtentsVisibility(effectiveOffset, actualSelection);
+    }
+
+    if (showSelection) {
+      _selectionRects ??= _textPainter.getBoxesForSelection(actualSelection);
+
+      int textOffset = 0;
+      Map<Offset, ImageSpan> imageSpans = Map<Offset, ImageSpan>();
+
+      ///zmt
+      ///find all image span in selection
+      if (handleSpecialText) {
+        if (text != null && text.children != null) {
+          for (TextSpan ts in text.children) {
+            if (textOffset >= actualSelection.start &&
+                textOffset <= actualSelection.end) {
+              if (ts is ImageSpan) {
+                var offset = _textPainter.getOffsetForCaret(
+                  TextPosition(offset: textOffset),
+                  effectiveOffset & size,
+                );
+                imageSpans[offset] = ts;
+              }
+            }
+            textOffset += ts.toPlainText().length;
+            if (textOffset > actualSelection.end) {
+              break;
+            }
+          }
+        }
+      }
+
+      _paintInnerSelection(context.canvas, effectiveOffset, imageSpans);
+    }
+  }
+
+  void _paintInnerSelection(Canvas canvas, Offset effectiveOffset,
+      Map<Offset, ImageSpan> imageSpans) {
+    assert(_selectionRects != null);
+    final Paint paint = Paint()..color = _selectionColor;
+
+    ///zmt
+    for (int i = 0; i < _selectionRects.length; i++) {
+      var box = _selectionRects[i];
+      var rect = box.toRect();
+      if (handleSpecialText) {
+        ImageSpan textSpan = imageSpans[Offset(box.left, box.top)];
+
+//      var textPosition =
+//          _textPainter.getPositionForOffset(Offset(box.left, box.top));
+//      var textSpan = text.getSpanForPosition(textPosition);
+
+        ///fix image span position
+        if (textSpan != null) {
+          ///move left only
+//        if (textSpan.width < rect.width) {
+//          rect = Rect.fromLTRB(rect.left - textSpan.width / 2.0, rect.top,
+//              rect.right, rect.bottom);
+//        }
+//        //move all rect
+//        else
+          {
+            rect = rect.shift(Offset(
+                -getImageSpanCorrectPosition(textSpan, textDirection), 0.0));
+          }
+        }
+      }
+      canvas.drawRect(rect.shift(effectiveOffset), paint);
+    }
+  }
+
+  /// Returns the local coordinates of the endpoints of the given selection.
+  ///
+  /// If the selection is collapsed (and therefore occupies a single point), the
+  /// returned list is of length one. Otherwise, the selection is not collapsed
+  /// and the returned list is of length two. In this case, however, the two
+  /// points might actually be co-located (e.g., because of a bidirectional
+  /// selection that contains some text but whose ends meet in the middle).
+  ///
+  /// See also:
+  ///
+  ///  * [getLocalRectForCaret], which is the equivalent but for
+  ///    a [TextPosition] rather than a [TextSelection].
+  List<TextSelectionPoint> getEndpointsForSelection(TextSelection selection) {
+    assert(constraints != null);
+    _layoutTextWithConstraints(constraints);
+
+    //final Offset paintOffset = _paintOffset;
+    ///zmt
+    final Offset effectiveOffset = Offset.zero;
+
+    var temp = convertTextInputSelectionToTextPainterSelection(text, selection);
+
+    if (!selection.isCollapsed) {
+      final Offset start = Offset(0.0, preferredLineHeight) +
+          _getCaretOffset(
+              effectiveOffset,
+              TextPosition(
+                  offset: temp.baseOffset, affinity: selection.affinity),
+              TextPosition(
+                  offset: selection.baseOffset, affinity: selection.affinity));
+      final Offset end = Offset(0.0, preferredLineHeight) +
+          _getCaretOffset(
+              effectiveOffset,
+              TextPosition(
+                  offset: temp.extentOffset, affinity: selection.affinity),
+              TextPosition(
+                  offset: selection.extentOffset,
+                  affinity: selection.affinity));
+
+      return <TextSelectionPoint>[
+        TextSelectionPoint(start, TextDirection.ltr),
+        TextSelectionPoint(end, TextDirection.ltr),
+      ];
+
+//      final List<ui.TextBox> boxes = _textPainter.getBoxesForSelection(temp);
+//      final Offset start =
+//          Offset(boxes.first.start, boxes.first.bottom) + paintOffset;
+//      final Offset end =
+//          Offset(boxes.last.end, boxes.last.bottom) + paintOffset;
+//
+//      return <TextSelectionPoint>[
+//        TextSelectionPoint(start, boxes.first.direction),
+//        TextSelectionPoint(end, boxes.last.direction),
+//      ];
+    }
+  }
+
+  Offset _getCaretOffset(Offset effectiveOffset, TextPosition textPosition,
+      TextPosition textInputPosition) {
+    ///zmt
+    double imageTextSpanWidth = 0.0;
+    Offset imageSpanEndCaretOffset;
+    if (handleSpecialText) {
+      var textSpan = text.getSpanForPosition(textPosition);
+      if (textSpan != null) {
+        if (textSpan is ImageSpan) {
+          if (textInputPosition.offset >= textSpan.start &&
+              textInputPosition.offset < textSpan.end) {
+            imageTextSpanWidth -=
+                getImageSpanCorrectPosition(textSpan, textDirection);
+          } else if (textInputPosition.offset == textSpan.end) {
+            var preTextPosition = TextPosition(
+                offset: textPosition.offset - 1,
+                affinity: textPosition.affinity);
+            var preTextSpan = text.getSpanForPosition(preTextPosition);
+            if (preTextSpan != null && preTextSpan is ImageSpan) {
+              ///_textPainter.getOffsetForCaret is not right.
+              imageSpanEndCaretOffset = _textPainter.getOffsetForCaret(
+                    preTextPosition,
+                    effectiveOffset & size,
+                  ) +
+                  Offset(getImageSpanCorrectPosition(textSpan, textDirection),
+                      0.0);
+            } else {
+              imageTextSpanWidth -=
+                  getImageSpanCorrectPosition(textSpan, textDirection);
+            }
+          }
+        }
+      } else {
+        //handle image text span is last one, textPainter will get wrong offset
+        //last one
+        textSpan = text.children?.last;
+        if (textSpan != null &&
+            textSpan is ImageSpan &&
+            textInputPosition.offset >= textSpan.start) {
+          imageSpanEndCaretOffset = _textPainter.getOffsetForCaret(
+                TextPosition(
+                    offset: textPosition.offset - 1,
+                    affinity: textPosition.affinity),
+                effectiveOffset & size,
+              ) +
+              Offset(getImageSpanCorrectPosition(textSpan, textDirection), 0.0);
+        }
+      }
+    }
+
+    final Offset caretOffset = (imageSpanEndCaretOffset ??
+            _textPainter.getOffsetForCaret(textPosition, _caretPrototype) +
+                Offset(imageTextSpanWidth, 0.0)) +
+        effectiveOffset;
+    return caretOffset;
+  }
+
+  Rect _caretPrototype = Rect.zero;
+
+  /// Track whether position of the start of the selected text is within the viewport.
+  ///
+  /// For example, if the text contains "Hello World", and the user selects
+  /// "Hello", then scrolls so only "World" is visible, this will become false.
+  /// If the user scrolls back so that the "H" is visible again, this will
+  /// become true.
+  ///
+  /// This bool indicates whether the text is scrolled so that the handle is
+  /// inside the text field viewport, as opposed to whether it is actually
+  /// visible on the screen.
+  ValueListenable<bool> get selectionStartInViewport =>
+      _selectionStartInViewport;
+  final ValueNotifier<bool> _selectionStartInViewport =
+      ValueNotifier<bool>(true);
+
+  /// Track whether position of the end of the selected text is within the viewport.
+  ///
+  /// For example, if the text contains "Hello World", and the user selects
+  /// "World", then scrolls so only "Hello" is visible, this will become
+  /// 'false'. If the user scrolls back so that the "d" is visible again, this
+  /// will become 'true'.
+  ///
+  /// This bool indicates whether the text is scrolled so that the handle is
+  /// inside the text field viewport, as opposed to whether it is actually
+  /// visible on the screen.
+  ValueListenable<bool> get selectionEndInViewport => _selectionEndInViewport;
+  final ValueNotifier<bool> _selectionEndInViewport = ValueNotifier<bool>(true);
+
+  TextPosition getPositionForPoint(Offset globalPosition) {
+    _layoutTextWithConstraints(constraints);
+    return _textPainter.getPositionForOffset(globalToLocal(globalPosition));
+  }
+
+  void _updateSelectionExtentsVisibility(
+      Offset effectiveOffset, TextSelection selection) {
+    ///final Rect visibleRegion = Offset.zero & size;
+
+    ///zmt
+    ///caret may be less than 0, because it's bigger than text
+    ///
+
+    final Rect visibleRegion = Offset.zero & size;
+
+    final Offset startOffset = _textPainter.getOffsetForCaret(
+      TextPosition(offset: selection.start, affinity: selection.affinity),
+      Rect.zero,
+    );
+
+    _selectionStartInViewport.value =
+        visibleRegion.contains(startOffset + effectiveOffset);
+
+    final Offset endOffset = _textPainter.getOffsetForCaret(
+      TextPosition(offset: selection.end, affinity: selection.affinity),
+      Rect.zero,
+    );
+
+    _selectionEndInViewport.value =
+        visibleRegion.contains(endOffset + effectiveOffset);
   }
 }
