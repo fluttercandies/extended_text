@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +9,7 @@ import '../../extended_text.dart';
 import '../extended_rich_text.dart';
 import '../extended_text_typedef.dart';
 import 'extended_text_selection_overlay.dart';
+import 'extended_text_selection_pointer_handler.dart';
 
 ///
 ///  create by zmtzawqlp on 2019/6/5
@@ -83,6 +86,8 @@ class ExtendedTextSelection extends StatefulWidget {
 
   final DragStartBehavior dragStartBehavior;
 
+  final String data;
+
   ExtendedTextSelection(
       {this.builder,
       this.onTap,
@@ -97,6 +102,7 @@ class ExtendedTextSelection extends StatefulWidget {
       this.overFlowTextSpan,
       this.selectionColor,
       this.dragStartBehavior,
+      this.data,
       Key key})
       : super(key: key);
 
@@ -112,19 +118,34 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   ExtendedTextSelectionOverlay _selectionOverlay;
   TextSelectionControls _textSelectionControls;
   final LayerLink _layerLink = LayerLink();
-
+  ExtendedTextSelectionPointerHandlerState _pointerHandlerState;
   @override
   void initState() {
     textEditingValue = TextEditingValue(
-      text: widget.text.toPlainText(),
+      text: widget.data,
     );
+
     // TODO: implement initState
     super.initState();
   }
 
   @override
+  void dispose() {
+    _pointerHandlerState?.selectionStates.remove(this);
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
+    _pointerHandlerState = context.ancestorStateOfType(
+        TypeMatcher<ExtendedTextSelectionPointerHandlerState>());
+    if (_pointerHandlerState != null) {
+      if (!_pointerHandlerState.selectionStates.contains(this)) {
+        _pointerHandlerState.selectionStates.add(this);
+      }
+    }
     bool forcePressEnabled;
 
     switch (themeData.platform) {
@@ -350,5 +371,17 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   void _hideSelectionOverlayIfNeeded() {
     _selectionOverlay?.hide();
     _selectionOverlay = null;
+  }
+
+  bool containsPosition(Offset position) {
+    //_hideSelectionOverlayIfNeeded();
+    return _renderParagraph.containsPosition(position);
+  }
+
+  void clearSelection() {
+    if (!textEditingValue.selection.isCollapsed) {
+      textEditingValue = textEditingValue.copyWith(
+          selection: TextSelection.collapsed(offset: 0));
+    }
   }
 }
