@@ -231,6 +231,7 @@ class ExtendedText extends StatelessWidget {
         selectionColor: selectionColor ?? Theme.of(context).textSelectionColor,
         dragStartBehavior: dragStartBehavior,
         onTap: onTap,
+        data: data ?? textSpanToActualText(innerTextSpan),
       );
     } else {
       result = ExtendedRichText(

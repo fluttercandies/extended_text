@@ -1267,4 +1267,9 @@ class ExtendedRenderParagraph extends RenderBox {
     _selectionEndInViewport.value =
         visibleRegion.contains(endOffset + effectiveOffset);
   }
+
+  bool containsPosition(Offset position) {
+    final Rect visibleRegion = Offset.zero & size;
+    return visibleRegion.contains(globalToLocal(position));
+  }
 }
