@@ -225,7 +225,7 @@ class ExtendedTextSelectionOverlay {
     if (renderObject == null || !renderObject.attached) return Container();
     // Find the horizontal midpoint, just above the selected text.
     final List<TextSelectionPoint> endpoints =
-        renderObject.getEndpointsForSelection(_selection);
+        renderObject.getEndpointsForSelection(_selection, toolbar: true);
     if (endpoints == null) return Container();
 
     final Offset midpoint = Offset(

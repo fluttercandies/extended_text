@@ -58,12 +58,12 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
       child: Column(
         children: <Widget>[
           AppBar(
-            title: Text("photo view demo"),
+            title: Text("text selection support"),
           ),
           Container(
             padding: EdgeInsets.all(margin),
             child: Text(
-                "click image to show photo view, support zoom/pan image. horizontal and vertical page view are supported."),
+                "support to select text and custom text selection toolbar"),
           ),
           Expanded(
             child: PullToRefreshNotification(
@@ -124,30 +124,29 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                                       },
                                       specialTextSpanBuilder:
                                           MySpecialTextSpanBuilder(),
-                                      overflow: ExtendedTextOverflow.ellipsis,
+                                      //overflow: ExtendedTextOverflow.ellipsis,
                                       style: TextStyle(
                                           fontSize:
                                               ScreenUtil.instance.setSp(28),
                                           color: Colors.grey),
-                                      //style: TextStyle(background: Paint()..color = Colors.red),
                                       maxLines: 10,
-//                                      overFlowTextSpan: OverFlowTextSpan(
-//                                          children: <TextSpan>[
-//                                            TextSpan(text: '  \u2026  '),
-//                                            TextSpan(
-//                                                text: "more detail",
-//                                                style: TextStyle(
-//                                                  color: Colors.blue,
-//                                                ),
-//                                                recognizer:
-//                                                    TapGestureRecognizer()
-//                                                      ..onTap = () {
-//                                                        launch(
-//                                                            "https://github.com/fluttercandies/extended_text");
-//                                                      })
-//                                          ],
-//                                          background:
-//                                              Theme.of(context).canvasColor),
+                                      overFlowTextSpan: OverFlowTextSpan(
+                                          children: <TextSpan>[
+                                            TextSpan(text: '  \u2026  '),
+                                            TextSpan(
+                                                text: "more detail",
+                                                style: TextStyle(
+                                                  color: Colors.blue,
+                                                ),
+                                                recognizer:
+                                                    TapGestureRecognizer()
+                                                      ..onTap = () {
+                                                        launch(
+                                                            "https://github.com/fluttercandies/extended_text");
+                                                      })
+                                          ],
+                                          background:
+                                              Theme.of(context).canvasColor),
                                       selectionEnabled: true,
                                       textSelectionControls:
                                           MyExtendedMaterialTextSelectionControls(),
