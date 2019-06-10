@@ -6,6 +6,8 @@ import 'package:example/text_demo.dart';
 import 'package:extended_image_library/extended_image_library.dart';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker_saver/image_picker_saver.dart';
 
 import 'text_selection_demo.dart';
 
@@ -126,8 +128,39 @@ class _MyHomePageState extends State<MyHomePage> {
       itemCount: pages.length,
     );
 
-    return Scaffold(
-      body: content,
+    return MaterialApp(
+      builder: (c, w) {
+        ScreenUtil.instance =
+            ScreenUtil(width: 750, height: 1334, allowFontScaling: true)
+              ..init(c);
+        var data = MediaQuery.of(context);
+        return MediaQuery(
+          data: data.copyWith(textScaleFactor: 1.0),
+          child: Scaffold(
+            body: w,
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                ///clear memory
+                clearMemoryImageCache();
+
+                ///clear local cahced
+                clearDiskCachedImages().then((bool done) {
+                  showToast(done ? "clear succeed" : "clear failed",
+                      position: ToastPosition(align: Alignment.center));
+                });
+              },
+              child: Text(
+                "clear cache",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  inherit: false,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      home: content,
     );
   }
 }
@@ -150,3 +183,10 @@ List<String> _imageTestUrls;
 List<String> get imageTestUrls =>
     _imageTestUrls ??
     <String>["https://photo.tuchong.com/4870004/f/298584322.jpg"];
+
+///save netwrok image to photo
+Future<bool> saveNetworkImageToPhoto(String url, {bool useCache: true}) async {
+  var data = await getNetworkImageData(url, useCache: useCache);
+  var filePath = await ImagePickerSaver.saveFile(fileData: data);
+  return filePath != null && filePath != "";
+}

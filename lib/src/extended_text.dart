@@ -30,7 +30,8 @@ class ExtendedText extends StatelessWidget {
       this.selectionEnabled: false,
       this.onTap,
       this.selectionColor,
-      this.dragStartBehavior: DragStartBehavior.start})
+      this.dragStartBehavior: DragStartBehavior.start,
+      this.textSelectionControls})
       : assert(data != null),
         textSpan = null,
         super(key: key);
@@ -52,11 +53,14 @@ class ExtendedText extends StatelessWidget {
       this.selectionEnabled: false,
       this.onTap,
       this.selectionColor,
-      this.dragStartBehavior: DragStartBehavior.start})
+      this.dragStartBehavior: DragStartBehavior.start,
+      this.textSelectionControls})
       : assert(textSpan != null),
         data = null,
         specialTextSpanBuilder = null,
         super(key: key);
+
+  final ExtendedTextSelectionControls textSelectionControls;
 
   final DragStartBehavior dragStartBehavior;
 
@@ -232,6 +236,7 @@ class ExtendedText extends StatelessWidget {
         dragStartBehavior: dragStartBehavior,
         onTap: onTap,
         data: data ?? textSpanToActualText(innerTextSpan),
+        textSelectionControls: textSelectionControls,
       );
     } else {
       result = ExtendedRichText(

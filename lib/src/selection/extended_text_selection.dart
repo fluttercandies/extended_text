@@ -10,6 +10,8 @@ import '../extended_rich_text.dart';
 import '../extended_text_typedef.dart';
 import 'extended_text_selection_overlay.dart';
 import 'extended_text_selection_pointer_handler.dart';
+import 'selection_controls/cupertino_text_selection_controls.dart';
+import 'selection_controls/material_text_selection_controls.dart';
 
 ///
 ///  create by zmtzawqlp on 2019/6/5
@@ -88,6 +90,8 @@ class ExtendedTextSelection extends StatefulWidget {
 
   final String data;
 
+  final ExtendedTextSelectionControls textSelectionControls;
+
   ExtendedTextSelection(
       {this.builder,
       this.onTap,
@@ -103,6 +107,7 @@ class ExtendedTextSelection extends StatefulWidget {
       this.selectionColor,
       this.dragStartBehavior,
       this.data,
+      this.textSelectionControls,
       Key key})
       : super(key: key);
 
@@ -116,14 +121,14 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   ExtendedRenderParagraph get _renderParagraph =>
       _renderParagraphKey.currentContext.findRenderObject();
   ExtendedTextSelectionOverlay _selectionOverlay;
-  TextSelectionControls _textSelectionControls;
+  ExtendedTextSelectionControls _textSelectionControls;
   final LayerLink _layerLink = LayerLink();
   ExtendedTextSelectionPointerHandlerState _pointerHandlerState;
   @override
   void initState() {
+    _textSelectionControls = widget.textSelectionControls;
     textEditingValue = TextEditingValue(
-      text: widget.data,
-    );
+        text: widget.data, selection: TextSelection.collapsed(offset: 0));
 
     // TODO: implement initState
     super.initState();
@@ -151,13 +156,13 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     switch (themeData.platform) {
       case TargetPlatform.iOS:
         forcePressEnabled = true;
-        _textSelectionControls = cupertinoTextSelectionControls;
+        _textSelectionControls ??= extendedCupertinoTextSelectionControls;
         break;
 
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
         forcePressEnabled = false;
-        _textSelectionControls = materialTextSelectionControls;
+        _textSelectionControls ??= extendedMaterialTextSelectionControls;
         break;
     }
 
@@ -178,8 +183,6 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
                 link: _layerLink,
                 child: Semantics(
                   onCopy: _semanticsOnCopy(_textSelectionControls),
-                  onCut: _semanticsOnCut(_textSelectionControls),
-                  onPaste: _semanticsOnPaste(_textSelectionControls),
                   child: ExtendedRichText(
                       textAlign: widget.textAlign,
                       textDirection: widget
@@ -312,21 +315,9 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
 //        widget.onSelectionChanged(selection, cause);
   }
 
-  VoidCallback _semanticsOnCopy(TextSelectionControls controls) {
+  VoidCallback _semanticsOnCopy(ExtendedTextSelectionControls controls) {
     return controls?.canCopy(this) == true
         ? () => controls.handleCopy(this)
-        : null;
-  }
-
-  VoidCallback _semanticsOnCut(TextSelectionControls controls) {
-    return controls?.canCut(this) == true
-        ? () => controls.handleCut(this)
-        : null;
-  }
-
-  VoidCallback _semanticsOnPaste(TextSelectionControls controls) {
-    return controls?.canPaste(this) == true
-        ? () => controls.handlePaste(this)
         : null;
   }
 
@@ -358,7 +349,6 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   /// selection currently exists.
   bool showToolbar() {
     if (_selectionOverlay == null) return false;
-
     _selectionOverlay.showToolbar();
     return true;
   }

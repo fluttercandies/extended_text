@@ -811,18 +811,21 @@ class ExtendedRenderParagraph extends RenderBox {
   Offset _findFinalOverflowOffset(
       {Rect rect, double x, int endTextOffset, double y}) {
     Offset endOffset = getOffsetForCaret(
-      TextPosition(offset: endTextOffset, affinity: TextAffinity.upstream),
+      TextPosition(offset: endTextOffset),
       rect,
     );
-
     final TextPosition position = getPositionForOffset(endOffset);
 
     ///handle image span
     final TextSpan textSpan = _textPainter.text.getSpanForPosition(position);
     if (textSpan is ImageSpan) {
       endOffset = Offset(endOffset.dx - textSpan.width / 2.0, endOffset.dy);
-    }
 
+      if (textSpan.margin != null) {
+        endOffset =
+            endOffset + Offset(textSpan.margin.left, textSpan.margin.top);
+      }
+    }
     //overflow
     if (endOffset == null || (endTextOffset != 0 && endOffset == Offset.zero)) {
       return _findFinalOverflowOffset(
@@ -831,7 +834,10 @@ class ExtendedRenderParagraph extends RenderBox {
 
     if (endOffset.dx > x) {
       return _findFinalOverflowOffset(
-          rect: rect, x: x, endTextOffset: endTextOffset - 1, y: endOffset.dy);
+          rect: rect,
+          x: x,
+          endTextOffset: endTextOffset - 1,
+          y: min(y, endOffset.dy));
     }
     return Offset(endOffset.dx, min(y, endOffset.dy));
   }
@@ -1114,7 +1120,22 @@ class ExtendedRenderParagraph extends RenderBox {
 
     var temp = convertTextInputSelectionToTextPainterSelection(text, selection);
 
-    if (!selection.isCollapsed) {
+//    if (temp.isCollapsed) {
+//      // TODO(mpcomplete): This doesn't work well at an RTL/LTR boundary.
+////      final Offset caretOffset =
+////          _textPainter.getOffsetForCaret(temp.extent, _caretPrototype);
+//
+//      final Offset caretOffset = _getCaretOffset(
+//          effectiveOffset,
+//          TextPosition(offset: temp.extentOffset, affinity: selection.affinity),
+//          TextPosition(
+//              offset: selection.extentOffset, affinity: selection.affinity));
+//
+//      final Offset start = Offset(0.0, preferredLineHeight) + caretOffset;
+//
+//      return <TextSelectionPoint>[TextSelectionPoint(start, null)];
+//    } else
+    if (!temp.isCollapsed) {
       final Offset start = Offset(0.0, preferredLineHeight) +
           _getCaretOffset(
               effectiveOffset,

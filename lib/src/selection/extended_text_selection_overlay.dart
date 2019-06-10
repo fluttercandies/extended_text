@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
 import '../extended_render_paragraph.dart';
+import 'selection_controls/extended_text_selection_controls.dart';
 
 final List<OverlayEntry> _entries = <OverlayEntry>[];
 
@@ -67,7 +68,7 @@ class ExtendedTextSelectionOverlay {
   final ExtendedRenderParagraph renderObject;
 
   /// Builds text selection handles and toolbar.
-  final TextSelectionControls selectionControls;
+  final ExtendedTextSelectionControls selectionControls;
 
   /// The delegate for manipulating the current selection in the owning
   /// text field.
@@ -105,9 +106,6 @@ class ExtendedTextSelectionOverlay {
   /// A copy/paste toolbar.
   OverlayEntry _toolbar;
 
-  ///transparent
-  OverlayEntry _hitTest;
-
   TextSelection get _selection => _value.selection;
 
   /// Shows the handles by inserting them into the [context]'s overlay.
@@ -122,10 +120,9 @@ class ExtendedTextSelectionOverlay {
               _buildHandle(context, _TextSelectionHandlePosition.end)),
     ];
     //_hitTest.remove();
-    _hideHitTest();
+
     var overlay = Overlay.of(context, debugRequiredFor: debugRequiredFor);
     overlay.insertAll(_handles);
-    _showHitTest();
     //overlay.insert(_hitTest);
   }
 
@@ -133,46 +130,12 @@ class ExtendedTextSelectionOverlay {
   void showToolbar() {
     assert(_toolbar == null);
     _toolbar = OverlayEntry(builder: _buildToolbar);
-    _hideHitTest();
+
     var overlay = Overlay.of(context, debugRequiredFor: debugRequiredFor);
     overlay.insert(_toolbar);
     //overlay.insert(_hitTest);
-    _showHitTest();
+
     _toolbarController.forward(from: 0.0);
-  }
-
-  void _showHitTest() {
-    assert(_hitTest == null);
-    return;
-    _hitTest = OverlayEntry(builder: ((context) {
-      return Container(
-          color: Colors.transparent,
-//          height: 100.0,
-//          width: 100.0,
-          child: Listener(
-            behavior: HitTestBehavior.translucent,
-            onPointerDown: (PointerDownEvent event) {
-              print(event.position);
-              if (!renderObject.containsPosition(event.position)) {
-                hide();
-              }
-              ;
-            },
-          ));
-    }));
-    //_hitTest.remove();
-    var overlay = Overlay.of(context, debugRequiredFor: debugRequiredFor);
-
-//    var index = overlay.widget.initialEntries.indexOf(_toolbar);
-//    var index1 = overlay.widget.initialEntries.indexOf(_handles?.first);
-//    var index2 = overlay.widget.initialEntries.indexOf(_handles?.last);
-
-    overlay.insert(_hitTest, below: _handles?.first);
-  }
-
-  void _hideHitTest() {
-    _hitTest?.remove();
-    _hitTest = null;
   }
 
   /// Updates the overlay after the selection has changed.
@@ -227,7 +190,6 @@ class ExtendedTextSelectionOverlay {
     _toolbar?.remove();
     _toolbar = null;
 
-    _hideHitTest();
     //_hitTest.remove();
     _toolbarController.stop();
   }
@@ -338,7 +300,7 @@ class _TextSelectionHandleOverlay extends StatefulWidget {
   final ExtendedRenderParagraph renderObject;
   final ValueChanged<TextSelection> onSelectionHandleChanged;
   final VoidCallback onSelectionHandleTapped;
-  final TextSelectionControls selectionControls;
+  final ExtendedTextSelectionControls selectionControls;
   final DragStartBehavior dragStartBehavior;
 
   @override
