@@ -131,26 +131,26 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                                           color: Colors.grey),
                                       //style: TextStyle(background: Paint()..color = Colors.red),
                                       maxLines: 10,
-                                      overFlowTextSpan: OverFlowTextSpan(
-                                          children: <TextSpan>[
-                                            TextSpan(text: '  \u2026  '),
-                                            TextSpan(
-                                                text: "more detail",
-                                                style: TextStyle(
-                                                  color: Colors.blue,
-                                                ),
-                                                recognizer:
-                                                    TapGestureRecognizer()
-                                                      ..onTap = () {
-                                                        launch(
-                                                            "https://github.com/fluttercandies/extended_text");
-                                                      })
-                                          ],
-                                          background:
-                                              Theme.of(context).canvasColor),
+//                                      overFlowTextSpan: OverFlowTextSpan(
+//                                          children: <TextSpan>[
+//                                            TextSpan(text: '  \u2026  '),
+//                                            TextSpan(
+//                                                text: "more detail",
+//                                                style: TextStyle(
+//                                                  color: Colors.blue,
+//                                                ),
+//                                                recognizer:
+//                                                    TapGestureRecognizer()
+//                                                      ..onTap = () {
+//                                                        launch(
+//                                                            "https://github.com/fluttercandies/extended_text");
+//                                                      })
+//                                          ],
+//                                          background:
+//                                              Theme.of(context).canvasColor),
                                       selectionEnabled: true,
                                       textSelectionControls:
-                                          _myExtendedMaterialTextSelectionControls,
+                                          MyExtendedMaterialTextSelectionControls(),
                                     ),
                                     padding: EdgeInsets.only(
                                         left: margin,
