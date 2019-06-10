@@ -308,14 +308,18 @@ class ExtendedRenderParagraph extends RenderBox {
     _layoutTextWithConstraints(constraints);
     final Offset offset = entry.localPosition;
     if (_hasVisualOverflow && overFlowTextSpan != null) {
-      final TextPosition position =
-          overFlowTextSpan.textPainterHelper.getPositionForOffset(offset);
-      final TextSpan span =
-          overFlowTextSpan.textPainterHelper.getSpanForPosition(position);
+      var overFlowTextSpanOffset =
+          offset - overFlowTextSpan.textPainterHelper.offset;
+      if (overFlowTextSpanOffset >= Offset.zero) {
+        final TextPosition position =
+            overFlowTextSpan.textPainterHelper.getPositionForOffset(offset);
+        final TextSpan span =
+            overFlowTextSpan.textPainterHelper.getSpanForPosition(position);
 
-      if (span?.recognizer != null) {
-        span.recognizer.addPointer(event);
-        return;
+        if (span?.recognizer != null) {
+          span.recognizer.addPointer(event);
+          return;
+        }
       }
     }
 
@@ -799,9 +803,8 @@ class ExtendedRenderParagraph extends RenderBox {
       textPainter.paint(
           canvas, Offset(finalOverflowOffset.dx, overFlowTextSpanOffset.dy));
 
-      overFlowTextSpan.textPainterHelper.saveOffset(Offset(
-          offset.dx + finalOverflowOffset.dx,
-          offset.dy + overFlowTextSpanOffset.dy));
+      overFlowTextSpan.textPainterHelper.saveOffset(
+          Offset(finalOverflowOffset.dx, overFlowTextSpanOffset.dy));
 
       canvas.restore();
     }
@@ -1112,13 +1115,43 @@ class ExtendedRenderParagraph extends RenderBox {
   ///    a [TextPosition] rather than a [TextSelection].
   List<TextSelectionPoint> getEndpointsForSelection(TextSelection selection) {
     assert(constraints != null);
-    _layoutTextWithConstraints(constraints);
+    if (!selection.isCollapsed) {
+      _layoutTextWithConstraints(constraints);
 
-    //final Offset paintOffset = _paintOffset;
-    ///zmt
-    final Offset effectiveOffset = Offset.zero;
+      //final Offset paintOffset = _paintOffset;
+      ///zmt
+      final Offset effectiveOffset = Offset.zero;
+      TextSelection finalTextSelection = selection.copyWith();
 
-    var temp = convertTextInputSelectionToTextPainterSelection(text, selection);
+      var temp = convertTextInputSelectionToTextPainterSelection(
+          text, finalTextSelection);
+
+      if (_hasVisualOverflow) {
+        if (overFlowTextSpan != null) {
+          var position =
+              getPositionForOffset(overFlowTextSpan.textPainterHelper.offset);
+          if (position != null && position.offset < temp.extentOffset) {
+            temp = temp.copyWith(extentOffset: position.offset);
+            finalTextSelection = finalTextSelection.copyWith(
+                extentOffset:
+                    convertTextPainterPostionToTextInputPostion(text, position)
+                        .offset);
+          }
+        } else {
+          final List<ui.TextBox> boxes =
+              _textPainter.getBoxesForSelection(temp);
+//          final Offset start = Offset(boxes.first.start, boxes.first.bottom);
+          final Offset end = Offset(boxes.last.end, boxes.last.bottom);
+          var position = getPositionForOffset(end);
+          if (position != null && position.offset < temp.extentOffset) {
+            temp = temp.copyWith(extentOffset: position.offset);
+            finalTextSelection = finalTextSelection.copyWith(
+                extentOffset:
+                    convertTextPainterPostionToTextInputPostion(text, position)
+                        .offset);
+          }
+        }
+      }
 
 //    if (temp.isCollapsed) {
 //      // TODO(mpcomplete): This doesn't work well at an RTL/LTR boundary.
@@ -1135,22 +1168,26 @@ class ExtendedRenderParagraph extends RenderBox {
 //
 //      return <TextSelectionPoint>[TextSelectionPoint(start, null)];
 //    } else
-    if (!temp.isCollapsed) {
+
       final Offset start = Offset(0.0, preferredLineHeight) +
           _getCaretOffset(
               effectiveOffset,
               TextPosition(
-                  offset: temp.baseOffset, affinity: selection.affinity),
+                  offset: temp.baseOffset,
+                  affinity: finalTextSelection.affinity),
               TextPosition(
-                  offset: selection.baseOffset, affinity: selection.affinity));
+                  offset: finalTextSelection.baseOffset,
+                  affinity: finalTextSelection.affinity));
+
       final Offset end = Offset(0.0, preferredLineHeight) +
           _getCaretOffset(
               effectiveOffset,
               TextPosition(
-                  offset: temp.extentOffset, affinity: selection.affinity),
+                  offset: temp.extentOffset,
+                  affinity: finalTextSelection.affinity),
               TextPosition(
-                  offset: selection.extentOffset,
-                  affinity: selection.affinity));
+                  offset: finalTextSelection.extentOffset,
+                  affinity: finalTextSelection.affinity));
 
       return <TextSelectionPoint>[
         TextSelectionPoint(start, TextDirection.ltr),
@@ -1158,16 +1195,16 @@ class ExtendedRenderParagraph extends RenderBox {
       ];
 
 //      final List<ui.TextBox> boxes = _textPainter.getBoxesForSelection(temp);
-//      final Offset start =
-//          Offset(boxes.first.start, boxes.first.bottom) + paintOffset;
-//      final Offset end =
-//          Offset(boxes.last.end, boxes.last.bottom) + paintOffset;
+//      final Offset start = Offset(boxes.first.start, boxes.first.bottom);
+//      final Offset end = Offset(boxes.last.end, boxes.last.bottom);
 //
 //      return <TextSelectionPoint>[
 //        TextSelectionPoint(start, boxes.first.direction),
 //        TextSelectionPoint(end, boxes.last.direction),
 //      ];
     }
+
+    return null;
   }
 
   Offset _getCaretOffset(Offset effectiveOffset, TextPosition textPosition,
@@ -1259,7 +1296,17 @@ class ExtendedRenderParagraph extends RenderBox {
 
   TextPosition getPositionForPoint(Offset globalPosition) {
     _layoutTextWithConstraints(constraints);
-    return _textPainter.getPositionForOffset(globalToLocal(globalPosition));
+    var result =
+        _textPainter.getPositionForOffset(globalToLocal(globalPosition));
+
+    ///never drag over the over flow text span
+    if (_hasVisualOverflow && overFlowTextSpan != null) {
+      var position =
+          getPositionForOffset(overFlowTextSpan.textPainterHelper.offset);
+      if (result.offset > position.offset) return position;
+    }
+
+    return result;
   }
 
   void _updateSelectionExtentsVisibility(
