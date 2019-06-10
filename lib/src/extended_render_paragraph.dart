@@ -202,7 +202,9 @@ class ExtendedRenderParagraph extends RenderBox {
     if (_overflow == value) return;
     _overflow = value;
     _textPainter.ellipsis =
-        value == ExtendedTextOverflow.ellipsis ? _kEllipsis : null;
+        (value == ExtendedTextOverflow.ellipsis && _overFlowTextSpan == null)
+            ? _kEllipsis
+            : null;
     markNeedsLayout();
   }
 
@@ -1113,18 +1115,35 @@ class ExtendedRenderParagraph extends RenderBox {
   ///
   ///  * [getLocalRectForCaret], which is the equivalent but for
   ///    a [TextPosition] rather than a [TextSelection].
-  List<TextSelectionPoint> getEndpointsForSelection(TextSelection selection) {
+  List<TextSelectionPoint> getEndpointsForSelection(TextSelection selection,
+      {bool toolbar: false}) {
     assert(constraints != null);
+//    if (temp.isCollapsed && toolbar) {
+//      // TODO(mpcomplete): This doesn't work well at an RTL/LTR boundary.
+////      final Offset caretOffset =
+////          _textPainter.getOffsetForCaret(temp.extent, _caretPrototype);
+//
+//      final Offset caretOffset = _getCaretOffset(
+//          effectiveOffset,
+//          TextPosition(offset: temp.extentOffset, affinity: selection.affinity),
+//          TextPosition(
+//              offset: selection.extentOffset, affinity: selection.affinity));
+//
+//      final Offset start = Offset(0.0, preferredLineHeight) + caretOffset;
+//
+//      return <TextSelectionPoint>[TextSelectionPoint(start, null)];
+//    } else
     if (!selection.isCollapsed) {
       _layoutTextWithConstraints(constraints);
 
-      //final Offset paintOffset = _paintOffset;
       ///zmt
-      final Offset effectiveOffset = Offset.zero;
       TextSelection finalTextSelection = selection.copyWith();
 
       var temp = convertTextInputSelectionToTextPainterSelection(
           text, finalTextSelection);
+
+      final Offset effectiveOffset = Offset.zero;
+      Offset finalEnd;
 
       if (_hasVisualOverflow) {
         if (overFlowTextSpan != null) {
@@ -1140,34 +1159,23 @@ class ExtendedRenderParagraph extends RenderBox {
         } else {
           final List<ui.TextBox> boxes =
               _textPainter.getBoxesForSelection(temp);
-//          final Offset start = Offset(boxes.first.start, boxes.first.bottom);
+          //final Offset start = Offset(boxes.first.start, boxes.first.bottom);
           final Offset end = Offset(boxes.last.end, boxes.last.bottom);
-          var position = getPositionForOffset(end);
-          if (position != null && position.offset < temp.extentOffset) {
-            temp = temp.copyWith(extentOffset: position.offset);
-            finalTextSelection = finalTextSelection.copyWith(
-                extentOffset:
-                    convertTextPainterPostionToTextInputPostion(text, position)
-                        .offset);
+
+          if (_oldOverflow == ExtendedTextOverflow.ellipsis) {
+            finalEnd = end;
+          } else {
+            var position = getPositionForOffset(end);
+            if (position != null && position.offset < temp.extentOffset) {
+              temp = temp.copyWith(extentOffset: position.offset);
+              finalTextSelection = finalTextSelection.copyWith(
+                  extentOffset: convertTextPainterPostionToTextInputPostion(
+                          text, position)
+                      .offset);
+            }
           }
         }
       }
-
-//    if (temp.isCollapsed) {
-//      // TODO(mpcomplete): This doesn't work well at an RTL/LTR boundary.
-////      final Offset caretOffset =
-////          _textPainter.getOffsetForCaret(temp.extent, _caretPrototype);
-//
-//      final Offset caretOffset = _getCaretOffset(
-//          effectiveOffset,
-//          TextPosition(offset: temp.extentOffset, affinity: selection.affinity),
-//          TextPosition(
-//              offset: selection.extentOffset, affinity: selection.affinity));
-//
-//      final Offset start = Offset(0.0, preferredLineHeight) + caretOffset;
-//
-//      return <TextSelectionPoint>[TextSelectionPoint(start, null)];
-//    } else
 
       final Offset start = Offset(0.0, preferredLineHeight) +
           _getCaretOffset(
@@ -1179,15 +1187,16 @@ class ExtendedRenderParagraph extends RenderBox {
                   offset: finalTextSelection.baseOffset,
                   affinity: finalTextSelection.affinity));
 
-      final Offset end = Offset(0.0, preferredLineHeight) +
-          _getCaretOffset(
-              effectiveOffset,
-              TextPosition(
-                  offset: temp.extentOffset,
-                  affinity: finalTextSelection.affinity),
-              TextPosition(
-                  offset: finalTextSelection.extentOffset,
-                  affinity: finalTextSelection.affinity));
+      final Offset end = finalEnd ??
+          (Offset(0.0, preferredLineHeight) +
+              _getCaretOffset(
+                  effectiveOffset,
+                  TextPosition(
+                      offset: temp.extentOffset,
+                      affinity: finalTextSelection.affinity),
+                  TextPosition(
+                      offset: finalTextSelection.extentOffset,
+                      affinity: finalTextSelection.affinity)));
 
       return <TextSelectionPoint>[
         TextSelectionPoint(start, TextDirection.ltr),
