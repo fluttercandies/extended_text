@@ -300,7 +300,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
         debugRequiredFor: widget,
         layerLink: _layerLink,
         renderObject: renderObject,
-        value: textEditingValue?.copyWith(selection: selection),
+        value: textEditingValue,
         dragStartBehavior: widget.dragStartBehavior,
         selectionDelegate: this,
         selectionControls: _textSelectionControls);

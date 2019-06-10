@@ -7,6 +7,8 @@ import 'package:extended_image_library/extended_image_library.dart';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 
+import 'text_selection_demo.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -46,11 +48,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     clearMemoryImageCache();
     // TODO: implement initState
-    pages.add(Page(PageType.Text, "quickly build special text"));
-    pages.add(Page(PageType.CustomImage, "custom inline-image in text"));
-    pages.add(Page(PageType.BackgroundText,
+    pages.add(Page(PageType.text, "quickly build special text"));
+    pages.add(Page(PageType.selection, "text selection support"));
+    pages.add(Page(PageType.customImage, "custom inline-image in text"));
+    pages.add(Page(PageType.backgroundText,
         "workaround for issue 24335/24337 about background"));
-    pages.add(Page(PageType.CustomTextOverflow,
+    pages.add(Page(PageType.customTextOverflow,
         "workaround for issue 26748. how to custom text overflow"));
 
     listSourceRepository = new TuChongRepository();
@@ -94,17 +97,20 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             onTap: () {
               switch (page.type) {
-                case PageType.Text:
-                  pageWidget = new TextDemo();
+                case PageType.text:
+                  pageWidget = TextDemo();
                   break;
-                case PageType.CustomImage:
-                  pageWidget = new CustomImageDemo();
+                case PageType.customImage:
+                  pageWidget = CustomImageDemo();
                   break;
-                case PageType.BackgroundText:
-                  pageWidget = new BackgroundTextDemo();
+                case PageType.backgroundText:
+                  pageWidget = BackgroundTextDemo();
                   break;
-                case PageType.CustomTextOverflow:
-                  pageWidget = new CustomTextOverflowDemo();
+                case PageType.customTextOverflow:
+                  pageWidget = CustomTextOverflowDemo();
+                  break;
+                case PageType.selection:
+                  pageWidget = TextSelectionDemo();
                   break;
                 default:
                   break;
@@ -132,7 +138,13 @@ class Page {
   Page(this.type, this.description);
 }
 
-enum PageType { Text, CustomImage, BackgroundText, CustomTextOverflow }
+enum PageType {
+  text,
+  customImage,
+  backgroundText,
+  customTextOverflow,
+  selection
+}
 
 List<String> _imageTestUrls;
 List<String> get imageTestUrls =>
