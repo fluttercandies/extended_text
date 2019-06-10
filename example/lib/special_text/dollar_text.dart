@@ -17,24 +17,18 @@ class DollarText extends SpecialText {
     // TODO: implement finishText
     final String text = getContent();
 
-    if (type == BuilderType.extendedText)
-      return TextSpan(
-          text: text,
-          style: textStyle?.copyWith(color: Colors.orange),
-          recognizer: TapGestureRecognizer()
-            ..onTap = () {
-              if (onTap != null) onTap(toString());
-            });
-
     return SpecialTextSpan(
-      text: text,
-      actualText: toString(),
-      start: start,
+        text: text,
+        actualText: toString(),
+        start: start,
 
-      ///caret can move into special text
-      deleteAll: true,
-      style: textStyle?.copyWith(color: Colors.orange),
-    );
+        ///caret can move into special text
+        deleteAll: true,
+        style: textStyle?.copyWith(color: Colors.orange),
+        recognizer: TapGestureRecognizer()
+          ..onTap = () {
+            if (onTap != null) onTap(toString());
+          });
   }
 }
 

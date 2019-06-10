@@ -24,15 +24,6 @@ class AtText extends SpecialText {
 
     final String atText = toString();
 
-    if (type == BuilderType.extendedText)
-      return TextSpan(
-          text: atText,
-          style: textStyle,
-          recognizer: TapGestureRecognizer()
-            ..onTap = () {
-              if (onTap != null) onTap(atText);
-            });
-
     return showAtBackground
         ? BackgroundTextSpan(
             background: Paint()..color = Colors.blue.withOpacity(0.15),
