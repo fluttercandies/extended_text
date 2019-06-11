@@ -97,10 +97,10 @@ class AtText extends SpecialText {
 
 ### 特殊文本Builder
 
-创建属于你自己规则的Builder，上面说了你可以继承SpecialText来定义各种各样的特殊字符。
-- build 方法中，是通过具体思路是对字符串进行进栈遍历，通过判断flag来判定是否是一个特殊字符。
+创建属于你自己规则的Builder，上面说了你可以继承SpecialText来定义各种各样的特殊文本。
+- build 方法中，是通过具体思路是对字符串进行进栈遍历，通过判断flag来判定是否是一个特殊文本。
   感兴趣的，可以看一下SpecialTextSpanBuilder里面build方法的实现，当然你也可以写出属于自己的build逻辑
-- createSpecialText 方法中则是属于你的特殊字符
+- createSpecialText 通过判断flag来判定是否是一个特殊文本
 
 ```dart
 class MySpecialTextSpanBuilder extends SpecialTextSpanBuilder {
@@ -138,7 +138,7 @@ class MySpecialTextSpanBuilder extends SpecialTextSpanBuilder {
 }
 ```
 
-其实你也不是一定要用这套代码将字符串转换为TextSpan，你可以有自己的方法，只要你告诉我最后的TextSpan就可以了。
+其实你也不是一定要用这套代码将字符串转换为TextSpan，你可以有自己的方法，给最后的TextSpan就可以了。
 
 [more detail](https://github.com/fluttercandies/extended_text/tree/master/example/lib/special_text)
 
