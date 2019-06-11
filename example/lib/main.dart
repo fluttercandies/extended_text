@@ -49,7 +49,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     clearMemoryImageCache();
-    // TODO: implement initState
     pages.add(Page(PageType.text, "quickly build special text"));
     pages.add(Page(PageType.selection, "text selection support"));
     pages.add(Page(PageType.customImage, "custom inline-image in text"));

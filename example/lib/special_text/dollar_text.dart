@@ -14,7 +14,6 @@ class DollarText extends SpecialText {
 
   @override
   TextSpan finishText() {
-    // TODO: implement finishText
     final String text = getContent();
 
     return SpecialTextSpan(
