@@ -6,12 +6,6 @@ Language: [English](README.md) | [中文简体](README-ZH.md)
 
 A powerful extended official text for Dart, which supports Speical Text(Image,@somebody), Custom Background, Custom overFlow, Text Selection.
 
-- [Flutter RichText 支持图片显示和自定义图片效果](https://juejin.im/post/5c8be0d06fb9a049a42ff067)
-- [Flutter RichText 支持自定义文本溢出效果](https://juejin.im/post/5c8ca608f265da2dd6394001)
-- [Flutter RichText 支持自定义文字背景](https://juejin.im/post/5c8bf9516fb9a049c9669204)
-- [Flutter RichText 支持特殊文字效果](https://juejin.im/post/5c8bf4fce51d451066008fa2)
-- [Flutter RichText 支持文本选择](https://juejin.im/post/5c8bf4fce51d451066008fa2)
-
 ## Table of contents
 - [extended_text](#extendedtext)
   - [Table of contents](#table-of-contents)
