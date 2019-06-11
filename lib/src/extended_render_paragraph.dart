@@ -199,12 +199,11 @@ class ExtendedRenderParagraph extends RenderBox {
   ExtendedTextOverflow _overflow;
   set overflow(ExtendedTextOverflow value) {
     assert(value != null);
-    if (_overflow == value) return;
-    _overflow = value;
+    var temp = overFlowTextSpan != null ? ExtendedTextOverflow.clip : value;
+    if (_overflow == temp) return;
+    _overflow = temp;
     _textPainter.ellipsis =
-        (value == ExtendedTextOverflow.ellipsis && _overFlowTextSpan == null)
-            ? _kEllipsis
-            : null;
+        value == ExtendedTextOverflow.ellipsis ? _kEllipsis : null;
     markNeedsLayout();
   }
 
@@ -531,11 +530,10 @@ class ExtendedRenderParagraph extends RenderBox {
     _recognizers.clear();
     int offset = 0;
     text.visitTextSpan((TextSpan span) {
-      if (span.recognizer != null &&
-          (span.recognizer is TapGestureRecognizer ||
-              span.recognizer is LongPressGestureRecognizer)) {
+      if (span.recognizer != null && (span.recognizer is TapGestureRecognizer || span.recognizer is LongPressGestureRecognizer)) {
+        final int length = span.semanticsLabel?.length ?? span.text.length;
         _recognizerOffsets.add(offset);
-        _recognizerOffsets.add(offset + span.text.length);
+        _recognizerOffsets.add(offset + length);
         _recognizers.add(span.recognizer);
       }
       offset += span.text.length;
