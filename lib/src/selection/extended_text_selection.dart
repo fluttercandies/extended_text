@@ -4,14 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import '../../extended_text.dart';
+import '../extended_render_paragraph.dart';
 import '../extended_rich_text.dart';
-import '../extended_text_typedef.dart';
+import '../over_flow_text_span.dart';
 import 'extended_text_selection_overlay.dart';
 import 'extended_text_selection_pointer_handler.dart';
-import 'selection_controls/cupertino_text_selection_controls.dart';
-import 'selection_controls/material_text_selection_controls.dart';
+import 'selection_controls/extended_text_selection_controls.dart';
 
 ///
 ///  create by zmtzawqlp on 2019/6/5
@@ -128,14 +126,12 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     textEditingValue = TextEditingValue(
         text: widget.data, selection: TextSelection.collapsed(offset: 0));
 
-    // TODO: implement initState
     super.initState();
   }
 
   @override
   void dispose() {
-    _pointerHandlerState?.selectionStates.remove(this);
-    // TODO: implement dispose
+    _pointerHandlerState?.selectionStates?.remove(this);
     super.dispose();
   }
 

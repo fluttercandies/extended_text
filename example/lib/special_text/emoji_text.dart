@@ -10,7 +10,6 @@ class EmojiText extends SpecialText {
 
   @override
   TextSpan finishText() {
-    // TODO: implement finishText
     var key = toString();
     if (EmojiUitl.instance.emojiMap.containsKey(key)) {
       //fontsize id define image height

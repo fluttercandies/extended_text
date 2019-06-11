@@ -4,343 +4,393 @@
 
 extended official text to quickly build special text like inline image or @somebody,it also provide custom background,custom over flow.
 
-- [Flutter RichText支持图片显示和自定义图片效果](https://juejin.im/post/5c8be0d06fb9a049a42ff067)
-- [Flutter RichText支持自定义文本溢出效果](https://juejin.im/post/5c8ca608f265da2dd6394001)
-- [Flutter RichText支持自定义文字背景](https://juejin.im/post/5c8bf9516fb9a049c9669204)
-- [Flutter RichText支持特殊文字效果](https://juejin.im/post/5c8bf4fce51d451066008fa2)
-- [Flutter RichText支持文本选择](https://juejin.im/post/5c8bf4fce51d451066008fa2)
-
+- [Flutter RichText 支持图片显示和自定义图片效果](https://juejin.im/post/5c8be0d06fb9a049a42ff067)
+- [Flutter RichText 支持自定义文本溢出效果](https://juejin.im/post/5c8ca608f265da2dd6394001)
+- [Flutter RichText 支持自定义文字背景](https://juejin.im/post/5c8bf9516fb9a049c9669204)
+- [Flutter RichText 支持特殊文字效果](https://juejin.im/post/5c8bf4fce51d451066008fa2)
+- [Flutter RichText 支持文本选择](https://juejin.im/post/5c8bf4fce51d451066008fa2)
 
 ## Table of contents
-
 - [extended_text](#extendedtext)
   - [Table of contents](#table-of-contents)
-  - [ImageSpan](#image-span)
-    - [simple use](#simple-use)
-    - [use Extendednetworkimageprovider](#use-Extendednetworkimageprovider)
-  - [Load State](#load-state)
-    - [demo code](#demo-code)
-  - [Zoom Pan](#zoom-pan)
-    - [double tap animation](#double-tap-animation)
-  - [Photo View](#photo-view)
-  - [Slide Out Page](#slide-out-page)
-    - [include your page in ExtendedImageSlidePage](#include-your-page-in-extendedimageslidepage)
-    - [make sure your page background is transparent](#make-sure-your-page-background-is-transparent)   
-    - [push with transparent page route](#push-with-transparent-page-route)
-  - [Border BorderRadius Shape](#border-borderradius-shape)
-  - [Clear Save](#clear-save)
-    - [clear](#clear)
-    - [save network](#save-network)
-  - [Crop](#crop)
-  - [Paint](#paint)
-  - [Other APIs](#other-apis)
-  
-## ImageSpan
+  - [Speical Text](#speical-text)
+    - [Create Speical Text](#create-speical-text)
+    - [SpecialTextSpanBuilder](#specialtextspanbuilder)
+  - [Image](#image)
+    - [ImageSpan](#imagespan)
+    - [Cache Image](#cache-image)
+  - [Selection](#selection)
+    - [TextSelectionControls](#textselectioncontrols)
+    - [Show/Hide ToolBar Handle](#showhide-toolbar-handle)
+      - [Default Behavior](#default-behavior)
+      - [Custom Behavior](#custom-behavior)
+  - [Custom Background](#custom-background)
+  - [Custom Overflow](#custom-overflow)
 
-![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/custom_image.gif)
-
-show image in text by using ImageSpan
-```dart
- ImageSpan(
-    this.image, {
-    @required this.imageWidth,
-    @required this.imageHeight,
-    this.margin,
-    this.beforePaintImage,
-    this.afterPaintImage,
-    this.fit: BoxFit.scaleDown,
-    String actualText: imageSpanTransparentPlaceholder,
-    int start: 0,
-    this.clearMemoryCacheIfFailed: true,
-    GestureRecognizer recognizer,
-  }) 
-
-  ImageSpan(AssetImage("xxx.jpg"),
-          imageWidth: size,
-          imageHeight: size,
-          margin: EdgeInsets.only(left: 2.0, bottom: 0.0, right: 2.0));
-    }
-```
-
-| parameter   | description                                                                           | default             |
-| ----------- | ------------------------------------------------------------------------------------- | ------------------- |
-| image         | The image to display(ImageProvider).                                     | -             |
-| imageWidth       | The width of image(not include margin)                           | required               |
-| imageHeight     | The height of image(not include margin)  |required                    |required
-| margin       | The margin of image                                               | -                |
-| beforePaintImage     | the time to retry to request                                                          | 3                   |
-| afterPaintImage   | time limit to request image                                                           | -                     |
-| fit   | the time duration to retry to request                                                 | milliseconds: 100   |
-| actualText | token to cancel network request                                                       | CancellationToken() |
-| start | token to cancel network request                                                       | CancellationToken() |
-| clearMemoryCacheIfFailed | token to cancel network request                                                       | CancellationToken() |
-| recognizer | token to cancel network request                                                       | CancellationToken() |
-
-
-
-
-and you can also define your image by using beforePaintImage and afterPaintImage.
-
-it's simple to create a loading placeholder.
-
-```dart
-ImageSpan(CachedNetworkImage(imageTestUrls.first), beforePaintImage:
-                    (Canvas canvas, Rect rect, ImageSpan imageSpan, clearFailedCache: true) {
-              bool hasPlaceholder = drawPlaceholder(canvas, rect, imageSpan);
-              if (!hasPlaceholder) {
-                clearRect(rect, canvas);
-              }
-              return false;
-            },
-                margin: EdgeInsets.only(right: 10.0),
-                imageWidth: 80.0,
-                imageHeight: 60.0),
-
-
-bool drawPlaceholder(Canvas canvas, Rect rect, ImageSpan imageSpan) {
-    bool hasPlaceholder = imageSpan.imageSpanResolver.imageInfo?.image == null;
-
-    if (hasPlaceholder) {
-      canvas.drawRect(rect, Paint()..color = Colors.grey);
-      var textPainter = TextPainter(
-          text: TextSpan(text: "loading", style: TextStyle(fontSize: 10.0)),
-          textAlign: TextAlign.center,
-          textScaleFactor: 1,
-          textDirection: TextDirection.ltr,
-          maxLines: 1)
-        ..layout(maxWidth: rect.width);
-
-      textPainter.paint(
-          canvas,
-          Offset(rect.left + (rect.width - textPainter.width) / 2.0,
-              rect.top + (rect.height - textPainter.height) / 2.0));
-    }
-    return hasPlaceholder;
-  }
-
-  void clearRect(Rect rect, Canvas canvas) {
-    ///if don't save layer
-    ///BlendMode.clear will show black
-    ///maybe this is bug for blendMode.clear
-    canvas.saveLayer(rect, Paint());
-    canvas.drawRect(rect, Paint()..blendMode = BlendMode.clear);
-    canvas.restore();
-  }
-```
-
-if you want cache the network image, you can use CachedNetworkImage and clear them with clearExtendedTextDiskCachedImages
-```dart
-  CachedNetworkImage(this.url,
-      {this.scale = 1.0,
-      this.headers,
-      this.cache: false,
-      this.retries = 3,
-      this.timeLimit,
-      this.timeRetry = const Duration(milliseconds: 100),
-      this.clearFailedCache: false})
-      : assert(url != null),
-        assert(scale != null);
-```
-
-```dart
-/// Clear the disk cache directory then return if it succeed.
-///  <param name="duration">timespan to compute whether file has expired or not</param>
-Future<bool> clearExtendedTextDiskCachedImages({Duration duration}) async
-```
-
-if network image was loaded failed, and you want to reload it next time,
-you can set clearFailedCache= true or use clearLoadFailedImageMemoryCache method
-
-```dart
-/// clear load failed image in memory so that it will reload
-void clearLoadFailedImageMemoryCache({CachedNetworkImage image}) {
-  if (image != null) {
-    if (_failedImageCache.remove(image)) image.evict();
-  } else {
-    _failedImageCache.forEach((image) {
-      if (_failedImageCache.remove(image)) image.evict();
-    });
-  }
-}
-```
-
-[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/custom_image_demo.dart)
-
-## Speical text
-
-extended text helps you to build speical text quickly.
+## Speical Text
 
 ![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/special_text.jpg)
 
-for example, follwing code show how to create @xxxx in your text.
 
-you just to extend SpecialText and define your rule.
+### Create Speical Text
+extended text helps you to convert your text to speical textSpan quickly.
+
+for example, follwing code show how to create @xxxx in your text.
 
 ```dart
 class AtText extends SpecialText {
   static const String flag = "@";
-  AtText(TextStyle textStyle, SpecialTextGestureTapCallback onTap)
+  final int start;
+
+  /// whether show background for @somebody
+  final bool showAtBackground;
+
+  final BuilderType type;
+  AtText(TextStyle textStyle, SpecialTextGestureTapCallback onTap,
+      {this.showAtBackground: false, this.type, this.start})
       : super(flag, " ", textStyle, onTap: onTap);
 
   @override
   TextSpan finishText() {
-    // TODO: implement finishText
+    TextStyle textStyle =
+        this.textStyle?.copyWith(color: Colors.blue, fontSize: 16.0);
 
     final String atText = toString();
-    return TextSpan(
-        text: atText,
-        style: textStyle?.copyWith(color: Colors.blue, fontSize: 16.0),
-        recognizer: TapGestureRecognizer()
-          ..onTap = () {
-            if (onTap != null) onTap(atText);
-          });
+
+    return showAtBackground
+        ? BackgroundTextSpan(
+            background: Paint()..color = Colors.blue.withOpacity(0.15),
+            text: atText,
+            actualText: atText,
+            start: start,
+
+            ///caret can move into special text
+            deleteAll: true,
+            style: textStyle,
+            recognizer: type == BuilderType.extendedText
+                ? (TapGestureRecognizer()
+                  ..onTap = () {
+                    if (onTap != null) onTap(atText);
+                  })
+                : null)
+        : SpecialTextSpan(
+            text: atText,
+            actualText: atText,
+            start: start,
+            style: textStyle,
+            recognizer: type == BuilderType.extendedText
+                ? (TapGestureRecognizer()
+                  ..onTap = () {
+                    if (onTap != null) onTap(atText);
+                  })
+                : null);
   }
 }
 
 ```
 
-and create your SpecialTextSpanBuilder by extend SpecialTextSpanBuilder
+### SpecialTextSpanBuilder
+
+create your SpecialTextSpanBuilder
 
 ```dart
 class MySpecialTextSpanBuilder extends SpecialTextSpanBuilder {
+  /// whether show background for @somebody
+  final bool showAtBackground;
+  final BuilderType type;
+  MySpecialTextSpanBuilder(
+      {this.showAtBackground: false, this.type: BuilderType.extendedText});
+
   @override
-  TextSpan build(String data,
-      {TextStyle textStyle, SpecialTextGestureTapCallback onTap}) {
-    if (data == null || data == "") return null;
-    List<TextSpan> inlineList = new List<TextSpan>();
-    if (data != null && data.length > 0) {
-      SpecialText specialText;
-      String textStack = "";
-      //String text
-      for (int i = 0; i < data.length; i++) {
-        String char = data[i];
-        if (specialText != null) {
-          if (!specialText.isEnd(char)) {
-            specialText.appendContent(char);
-          } else {
-            inlineList.add(specialText.finishText());
-            specialText = null;
-          }
-        } else {
-          textStack += char;
-          specialText =
-              createSpecialText(textStack, textStyle: textStyle, onTap: onTap);
-          if (specialText != null) {
-            if (textStack.length - specialText.startFlag.length >= 0) {
-              textStack = textStack.substring(
-                  0, textStack.length - specialText.startFlag.length);
-              if (textStack.length > 0) {
-                inlineList.add(TextSpan(text: textStack, style: textStyle));
-              }
-            }
-            textStack = "";
-          }
-        }
-      }
-
-      if (specialText != null) {
-        inlineList.add(TextSpan(
-            text: specialText.startFlag + specialText.getContent(),
-            style: textStyle));
-      } else if (textStack.length > 0) {
-        inlineList.add(TextSpan(text: textStack, style: textStyle));
-      }
-    }
-
-    // TODO: implement build
-    return TextSpan(children: inlineList, style: textStyle);
+  TextSpan build(String data, {TextStyle textStyle, onTap}) {
+    var textSpan = super.build(data, textStyle: textStyle, onTap: onTap);
+    return textSpan;
   }
 
   @override
   SpecialText createSpecialText(String flag,
-      {TextStyle textStyle, SpecialTextGestureTapCallback onTap}) {
+      {TextStyle textStyle, SpecialTextGestureTapCallback onTap, int index}) {
     if (flag == null || flag == "") return null;
-    // TODO: implement createSpecialText
 
+    ///index is end index of start flag, so text start index should be index-(flag.length-1)
     if (isStart(flag, AtText.flag)) {
-      return AtText(textStyle, onTap);
+      return AtText(textStyle, onTap,
+          start: index - (AtText.flag.length - 1),
+          showAtBackground: showAtBackground,
+          type: type);
     } else if (isStart(flag, EmojiText.flag)) {
-      return EmojiText(textStyle);
+      return EmojiText(textStyle, start: index - (EmojiText.flag.length - 1));
     } else if (isStart(flag, DollarText.flag)) {
-      return DollarText(textStyle, onTap);
+      return DollarText(textStyle, onTap,
+          start: index - (DollarText.flag.length - 1), type: type);
     }
     return null;
   }
 }
 ```
 
-at last used them in extended text, import thing is that you can define your self rule to create your text span.
-
-```dart
-ExtendedText(
-          "[love]Extended text help you to build rich text quickly. any special text you will have with extended text. "
-              "\n\nIt's my pleasure to invite you to join \$FlutterCandies\$ if you want to improve flutter .[love]"
-              "\n\nif you meet any problem, please let me konw @zmtzawqlp .[sun_glasses]",
-          onSpecialTextTap: (String data) {
-            if (data.startsWith("\$")) {
-              launch("https://github.com/fluttercandies");
-            } else if (data.startsWith("@")) {
-              launch("mailto:zmtzawqlp@live.com");
-            }
-          },
-          specialTextSpanBuilder: MySpecialTextSpanBuilder(),
-          overflow: TextOverflow.ellipsis,
-          //style: TextStyle(background: Paint()..color = Colors.red),
-          maxLines: 10,
-        ),
-```
-
 [more detail](https://github.com/fluttercandies/extended_text/tree/master/example/lib/special_text)
 
-## custom background (refer to issue [24335](https://github.com/flutter/flutter/issues/24335)/[24337](https://github.com/flutter/flutter/issues/24337) about background)
+## Image
+
+![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/custom_image.gif)
+
+### ImageSpan
+
+show image in text by using ImageSpan
+
+```dart
+ImageSpan(
+  this.image, {
+  @required this.imageWidth,
+  @required this.imageHeight,
+  this.margin,
+  this.beforePaintImage,
+  this.afterPaintImage,
+  this.fit: BoxFit.scaleDown,
+  String actualText: imageSpanTransparentPlaceholder,
+  int start: 0,
+  this.clearMemoryCacheIfFailed: true,
+  GestureRecognizer recognizer,
+})
+
+ImageSpan(AssetImage("xxx.jpg"),
+        imageWidth: size,
+        imageHeight: size,
+        margin: EdgeInsets.only(left: 2.0, bottom: 0.0, right: 2.0));
+  }
+```
+
+| parameter                | description                                                                                    | default          |
+| ------------------------ | ---------------------------------------------------------------------------------------------- | ---------------- |
+| image                    | The image to display(ImageProvider).                                                           | -                |
+| imageWidth               | The width of image(not include margin)                                                         | required         |
+| imageHeight              | The height of image(not include margin)                                                        | required         |
+| margin                   | The margin of image                                                                            | -                |
+| beforePaintImage         | you can paint your placeholder or clip etc if needed                                           | -                |
+| afterPaintImage          | you can paint border,shadow etc if needed                                                      | -                |
+| fit                      | image fit                                                                                      | BoxFit.scaleDown |
+| actualText               | actual text. take care of it when enable selection,it's something like "\[love\]"              | "\u200B"         |
+| start                    | start index of text.take care of it when enable selection.                                     | 0                |
+| clearMemoryCacheIfFailed | when failed to load image, whether clear memory cache,if ture, image will reload in next time. | true             |
+| recognizer               | A gesture recognizer that will receive events that hit this text span.                         | -                |
+
+### Cache Image
+
+if you want cache the network image, you can use ExtendedNetworkImageProvider and clear them with clearDiskCachedImages
+
+```dart
+ExtendedNetworkImageProvider(
+  this.url, {
+  this.scale = 1.0,
+  this.headers,
+  this.cache: false,
+  this.retries = 3,
+  this.timeLimit,
+  this.timeRetry = const Duration(milliseconds: 100),
+  CancellationToken cancelToken,
+})  : assert(url != null),
+      assert(scale != null),
+      cancelToken = cancelToken ?? CancellationToken();
+```
+
+| parameter   | description                                                                           | default             |
+| ----------- | ------------------------------------------------------------------------------------- | ------------------- |
+| url         | The URL from which the image will be fetched.                                         | required            |
+| scale       | The scale to place in the [ImageInfo] object of the image.                            | 1.0                 |
+| headers     | The HTTP headers that will be used with [HttpClient.get] to fetch image from network. | -                   |
+| cache       | whether cache image to local                                                          | false               |
+| retries     | the time to retry to request                                                          | 3                   |
+| timeLimit   | time limit to request image                                                           | -                   |
+| timeRetry   | the time duration to retry to request                                                 | milliseconds: 100   |
+| cancelToken | token to cancel network request                                                       | CancellationToken() |
+
+```dart
+/// Clear the disk cache directory then return if it succeed.
+///  <param name="duration">timespan to compute whether file has expired or not</param>
+Future<bool> clearDiskCachedImages({Duration duration}) async
+```
+
+[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/custom_image_demo.dart)
+
+
+## Selection
+
+![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/selection.gif)
+
+| parameter             | description                                                                                                          | default                                                                      |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| selectionEnabled      | Whether enable selection                                                                                             | false                                                                        |
+| selectionColor        | Color of selection                                                                                                   | Theme.of(context).textSelectionColor                                         |
+| dragStartBehavior     | DragStartBehavior for text selection                                                                                 | DragStartBehavior.start                                                      |
+| textSelectionControls | An interface for building the selection UI, to be provided by the implementor of the toolbar widget or handle widget | extendedMaterialTextSelectionControls/extendedCupertinoTextSelectionControls |
+
+### TextSelectionControls
+
+default value of textSelectionControls are extendedMaterialTextSelectionControls/extendedCupertinoTextSelectionControls 
+
+override buildToolbar or buildHandle to custom your toolbar widget or handle widget
+
+```dart
+class MyExtendedMaterialTextSelectionControls
+    extends ExtendedMaterialTextSelectionControls {
+  @override
+  Widget buildToolbar(BuildContext context, Rect globalEditableRegion,
+      Offset position, TextSelectionDelegate delegate) {
+    assert(debugCheckHasMediaQuery(context));
+    assert(debugCheckHasMaterialLocalizations(context));
+    return ConstrainedBox(
+      constraints: BoxConstraints.tight(globalEditableRegion.size),
+      child: CustomSingleChildLayout(
+        delegate: ExtendedTextSelectionToolbarLayout(
+          MediaQuery.of(context).size,
+          globalEditableRegion,
+          position,
+        ),
+        child: _TextSelectionToolbar(
+          handleCopy: canCopy(delegate) ? () => handleCopy(delegate) : null,
+          handleSelectAll:
+              canSelectAll(delegate) ? () => handleSelectAll(delegate) : null,
+          handleLike: () {
+            //mailto:<email address>?subject=<subject>&body=<body>, e.g.
+            launch(
+                "mailto:zmtzawqlp@live.com?subject=extended_text_share&body=${delegate.textEditingValue.text}");
+            delegate.hideToolbar();
+          },
+        ),
+      ),
+    );
+  }
+}
+
+/// Manages a copy/paste text selection toolbar.
+class _TextSelectionToolbar extends StatelessWidget {
+  const _TextSelectionToolbar(
+      {Key key, this.handleCopy, this.handleSelectAll, this.handleLike})
+      : super(key: key);
+
+  final VoidCallback handleCopy;
+  final VoidCallback handleSelectAll;
+  final VoidCallback handleLike;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Widget> items = <Widget>[];
+    final MaterialLocalizations localizations =
+        MaterialLocalizations.of(context);
+
+    if (handleCopy != null)
+      items.add(FlatButton(
+          child: Text(localizations.copyButtonLabel), onPressed: handleCopy));
+    if (handleSelectAll != null)
+      items.add(FlatButton(
+          child: Text(localizations.selectAllButtonLabel),
+          onPressed: handleSelectAll));
+    if (handleLike != null)
+      items.add(FlatButton(child: Icon(Icons.favorite), onPressed: handleLike));
+
+    return Material(
+      elevation: 1.0,
+      child: Container(
+        height: 44.0,
+        child: Row(mainAxisSize: MainAxisSize.min, children: items),
+      ),
+    );
+  }
+}
+
+```
+
+### Show/Hide ToolBar Handle
+
+contain your page into ExtendedTextSelectionPointerHandler, so you can define when to show/hide toolbar and handle.
+
+#### Default Behavior
+
+- tap region outside of extended text,may be it should hide 
+- scorll list, may be it should hide
+
+#### Custom Behavior
+
+Default Behavior isn't what you want, you can listen and handle by your self.
+
+```dart
+ return ExtendedTextSelectionPointerHandler(
+      //default behavior
+      // child: result,
+      //custom your behavior
+      builder: (states) {
+        return Listener(
+          child: result,
+          behavior: HitTestBehavior.translucent,
+          onPointerDown: (value) {
+            for (var state in states) {
+              if (!state.containsPosition(value.position)) {
+                //clear other selection
+                state.clearSelection();
+              }
+            }
+          },
+          onPointerMove: (value) {
+            //clear other selection
+            for (var state in states) {
+              state.clearSelection();
+            }
+          },
+        );
+      },
+    );
+```
+[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/text_selection_demo.dart)
+
+## Custom Background
 
 ![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/background.png)
 
+refer to issues [24335](https://github.com/flutter/flutter/issues/24335)/[24337](https://github.com/flutter/flutter/issues/24337) about background
 
 ```dart
- BackgroundTextSpan(
-                      text: "错误演示 12345",
-                      background: Paint()..color = Colors.blue,
-                    ),
+  BackgroundTextSpan(
+      text:
+          "This text has nice background with borderradius,no mattter how many line,it likes nice",
+      background: Paint()..color = Colors.indigo,
+      clipBorderRadius: BorderRadius.all(Radius.circular(3.0))),
 ```
-
-and you can also to cilp your background with clipBorderRadius or paintBackground
-
-```dart
-clipBorderRadius: BorderRadius.all(Radius.circular(3.0)),
-paintBackground: (BackgroundTextSpan backgroundTextSpan,
-                          Canvas canvas,
-                          Offset offset,
-                          TextPainter painter,
-                          Rect rect,
-                          {Offset endOffset}) {}
-```
+| parameter        | description                                                  | default |
+| ---------------- | ------------------------------------------------------------ | ------- |
+| background       | Background painter                                           | -       |
+| clipBorderRadius | Clip BorderRadius                                            | -       |
+| paintBackground  | Paint background call back, you can paint background by self | -       |
 
 [more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/background_text_demo.dart)
 
-## custom overflow (refer to issue [26748](https://github.com/flutter/flutter/issues/26748))
+## Custom Overflow
 
 ![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/overflow.jpg)
 
-you can define your custom over flow textspan with overFlowTextSpan.
+refer to issue [26748](https://github.com/flutter/flutter/issues/26748)
 
-``` dart
-          ExtendedText(...
-             overFlowTextSpan: OverFlowTextSpan(children: <TextSpan>[
-                      TextSpan(text: '  \u2026  '),
-                      TextSpan(
-                          text: "more detail",
-                          style: TextStyle(
-                            color: Colors.blue,
-                          ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              launch(
-                                  "https://github.com/fluttercandies/extended_text");
-                            })
-                    ], background: Theme.of(context).canvasColor),
-                    ...
-                  )
+| parameter  | description                                                       | default |
+| ---------- | ----------------------------------------------------------------- | ------- |
+| background | Background to cover up the original text under [OverFlowTextSpan] | -       |
+
+```dart
+  ExtendedText(...
+      overFlowTextSpan: OverFlowTextSpan(children: <TextSpan>[
+              TextSpan(text: '  \u2026  '),
+              TextSpan(
+                  text: "more detail",
+                  style: TextStyle(
+                    color: Colors.blue,
+                  ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      launch(
+                          "https://github.com/fluttercandies/extended_text");
+                    })
+            ], background: Theme.of(context).canvasColor),
+            ...
+          )
 ```
 
 [more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/custom_text_overflow_demo.dart)
