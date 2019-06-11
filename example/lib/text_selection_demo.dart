@@ -63,7 +63,7 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
           Container(
             padding: EdgeInsets.all(margin),
             child: Text(
-                "support to select text and custom text selection toolbar"),
+                "support to select text and custom text selection toolbar/handle"),
           ),
           Expanded(
             child: PullToRefreshNotification(
@@ -234,7 +234,29 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
     );
 
     return ExtendedTextSelectionPointerHandler(
-      child: result,
+      //default behavior
+      // child: result,
+      //custom your behavior
+      builder: (states) {
+        return Listener(
+          child: result,
+          behavior: HitTestBehavior.translucent,
+          onPointerDown: (value) {
+            for (var state in states) {
+              if (!state.containsPosition(value.position)) {
+                //clear other selection
+                state.clearSelection();
+              }
+            }
+          },
+          onPointerMove: (value) {
+            //clear other selection
+            for (var state in states) {
+              state.clearSelection();
+            }
+          },
+        );
+      },
     );
   }
 

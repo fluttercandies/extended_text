@@ -18,7 +18,6 @@ import 'selection_controls/material_text_selection_controls.dart';
 ///
 
 class ExtendedTextSelection extends StatefulWidget {
-  final WidgetKeyBuilder builder;
   final GestureTapCallback onTap;
 
   /// How the text should be aligned horizontally.
@@ -93,8 +92,7 @@ class ExtendedTextSelection extends StatefulWidget {
   final ExtendedTextSelectionControls textSelectionControls;
 
   ExtendedTextSelection(
-      {this.builder,
-      this.onTap,
+      {this.onTap,
       this.softWrap,
       this.locale,
       this.textDirection,
@@ -339,6 +337,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
 
   @override
   void bringIntoView(TextPosition position) {
+    //do nothing
 //    _scrollController.jumpTo(_getScrollOffsetForCaret(
 //        renderEditable.getLocalRectForCaret(position)));
   }
@@ -363,11 +362,13 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     _selectionOverlay = null;
   }
 
+  ///hittest
   bool containsPosition(Offset position) {
     //_hideSelectionOverlayIfNeeded();
     return _renderParagraph.containsPosition(position);
   }
 
+  ///clear selection if it has.
   void clearSelection() {
     if (!textEditingValue.selection.isCollapsed) {
       textEditingValue = textEditingValue.copyWith(

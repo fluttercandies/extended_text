@@ -1,3 +1,8 @@
+## [0.5.4]
+
+* support text selection
+* fix issue about rect of overFlowTextSpan 
+
 ## [0.5.3]
 
 * update extended_text_library

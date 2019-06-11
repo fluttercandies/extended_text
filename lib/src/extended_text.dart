@@ -60,10 +60,14 @@ class ExtendedText extends StatelessWidget {
         specialTextSpanBuilder = null,
         super(key: key);
 
+  /// An interface for building the selection UI, to be provided by the
+  /// implementor of the toolbar widget or handle widget
   final ExtendedTextSelectionControls textSelectionControls;
 
+  ///DragStartBehavior for text selection
   final DragStartBehavior dragStartBehavior;
 
+  ///Color of selection
   final Color selectionColor;
 
   ///Called when the user taps on this text.
