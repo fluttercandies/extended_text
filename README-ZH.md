@@ -12,9 +12,9 @@
 - [Flutter RichText 支持特殊文字效果](https://juejin.im/post/5c8bf4fce51d451066008fa2)
 - [Flutter RichText 支持文本选择](https://juejin.im/post/5c8bf4fce51d451066008fa2)
 
-## Table of contents
+## 目录
 - [extended_text](#extendedtext)
-  - [Table of contents](#table-of-contents)
+  - [目录](#%E7%9B%AE%E5%BD%95)
   - [特殊文本](#%E7%89%B9%E6%AE%8A%E6%96%87%E6%9C%AC)
     - [创建特殊文本](#%E5%88%9B%E5%BB%BA%E7%89%B9%E6%AE%8A%E6%96%87%E6%9C%AC)
     - [特殊文本Builder](#%E7%89%B9%E6%AE%8A%E6%96%87%E6%9C%ACbuilder)
@@ -41,7 +41,7 @@ extended_text 帮助将字符串文本快速转换为特殊的TextSpan
 下面的例子告诉你怎么创建一个@xxx
 
 具体思路是对字符串进行进栈遍历，通过判断flag来判定是否是一个特殊字符。
-例子：@zmtzawqlp ，以@开头并且以空格结束，我们就认为它是一个@的特殊字符
+例子：@zmtzawqlp ，以@开头并且以空格结束，我们就认为它是一个@的特殊文本
 
 ```dart
 class AtText extends SpecialText {
@@ -172,7 +172,7 @@ ImageSpan(AssetImage("xxx.jpg"),
   }
 ```
 
-| parameter                | description                                                            | default          |
+| 参数                     | 描述                                                                   | 默认             |
 | ------------------------ | ---------------------------------------------------------------------- | ---------------- |
 | image                    | 图片展示的Provider(ImageProvider)                                      | -                |
 | imageWidth               | 宽度，不包括 margin                                                    | 必填             |
@@ -180,7 +180,7 @@ ImageSpan(AssetImage("xxx.jpg"),
 | margin                   | 图片的margin                                                           | -                |
 | beforePaintImage         | 在绘制图片之前的回调，可以在这个时机绘制占位或者做裁剪等               | -                |
 | afterPaintImage          | 在绘制图片之后的回调，可以在这个时机绘制边框或者阴影等                 | -                |
-| fit                      | image fit                                                              | BoxFit.scaleDown |
+| fit                      | BoxFit                                                                 | BoxFit.scaleDown |
 | actualText               | 真实的文本,当你开启文本选择功能的时候，必须设置,比如图片"\[love\]      | 空占位符"\u200B" |
 | start                    | 在文本字符串中的开始位置,当你开启文本选择功能的时候，必须设置          | 0                |
 | clearMemoryCacheIfFailed | 是否在图片加载失败之后清掉内存缓存，如果是ture的话，下次会重新加载图片 | true             |
@@ -205,7 +205,7 @@ ExtendedNetworkImageProvider(
       cancelToken = cancelToken ?? CancellationToken();
 ```
 
-| parameter   | description         | default             |
+| 参数        | 描述                | 默认                |
 | ----------- | ------------------- | ------------------- |
 | url         | 网络请求地址        | required            |
 | scale       | ImageInfo中的scale  | 1.0                 |
@@ -229,7 +229,7 @@ Future<bool> clearDiskCachedImages({Duration duration}) async
 
 ![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/selection.gif)
 
-| parameter             | description                                          | default                                                                      |
+| 参数                  | 描述                                                 | 默认                                                                         |
 | --------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------- |
 | selectionEnabled      | 是否开启文本选择功能                                 | false                                                                        |
 | selectionColor        | 文本选择的颜色                                       | Theme.of(context).textSelectionColor                                         |
@@ -369,11 +369,11 @@ Text背景相关的issue[24335](https://github.com/flutter/flutter/issues/24335)
       background: Paint()..color = Colors.indigo,
       clipBorderRadius: BorderRadius.all(Radius.circular(3.0))),
 ```
-| parameter        | description                                | default |
-| ---------------- | ------------------------------------------ | ------- |
-| background       | 背景画刷                                   | -       |
-| clipBorderRadius | 用于裁剪背景                               | -       |
-| paintBackground  | 绘制背景的回调，你可以按照你的想法绘画背景 | -       |
+| 参数             | 描述                                       | 默认 |
+| ---------------- | ------------------------------------------ | ---- |
+| background       | 背景画刷                                   | -    |
+| clipBorderRadius | 用于裁剪背景                               | -    |
+| paintBackground  | 绘制背景的回调，你可以按照你的想法绘画背景 | -    |
 
 [more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/background_text_demo.dart)
 
@@ -383,9 +383,9 @@ Text背景相关的issue[24335](https://github.com/flutter/flutter/issues/24335)
 
 文本溢出相关issue [26748](https://github.com/flutter/flutter/issues/26748)
 
-| parameter  | description                                                       | default |
-| ---------- | ----------------------------------------------------------------- | ------- |
-| background | 用于覆盖溢出部分本来的文字的背景色 | -       |
+| 参数       | 描述                               | 默认 |
+| ---------- | ---------------------------------- | ---- |
+| background | 用于覆盖溢出部分本来的文字的背景色 | -    |
 
 ```dart
   ExtendedText(...

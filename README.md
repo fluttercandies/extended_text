@@ -38,7 +38,7 @@ A powerful extended official text for Dart, which supports Speical Text(Image,@s
 
 extended text helps to convert your text to speical textSpan quickly.
 
-for example, follwing code show how to create @xxxx in your text.
+for example, follwing code show how to create @xxxx speical textSpan.
 
 ```dart
 class AtText extends SpecialText {
@@ -312,8 +312,8 @@ contain your page into ExtendedTextSelectionPointerHandler, so you can define wh
 
 set your page as child of ExtendedTextSelectionPointerHandler
 
-- tap region outside of extended text,may be it should hide 
-- scorll list, may be it should hide
+- tap region outside of extended text, hide toolbar and handle
+- scorll, hide toolbar and handle
 
 #### Custom Behavior
 
