@@ -12,6 +12,10 @@ import 'material_text_selection_controls.dart';
 // viewport.
 const double _kToolbarScreenPadding = 8.0;
 
+/// An interface for building the selection UI, to be provided by the
+/// implementor of the toolbar widget.
+///
+/// Override text operations if needed.
 abstract class ExtendedTextSelectionControls {
   /// Builds a selection handle of the given type.
   ///

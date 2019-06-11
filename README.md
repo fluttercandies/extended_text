@@ -4,7 +4,167 @@
 
 extended official text to quickly build special text like inline image or @somebody,it also provide custom background,custom over flow.
 
-[Chinese blog](https://juejin.im/post/5c8be0d06fb9a049a42ff067)
+- [Flutter RichText支持图片显示和自定义图片效果](https://juejin.im/post/5c8be0d06fb9a049a42ff067)
+- [Flutter RichText支持自定义文本溢出效果](https://juejin.im/post/5c8ca608f265da2dd6394001)
+- [Flutter RichText支持自定义文字背景](https://juejin.im/post/5c8bf9516fb9a049c9669204)
+- [Flutter RichText支持特殊文字效果](https://juejin.im/post/5c8bf4fce51d451066008fa2)
+- [Flutter RichText支持文本选择](https://juejin.im/post/5c8bf4fce51d451066008fa2)
+
+
+## Table of contents
+
+- [extended_text](#extendedtext)
+  - [Table of contents](#table-of-contents)
+  - [ImageSpan](#image-span)
+    - [simple use](#simple-use)
+    - [use Extendednetworkimageprovider](#use-Extendednetworkimageprovider)
+  - [Load State](#load-state)
+    - [demo code](#demo-code)
+  - [Zoom Pan](#zoom-pan)
+    - [double tap animation](#double-tap-animation)
+  - [Photo View](#photo-view)
+  - [Slide Out Page](#slide-out-page)
+    - [include your page in ExtendedImageSlidePage](#include-your-page-in-extendedimageslidepage)
+    - [make sure your page background is transparent](#make-sure-your-page-background-is-transparent)   
+    - [push with transparent page route](#push-with-transparent-page-route)
+  - [Border BorderRadius Shape](#border-borderradius-shape)
+  - [Clear Save](#clear-save)
+    - [clear](#clear)
+    - [save network](#save-network)
+  - [Crop](#crop)
+  - [Paint](#paint)
+  - [Other APIs](#other-apis)
+  
+## ImageSpan
+
+![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/custom_image.gif)
+
+show image in text by using ImageSpan
+```dart
+ ImageSpan(
+    this.image, {
+    @required this.imageWidth,
+    @required this.imageHeight,
+    this.margin,
+    this.beforePaintImage,
+    this.afterPaintImage,
+    this.fit: BoxFit.scaleDown,
+    String actualText: imageSpanTransparentPlaceholder,
+    int start: 0,
+    this.clearMemoryCacheIfFailed: true,
+    GestureRecognizer recognizer,
+  }) 
+
+  ImageSpan(AssetImage("xxx.jpg"),
+          imageWidth: size,
+          imageHeight: size,
+          margin: EdgeInsets.only(left: 2.0, bottom: 0.0, right: 2.0));
+    }
+```
+
+| parameter   | description                                                                           | default             |
+| ----------- | ------------------------------------------------------------------------------------- | ------------------- |
+| image         | The image to display(ImageProvider).                                     | -             |
+| imageWidth       | The width of image(not include margin)                           | required               |
+| imageHeight     | The height of image(not include margin)  |required                    |required
+| margin       | The margin of image                                               | -                |
+| beforePaintImage     | the time to retry to request                                                          | 3                   |
+| afterPaintImage   | time limit to request image                                                           | -                     |
+| fit   | the time duration to retry to request                                                 | milliseconds: 100   |
+| actualText | token to cancel network request                                                       | CancellationToken() |
+| start | token to cancel network request                                                       | CancellationToken() |
+| clearMemoryCacheIfFailed | token to cancel network request                                                       | CancellationToken() |
+| recognizer | token to cancel network request                                                       | CancellationToken() |
+
+
+
+
+and you can also define your image by using beforePaintImage and afterPaintImage.
+
+it's simple to create a loading placeholder.
+
+```dart
+ImageSpan(CachedNetworkImage(imageTestUrls.first), beforePaintImage:
+                    (Canvas canvas, Rect rect, ImageSpan imageSpan, clearFailedCache: true) {
+              bool hasPlaceholder = drawPlaceholder(canvas, rect, imageSpan);
+              if (!hasPlaceholder) {
+                clearRect(rect, canvas);
+              }
+              return false;
+            },
+                margin: EdgeInsets.only(right: 10.0),
+                imageWidth: 80.0,
+                imageHeight: 60.0),
+
+
+bool drawPlaceholder(Canvas canvas, Rect rect, ImageSpan imageSpan) {
+    bool hasPlaceholder = imageSpan.imageSpanResolver.imageInfo?.image == null;
+
+    if (hasPlaceholder) {
+      canvas.drawRect(rect, Paint()..color = Colors.grey);
+      var textPainter = TextPainter(
+          text: TextSpan(text: "loading", style: TextStyle(fontSize: 10.0)),
+          textAlign: TextAlign.center,
+          textScaleFactor: 1,
+          textDirection: TextDirection.ltr,
+          maxLines: 1)
+        ..layout(maxWidth: rect.width);
+
+      textPainter.paint(
+          canvas,
+          Offset(rect.left + (rect.width - textPainter.width) / 2.0,
+              rect.top + (rect.height - textPainter.height) / 2.0));
+    }
+    return hasPlaceholder;
+  }
+
+  void clearRect(Rect rect, Canvas canvas) {
+    ///if don't save layer
+    ///BlendMode.clear will show black
+    ///maybe this is bug for blendMode.clear
+    canvas.saveLayer(rect, Paint());
+    canvas.drawRect(rect, Paint()..blendMode = BlendMode.clear);
+    canvas.restore();
+  }
+```
+
+if you want cache the network image, you can use CachedNetworkImage and clear them with clearExtendedTextDiskCachedImages
+```dart
+  CachedNetworkImage(this.url,
+      {this.scale = 1.0,
+      this.headers,
+      this.cache: false,
+      this.retries = 3,
+      this.timeLimit,
+      this.timeRetry = const Duration(milliseconds: 100),
+      this.clearFailedCache: false})
+      : assert(url != null),
+        assert(scale != null);
+```
+
+```dart
+/// Clear the disk cache directory then return if it succeed.
+///  <param name="duration">timespan to compute whether file has expired or not</param>
+Future<bool> clearExtendedTextDiskCachedImages({Duration duration}) async
+```
+
+if network image was loaded failed, and you want to reload it next time,
+you can set clearFailedCache= true or use clearLoadFailedImageMemoryCache method
+
+```dart
+/// clear load failed image in memory so that it will reload
+void clearLoadFailedImageMemoryCache({CachedNetworkImage image}) {
+  if (image != null) {
+    if (_failedImageCache.remove(image)) image.evict();
+  } else {
+    _failedImageCache.forEach((image) {
+      if (_failedImageCache.remove(image)) image.evict();
+    });
+  }
+}
+```
+
+[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/custom_image_demo.dart)
 
 ## Speical text
 
@@ -131,114 +291,6 @@ ExtendedText(
 ```
 
 [more detail](https://github.com/fluttercandies/extended_text/tree/master/example/lib/special_text)
-
-## Inline-image
-
-![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/custom_image.gif)
-
-to show your inline image, you just to use as follwing
-```dart
-ImageSpan(this.image,
-      {@required this.imageWidth,
-      @required this.imageHeight,
-      this.margin,
-      this.beforePaintImage,
-      this.afterPaintImage,
-      this.fit: BoxFit.scaleDown})
-
-ImageSpan(AssetImage("xxx.jpg"),
-          imageWidth: size,
-          imageHeight: size,
-          margin: EdgeInsets.only(left: 2.0, bottom: 0.0, right: 2.0));
-    }
-```
-
-and you can also define your image by using beforePaintImage and afterPaintImage.
-
-it's simple to create a loading placeholder.
-
-```dart
-ImageSpan(CachedNetworkImage(imageTestUrls.first), beforePaintImage:
-                    (Canvas canvas, Rect rect, ImageSpan imageSpan, clearFailedCache: true) {
-              bool hasPlaceholder = drawPlaceholder(canvas, rect, imageSpan);
-              if (!hasPlaceholder) {
-                clearRect(rect, canvas);
-              }
-              return false;
-            },
-                margin: EdgeInsets.only(right: 10.0),
-                imageWidth: 80.0,
-                imageHeight: 60.0),
-
-
-bool drawPlaceholder(Canvas canvas, Rect rect, ImageSpan imageSpan) {
-    bool hasPlaceholder = imageSpan.imageSpanResolver.imageInfo?.image == null;
-
-    if (hasPlaceholder) {
-      canvas.drawRect(rect, Paint()..color = Colors.grey);
-      var textPainter = TextPainter(
-          text: TextSpan(text: "loading", style: TextStyle(fontSize: 10.0)),
-          textAlign: TextAlign.center,
-          textScaleFactor: 1,
-          textDirection: TextDirection.ltr,
-          maxLines: 1)
-        ..layout(maxWidth: rect.width);
-
-      textPainter.paint(
-          canvas,
-          Offset(rect.left + (rect.width - textPainter.width) / 2.0,
-              rect.top + (rect.height - textPainter.height) / 2.0));
-    }
-    return hasPlaceholder;
-  }
-
-  void clearRect(Rect rect, Canvas canvas) {
-    ///if don't save layer
-    ///BlendMode.clear will show black
-    ///maybe this is bug for blendMode.clear
-    canvas.saveLayer(rect, Paint());
-    canvas.drawRect(rect, Paint()..blendMode = BlendMode.clear);
-    canvas.restore();
-  }
-```
-
-if you want cache the network image, you can use CachedNetworkImage and clear them with clearExtendedTextDiskCachedImages
-```dart
-  CachedNetworkImage(this.url,
-      {this.scale = 1.0,
-      this.headers,
-      this.cache: false,
-      this.retries = 3,
-      this.timeLimit,
-      this.timeRetry = const Duration(milliseconds: 100),
-      this.clearFailedCache: false})
-      : assert(url != null),
-        assert(scale != null);
-```
-
-```dart
-/// Clear the disk cache directory then return if it succeed.
-///  <param name="duration">timespan to compute whether file has expired or not</param>
-Future<bool> clearExtendedTextDiskCachedImages({Duration duration}) async
-```
-
-if network image was loaded failed, and you want to reload it next time,
-you can set clearFailedCache= true or use clearLoadFailedImageMemoryCache method
-
-```dart
-/// clear load failed image in memory so that it will reload
-void clearLoadFailedImageMemoryCache({CachedNetworkImage image}) {
-  if (image != null) {
-    if (_failedImageCache.remove(image)) image.evict();
-  } else {
-    _failedImageCache.forEach((image) {
-      if (_failedImageCache.remove(image)) image.evict();
-    });
-  }
-}
-```
-
-[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/custom_image_demo.dart)
 
 ## custom background (refer to issue [24335](https://github.com/flutter/flutter/issues/24335)/[24337](https://github.com/flutter/flutter/issues/24337) about background)
 

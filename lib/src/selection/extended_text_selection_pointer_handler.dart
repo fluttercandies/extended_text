@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../extended_text_typedef.dart';
 import 'extended_text_selection.dart';
 
 ///
@@ -10,7 +11,10 @@ import 'extended_text_selection.dart';
 ///
 class ExtendedTextSelectionPointerHandler extends StatefulWidget {
   final Widget child;
-  ExtendedTextSelectionPointerHandler({@required this.child});
+  final TextSelectionPointerHandlerWidgetBuilder builder;
+  ExtendedTextSelectionPointerHandler({this.child, this.builder})
+      : assert(!(child == null && builder == null)),
+        assert(!(child != null && builder != null));
   @override
   ExtendedTextSelectionPointerHandlerState createState() =>
       ExtendedTextSelectionPointerHandlerState();
@@ -22,9 +26,11 @@ class ExtendedTextSelectionPointerHandlerState
       <ExtendedTextSelectionState>[];
   List<ExtendedTextSelectionState> get selectionStates => _selectionStates;
 
-  bool _pointerMove = false;
   @override
   Widget build(BuildContext context) {
+    if (widget.builder != null) {
+      return widget.builder(_selectionStates);
+    }
     return Listener(
       child: widget.child,
       behavior: HitTestBehavior.translucent,
