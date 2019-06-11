@@ -33,7 +33,6 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
   void initState() {
     _myExtendedMaterialTextSelectionControls =
         MyExtendedMaterialTextSelectionControls();
-    // TODO: implement initState
     super.initState();
   }
 
@@ -46,7 +45,6 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
   @override
   void dispose() {
     listSourceRepository.dispose();
-    // TODO: implement dispose
     super.dispose();
   }
 
@@ -149,7 +147,7 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                                               Theme.of(context).canvasColor),
                                       selectionEnabled: true,
                                       textSelectionControls:
-                                          MyExtendedMaterialTextSelectionControls(),
+                                          _myExtendedMaterialTextSelectionControls,
                                     ),
                                     padding: EdgeInsets.only(
                                         left: margin,

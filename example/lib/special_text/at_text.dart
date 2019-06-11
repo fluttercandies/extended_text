@@ -18,7 +18,6 @@ class AtText extends SpecialText {
 
   @override
   TextSpan finishText() {
-    // TODO: implement finishText
     TextStyle textStyle =
         this.textStyle?.copyWith(color: Colors.blue, fontSize: 16.0);
 
