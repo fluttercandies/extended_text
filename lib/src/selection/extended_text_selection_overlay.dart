@@ -13,8 +13,6 @@ import 'package:flutter/material.dart';
 import '../extended_render_paragraph.dart';
 import 'selection_controls/extended_text_selection_controls.dart';
 
-final List<OverlayEntry> _entries = <OverlayEntry>[];
-
 /// The text position that a give selection handle manipulates. Dragging the
 /// [start] handle always moves the [start]/[baseOffset] of the selection.
 enum _TextSelectionHandlePosition { start, end }
