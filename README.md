@@ -300,11 +300,18 @@ class _TextSelectionToolbar extends StatelessWidget {
 
 ### Control ToolBar Handle
 
-contain your page into ExtendedTextSelectionPointerHandler, so you can define when to show/hide toolbar and handle.
+contain your page into ExtendedTextSelectionPointerHandler, so you can control toolbar and handle.
 
 #### Default Behavior
 
 set your page as child of ExtendedTextSelectionPointerHandler
+
+```dart
+ return ExtendedTextSelectionPointerHandler(
+      //default behavior
+       child: result,
+    );
+```
 
 - tap region outside of extended text, hide toolbar and handle
 - scorll, hide toolbar and handle

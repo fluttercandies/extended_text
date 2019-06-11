@@ -10,6 +10,7 @@
 - [Flutter RichText 支持自定义文本溢出效果](https://juejin.im/post/5c8ca608f265da2dd6394001)
 - [Flutter RichText 支持自定义文字背景](https://juejin.im/post/5c8bf9516fb9a049c9669204)
 - [Flutter RichText 支持特殊文字效果](https://juejin.im/post/5c8bf4fce51d451066008fa2)
+- [Flutter RichText支持文本选择](https://juejin.im/post/5cff71d46fb9a07ea6486a0e)  
 
 ## 目录
 - [extended_text](#extendedtext)
@@ -313,11 +314,18 @@ class _TextSelectionToolbar extends StatelessWidget {
 
 ### 工具栏和选择器的控制
 
-除了默认的效果，你可以通过将你的页面包裹到ExtendedTextSelectionPointerHandler里面来定义不同的行为效果。
+你可以通过将你的页面包裹到ExtendedTextSelectionPointerHandler里面来定义不同的行为效果。
 
 #### 默认行为
 
-把你页面当作ExtendedTextSelectionPointerHandler的Child，将会有默认的行为
+通过赋值ExtendedTextSelectionPointerHandler的child为你的页面，将会有默认的行为
+
+```dart
+ return ExtendedTextSelectionPointerHandler(
+      //default behavior
+       child: result,
+    );
+```
 
 - 当点击extended_text之外的区域的时候，关闭工具栏和选择器
 - 滚动的时候，关闭工具栏和选择器
