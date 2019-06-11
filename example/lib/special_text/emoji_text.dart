@@ -1,15 +1,15 @@
-import 'package:extended_text/extended_text.dart';
+import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/material.dart';
 
 ///emoji/image text
 class EmojiText extends SpecialText {
   static const String flag = "[";
-
-  EmojiText(TextStyle textStyle) : super(EmojiText.flag, "]", textStyle);
+  final int start;
+  EmojiText(TextStyle textStyle, {this.start})
+      : super(EmojiText.flag, "]", textStyle);
 
   @override
   TextSpan finishText() {
-    // TODO: implement finishText
     var key = toString();
     if (EmojiUitl.instance.emojiMap.containsKey(key)) {
       //fontsize id define image height
@@ -20,9 +20,12 @@ class EmojiText extends SpecialText {
       //final double fontSize = 26.0;
 
       return ImageSpan(AssetImage(EmojiUitl.instance.emojiMap[key]),
+          actualText: key,
           imageWidth: size,
           imageHeight: size,
-          margin: EdgeInsets.only(left: 2.0, bottom: 0.0, right: 2.0));
+          start: start,
+          fit: BoxFit.fill,
+          margin: EdgeInsets.only(left: 2.0, top: 2.0, right: 2.0));
     }
 
     return TextSpan(text: toString(), style: textStyle);

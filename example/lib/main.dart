@@ -6,6 +6,10 @@ import 'package:example/text_demo.dart';
 import 'package:extended_image_library/extended_image_library.dart';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker_saver/image_picker_saver.dart';
+
+import 'text_selection_demo.dart';
 
 void main() => runApp(MyApp());
 
@@ -45,12 +49,12 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     clearMemoryImageCache();
-    // TODO: implement initState
-    pages.add(Page(PageType.Text, "quickly build special text"));
-    pages.add(Page(PageType.CustomImage, "custom inline-image in text"));
-    pages.add(Page(PageType.BackgroundText,
+    pages.add(Page(PageType.text, "quickly build special text"));
+    pages.add(Page(PageType.selection, "text selection support"));
+    pages.add(Page(PageType.customImage, "custom inline-image in text"));
+    pages.add(Page(PageType.backgroundText,
         "workaround for issue 24335/24337 about background"));
-    pages.add(Page(PageType.CustomTextOverflow,
+    pages.add(Page(PageType.customTextOverflow,
         "workaround for issue 26748. how to custom text overflow"));
 
     listSourceRepository = new TuChongRepository();
@@ -94,17 +98,20 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             onTap: () {
               switch (page.type) {
-                case PageType.Text:
-                  pageWidget = new TextDemo();
+                case PageType.text:
+                  pageWidget = TextDemo();
                   break;
-                case PageType.CustomImage:
-                  pageWidget = new CustomImageDemo();
+                case PageType.customImage:
+                  pageWidget = CustomImageDemo();
                   break;
-                case PageType.BackgroundText:
-                  pageWidget = new BackgroundTextDemo();
+                case PageType.backgroundText:
+                  pageWidget = BackgroundTextDemo();
                   break;
-                case PageType.CustomTextOverflow:
-                  pageWidget = new CustomTextOverflowDemo();
+                case PageType.customTextOverflow:
+                  pageWidget = CustomTextOverflowDemo();
+                  break;
+                case PageType.selection:
+                  pageWidget = TextSelectionDemo();
                   break;
                 default:
                   break;
@@ -120,8 +127,39 @@ class _MyHomePageState extends State<MyHomePage> {
       itemCount: pages.length,
     );
 
-    return Scaffold(
-      body: content,
+    return MaterialApp(
+      builder: (c, w) {
+        ScreenUtil.instance =
+            ScreenUtil(width: 750, height: 1334, allowFontScaling: true)
+              ..init(c);
+        var data = MediaQuery.of(context);
+        return MediaQuery(
+          data: data.copyWith(textScaleFactor: 1.0),
+          child: Scaffold(
+            body: w,
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                ///clear memory
+                clearMemoryImageCache();
+
+                ///clear local cahced
+                clearDiskCachedImages().then((bool done) {
+                  showToast(done ? "clear succeed" : "clear failed",
+                      position: ToastPosition(align: Alignment.center));
+                });
+              },
+              child: Text(
+                "clear cache",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  inherit: false,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      home: content,
     );
   }
 }
@@ -132,9 +170,22 @@ class Page {
   Page(this.type, this.description);
 }
 
-enum PageType { Text, CustomImage, BackgroundText, CustomTextOverflow }
+enum PageType {
+  text,
+  customImage,
+  backgroundText,
+  customTextOverflow,
+  selection
+}
 
 List<String> _imageTestUrls;
 List<String> get imageTestUrls =>
     _imageTestUrls ??
     <String>["https://photo.tuchong.com/4870004/f/298584322.jpg"];
+
+///save netwrok image to photo
+Future<bool> saveNetworkImageToPhoto(String url, {bool useCache: true}) async {
+  var data = await getNetworkImageData(url, useCache: useCache);
+  var filePath = await ImagePickerSaver.saveFile(fileData: data);
+  return filePath != null && filePath != "";
+}

@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'package:image_picker_saver/image_picker_saver.dart';
+
+import 'package:example/main.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:oktoast/oktoast.dart';
 import 'dart:ui';
@@ -53,31 +54,12 @@ class _PicSwiperState extends State<PicSwiper>
   @override
   Widget build(BuildContext context) {
     return Material(
-        child: Column(
-      children: <Widget>[
-        AppBar(
-          actions: <Widget>[
-            GestureDetector(
-              child: Container(
-                padding: EdgeInsets.only(right: 10.0),
-                alignment: Alignment.center,
-                child: Text(
-                  "Save",
-                  style: TextStyle(fontSize: 16.0, color: Colors.white),
-                ),
-              ),
-              onTap: () {
-                saveNetworkImageToPhoto(widget.pics[currentIndex].picUrl)
-                    .then((bool done) {
-                  showToast(done ? "save succeed" : "save failed",
-                      position: ToastPosition(align: Alignment.topCenter));
-                });
-              },
-            )
-          ],
-        ),
-        Expanded(
-            child: Stack(
+
+        /// if you use ExtendedImageSlidePage and slideType =SlideType.onlyImage,
+        /// make sure your page is transparent background
+        color: Colors.transparent,
+        shadowColor: Colors.transparent,
+        child: Stack(
           fit: StackFit.expand,
           children: <Widget>[
             ExtendedImageGesturePageView.builder(
@@ -137,14 +119,14 @@ class _PicSwiperState extends State<PicSwiper>
                   child: image,
                   padding: EdgeInsets.all(5.0),
                 );
-//                if (index == currentIndex) {
-//                  return Hero(
-//                    tag: item + index.toString(),
-//                    child: image,
-//                  );
-//                } else {
-                return image;
-                //}
+                if (index == currentIndex) {
+                  return Hero(
+                    tag: item + index.toString(),
+                    child: image,
+                  );
+                } else {
+                  return image;
+                }
               },
               itemCount: widget.pics.length,
               onPageChanged: (int index) {
@@ -155,6 +137,8 @@ class _PicSwiperState extends State<PicSwiper>
                 initialPage: currentIndex,
               ),
               scrollDirection: Axis.horizontal,
+              physics: BouncingScrollPhysics(),
+              //physics: ClampingScrollPhysics(),
             ),
             Positioned(
               bottom: 0.0,
@@ -163,9 +147,7 @@ class _PicSwiperState extends State<PicSwiper>
               child: MySwiperPlugin(widget.pics, currentIndex, rebuild),
             )
           ],
-        ))
-      ],
-    ));
+        ));
   }
 }
 
@@ -190,22 +172,36 @@ class MySwiperPlugin extends StatelessWidget {
                   width: 10.0,
                 ),
                 Text(
-                  pics[data.data].des ?? "",
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Expanded(
-                  child: Container(),
-                ),
-                Text(
                   "${data.data + 1}",
                 ),
                 Text(
                   " / ${pics.length}",
                 ),
+                Expanded(
+                    child: Text(pics[data.data].des ?? "",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 16.0, color: Colors.blue))),
                 Container(
                   width: 10.0,
                 ),
+                GestureDetector(
+                  child: Container(
+                    padding: EdgeInsets.only(right: 10.0),
+                    alignment: Alignment.center,
+                    child: Text(
+                      "Save",
+                      style: TextStyle(fontSize: 16.0, color: Colors.blue),
+                    ),
+                  ),
+                  onTap: () {
+                    saveNetworkImageToPhoto(pics[index].picUrl)
+                        .then((bool done) {
+                      showToast(done ? "save succeed" : "save failed",
+                          position: ToastPosition(align: Alignment.topCenter));
+                    });
+                  },
+                )
               ],
             ),
           ),
@@ -221,11 +217,4 @@ class PicSwiperItem {
   String picUrl;
   String des;
   PicSwiperItem(this.picUrl, {this.des = ""});
-}
-
-///save netwrok image to photo
-Future<bool> saveNetworkImageToPhoto(String url, {bool useCache: true}) async {
-  var data = await getNetworkImageData(url, useCache: useCache);
-  var filePath = await ImagePickerSaver.saveFile(fileData: data);
-  return filePath != null && filePath != "";
 }
