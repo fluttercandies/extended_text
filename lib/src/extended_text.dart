@@ -3,7 +3,10 @@ import 'package:extended_text/src/extended_render_paragraph.dart';
 import 'package:extended_text/src/extended_rich_text.dart';
 import 'package:extended_text/src/over_flow_text_span.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+
+import 'package:extended_text/src/selection/extended_text_selection.dart';
 
 class ExtendedText extends StatelessWidget {
   /// Creates a text widget.
@@ -23,30 +26,55 @@ class ExtendedText extends StatelessWidget {
       this.semanticsLabel,
       this.specialTextSpanBuilder,
       this.onSpecialTextTap,
-      this.overFlowTextSpan})
+      this.overFlowTextSpan,
+      this.selectionEnabled: false,
+      this.onTap,
+      this.selectionColor,
+      this.dragStartBehavior: DragStartBehavior.start,
+      this.textSelectionControls})
       : assert(data != null),
         textSpan = null,
         super(key: key);
 
   /// Creates a text widget with a [TextSpan].
-  const ExtendedText.rich(
-    this.textSpan, {
-    Key key,
-    this.style,
-    this.textAlign,
-    this.textDirection,
-    this.locale,
-    this.softWrap,
-    this.overflow,
-    this.textScaleFactor,
-    this.maxLines,
-    this.semanticsLabel,
-    this.onSpecialTextTap,
-    this.overFlowTextSpan,
-  })  : assert(textSpan != null),
+  const ExtendedText.rich(this.textSpan,
+      {Key key,
+      this.style,
+      this.textAlign,
+      this.textDirection,
+      this.locale,
+      this.softWrap,
+      this.overflow,
+      this.textScaleFactor,
+      this.maxLines,
+      this.semanticsLabel,
+      this.onSpecialTextTap,
+      this.overFlowTextSpan,
+      this.selectionEnabled: false,
+      this.onTap,
+      this.selectionColor,
+      this.dragStartBehavior: DragStartBehavior.start,
+      this.textSelectionControls})
+      : assert(textSpan != null),
         data = null,
         specialTextSpanBuilder = null,
         super(key: key);
+
+  /// An interface for building the selection UI, to be provided by the
+  /// implementor of the toolbar widget or handle widget
+  final ExtendedTextSelectionControls textSelectionControls;
+
+  ///DragStartBehavior for text selection
+  final DragStartBehavior dragStartBehavior;
+
+  ///Color of selection
+  final Color selectionColor;
+
+  ///Called when the user taps on this text.
+  final GestureTapCallback onTap;
+
+  ///whether enable selection
+  final bool selectionEnabled;
 
   /// the custom text over flow TextSpan
   final OverFlowTextSpan overFlowTextSpan;
@@ -146,6 +174,8 @@ class ExtendedText extends StatelessWidget {
   /// ```
   final String semanticsLabel;
 
+//  ExtendedRenderEditable get _renderEditable =>
+//      _editableTextKey.currentState.renderEditable;
   @override
   Widget build(BuildContext context) {
     final DefaultTextStyle defaultTextStyle = DefaultTextStyle.of(context);
@@ -191,19 +221,44 @@ class ExtendedText extends StatelessWidget {
       }
     }
 
-    Widget result = ExtendedRichText(
-      textAlign: textAlign ?? defaultTextStyle.textAlign ?? TextAlign.start,
-      textDirection:
-          textDirection, // RichText uses Directionality.of to obtain a default if this is null.
-      locale:
-          locale, // RichText uses Localizations.localeOf to obtain a default if this is null
-      softWrap: softWrap ?? defaultTextStyle.softWrap,
-      overflow: extendedTextOverflow,
-      textScaleFactor: textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
-      maxLines: maxLines ?? defaultTextStyle.maxLines,
-      text: innerTextSpan,
-      overFlowTextSpan: effectiveOverFlowTextSpan,
-    );
+    Widget result;
+    if (selectionEnabled) {
+      result = ExtendedTextSelection(
+        textAlign: textAlign ?? defaultTextStyle.textAlign ?? TextAlign.start,
+        textDirection:
+            textDirection, // RichText uses Directionality.of to obtain a default if this is null.
+        locale:
+            locale, // RichText uses Localizations.localeOf to obtain a default if this is null
+        softWrap: softWrap ?? defaultTextStyle.softWrap,
+        overflow: extendedTextOverflow,
+        textScaleFactor:
+            textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
+        maxLines: maxLines ?? defaultTextStyle.maxLines,
+        text: innerTextSpan,
+        overFlowTextSpan: effectiveOverFlowTextSpan,
+        selectionColor: selectionColor ?? Theme.of(context).textSelectionColor,
+        dragStartBehavior: dragStartBehavior,
+        onTap: onTap,
+        data: data ?? textSpanToActualText(innerTextSpan),
+        textSelectionControls: textSelectionControls,
+      );
+    } else {
+      result = ExtendedRichText(
+        textAlign: textAlign ?? defaultTextStyle.textAlign ?? TextAlign.start,
+        textDirection:
+            textDirection, // RichText uses Directionality.of to obtain a default if this is null.
+        locale:
+            locale, // RichText uses Localizations.localeOf to obtain a default if this is null
+        softWrap: softWrap ?? defaultTextStyle.softWrap,
+        overflow: extendedTextOverflow,
+        textScaleFactor:
+            textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
+        maxLines: maxLines ?? defaultTextStyle.maxLines,
+        text: innerTextSpan,
+        overFlowTextSpan: effectiveOverFlowTextSpan,
+      );
+    }
+
     if (semanticsLabel != null) {
       result = Semantics(
           textDirection: textDirection,
@@ -212,6 +267,7 @@ class ExtendedText extends StatelessWidget {
             child: result,
           ));
     }
+
     return result;
   }
 
