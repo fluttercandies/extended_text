@@ -1138,9 +1138,11 @@ class ExtendedRenderParagraph extends RenderBox {
 
       ///zmt
       TextSelection finalTextSelection = selection.copyWith();
-
-      var temp = convertTextInputSelectionToTextPainterSelection(
-          text, finalTextSelection);
+      TextSelection textPainterSelection = selection;
+      if (handleSpecialText) {
+        textPainterSelection = convertTextInputSelectionToTextPainterSelection(
+            text, finalTextSelection);
+      }
 
       final Offset effectiveOffset = Offset.zero;
       Offset finalEnd;
@@ -1149,8 +1151,10 @@ class ExtendedRenderParagraph extends RenderBox {
         if (overFlowTextSpan != null) {
           var position =
               getPositionForOffset(overFlowTextSpan.textPainterHelper.offset);
-          if (position != null && position.offset < temp.extentOffset) {
-            temp = temp.copyWith(extentOffset: position.offset);
+          if (position != null &&
+              position.offset < textPainterSelection.extentOffset) {
+            textPainterSelection =
+                textPainterSelection.copyWith(extentOffset: position.offset);
             finalTextSelection = finalTextSelection.copyWith(
                 extentOffset:
                     convertTextPainterPostionToTextInputPostion(text, position)
@@ -1158,7 +1162,7 @@ class ExtendedRenderParagraph extends RenderBox {
           }
         } else {
           final List<ui.TextBox> boxes =
-              _textPainter.getBoxesForSelection(temp);
+              _textPainter.getBoxesForSelection(textPainterSelection);
           //final Offset start = Offset(boxes.first.start, boxes.first.bottom);
           final Offset end = Offset(boxes.last.end, boxes.last.bottom);
 
@@ -1166,8 +1170,10 @@ class ExtendedRenderParagraph extends RenderBox {
             finalEnd = end;
           } else {
             var position = getPositionForOffset(end);
-            if (position != null && position.offset < temp.extentOffset) {
-              temp = temp.copyWith(extentOffset: position.offset);
+            if (position != null &&
+                position.offset < textPainterSelection.extentOffset) {
+              textPainterSelection =
+                  textPainterSelection.copyWith(extentOffset: position.offset);
               finalTextSelection = finalTextSelection.copyWith(
                   extentOffset: convertTextPainterPostionToTextInputPostion(
                           text, position)
@@ -1181,7 +1187,7 @@ class ExtendedRenderParagraph extends RenderBox {
           _getCaretOffset(
               effectiveOffset,
               TextPosition(
-                  offset: temp.baseOffset,
+                  offset: textPainterSelection.baseOffset,
                   affinity: finalTextSelection.affinity),
               TextPosition(
                   offset: finalTextSelection.baseOffset,
@@ -1192,7 +1198,7 @@ class ExtendedRenderParagraph extends RenderBox {
               _getCaretOffset(
                   effectiveOffset,
                   TextPosition(
-                      offset: temp.extentOffset,
+                      offset: textPainterSelection.extentOffset,
                       affinity: finalTextSelection.affinity),
                   TextPosition(
                       offset: finalTextSelection.extentOffset,
