@@ -10,7 +10,6 @@
 - [Flutter RichText 支持自定义文本溢出效果](https://juejin.im/post/5c8ca608f265da2dd6394001)
 - [Flutter RichText 支持自定义文字背景](https://juejin.im/post/5c8bf9516fb9a049c9669204)
 - [Flutter RichText 支持特殊文字效果](https://juejin.im/post/5c8bf4fce51d451066008fa2)
-- [Flutter RichText 支持文本选择](https://juejin.im/post/5c8bf4fce51d451066008fa2)
 
 ## 目录
 - [extended_text](#extendedtext)
