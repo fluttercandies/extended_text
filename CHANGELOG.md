@@ -1,4 +1,4 @@
-## [0.5.6]
+## [0.5.7]
 
 * issue: fix textEditingValue and textSelectionControls are not update when didUpdateWidget
 
