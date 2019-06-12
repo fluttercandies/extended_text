@@ -125,8 +125,32 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     _textSelectionControls = widget.textSelectionControls;
     textEditingValue = TextEditingValue(
         text: widget.data, selection: TextSelection.collapsed(offset: 0));
-
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(ExtendedTextSelection oldWidget) {
+    if (oldWidget.textSelectionControls != this.widget.textSelectionControls) {
+      _textSelectionControls = widget.textSelectionControls;
+      final ThemeData themeData = Theme.of(context);
+      switch (themeData.platform) {
+        case TargetPlatform.iOS:
+          _textSelectionControls ??= extendedCupertinoTextSelectionControls;
+          break;
+
+        case TargetPlatform.android:
+        case TargetPlatform.fuchsia:
+          _textSelectionControls ??= extendedMaterialTextSelectionControls;
+          break;
+      }
+    }
+
+    if (oldWidget.data != this.widget.data) {
+      textEditingValue = TextEditingValue(
+          text: widget.data, selection: TextSelection.collapsed(offset: 0));
+    }
+
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
