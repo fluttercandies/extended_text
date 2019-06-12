@@ -1,7 +1,11 @@
+## [0.5.5]
+
+* issue: fix textEditingValue and textSelectionControls are not update when didUpdateWidget
+
 ## [0.5.4]
 
-* support text selection
-* fix issue about rect of overFlowTextSpan 
+* feature: support text selection
+* issue: fix issue about rect of overFlowTextSpan 
 
 ## [0.5.3]
 
