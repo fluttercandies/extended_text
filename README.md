@@ -8,20 +8,20 @@ A powerful extended official text for Dart, which supports Speical Text(Image,@s
 
 ## Table of contents
 - [extended_text](#extendedtext)
-  - [Table of contents](#table-of-contents)
-  - [Speical Text](#speical-text)
-    - [Create Speical Text](#create-speical-text)
-    - [SpecialTextSpanBuilder](#specialtextspanbuilder)
-  - [Image](#image)
-    - [ImageSpan](#imagespan)
-    - [Cache Image](#cache-image)
-  - [Selection](#selection)
-    - [TextSelectionControls](#textselectioncontrols)
-    - [Control ToolBar Handle](#control-toolbar-handle)
-      - [Default Behavior](#default-behavior)
-      - [Custom Behavior](#custom-behavior)
-  - [Custom Background](#custom-background)
-  - [Custom Overflow](#custom-overflow)
+  - [Table of contents](#Table-of-contents)
+  - [Speical Text](#Speical-Text)
+    - [Create Speical Text](#Create-Speical-Text)
+    - [SpecialTextSpanBuilder](#SpecialTextSpanBuilder)
+  - [Image](#Image)
+    - [ImageSpan](#ImageSpan)
+    - [Cache Image](#Cache-Image)
+  - [Selection](#Selection)
+    - [TextSelectionControls](#TextSelectionControls)
+    - [Control ToolBar Handle](#Control-ToolBar-Handle)
+      - [Default Behavior](#Default-Behavior)
+      - [Custom Behavior](#Custom-Behavior)
+  - [Custom Background](#Custom-Background)
+  - [Custom Overflow](#Custom-Overflow)
 
 ## Speical Text
 
@@ -376,10 +376,6 @@ refer to issues [24335](https://github.com/flutter/flutter/issues/24335)/[24337]
 
 refer to issue [26748](https://github.com/flutter/flutter/issues/26748)
 
-| parameter  | description                                                       | default |
-| ---------- | ----------------------------------------------------------------- | ------- |
-| background | Background to cover up the original text under [OverFlowTextSpan] | -       |
-
 ```dart
   ExtendedText(...
       overFlowTextSpan: OverFlowTextSpan(children: <TextSpan>[
@@ -394,7 +390,7 @@ refer to issue [26748](https://github.com/flutter/flutter/issues/26748)
                       launch(
                           "https://github.com/fluttercandies/extended_text");
                     })
-            ], background: Theme.of(context).canvasColor),
+            ]),
             ...
           )
 ```
