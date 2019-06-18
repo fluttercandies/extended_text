@@ -18,11 +18,11 @@ class CustomTextOverflowDemo extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   ExtendedText(
-                    "[love]Extended text help you to build rich text quickly. any special text you will have with extended text. "
-                        "\n\nIt's my pleasure to invite you to join \$FlutterCandies\$ if you want to improve flutter .[love]"
-                        "\n\nif you meet any problem, please let me konw @zmtzawqlp .[sun_glasses] "
-                        "\n notice: fail to clear text under overflow span, with BlendMode.clear. "
-                        "so paint a backgounrd (Theme.of(context).canvasColor) over text. relate to \$issue 26748\$ . let me know if you have any idea.I'm overflow text.I'm overflow text.I'm overflow text.I'm overflow text.",
+                    "Extended text help you to build rich text quickly. any special text you will have with extended text. "
+                    "\n\nIt's my pleasure to invite you to join \$FlutterCandies\$ if you want to improve flutter .[love]"
+                    "\n\nif you meet any problem, please let me konw @zmtzawqlp .[sun_glasses] "
+                    "\n notice: fail to clear text under overflow span, with BlendMode.clear. "
+                    "so paint a backgounrd (Theme.of(context).canvasColor) over text. relate to \$issue 26748\$ . let me know if you have any idea.I'm overflow text.I'm overflow text.yyyI'm overflow text.I'm overflow text.",
                     onSpecialTextTap: (dynamic parameter) {
                       if (parameter.startsWith("\$")) {
                         if (parameter.contains("issue")) {
@@ -49,7 +49,7 @@ class CustomTextOverflowDemo extends StatelessWidget {
                               launch(
                                   "https://github.com/fluttercandies/extended_text");
                             })
-                    ], background: Theme.of(context).canvasColor),
+                    ]),
                     maxLines: 13,
                   ),
                 ])));

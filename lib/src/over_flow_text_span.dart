@@ -8,17 +8,12 @@ class OverFlowTextSpan extends TextSpan {
   final TextPainterHelper _textPainterHelper;
   TextPainterHelper get textPainterHelper => _textPainterHelper;
 
-  ///background to cover up the original text under [OverFlowTextSpan]
-  final Color background;
-
   OverFlowTextSpan(
       {TextStyle style,
       String text,
       List<TextSpan> children,
-      GestureRecognizer recognizer,
-      this.background})
+      GestureRecognizer recognizer})
       : _textPainterHelper = TextPainterHelper(),
-        //assert(background != null),
         super(
             style: style,
             text: text,
@@ -37,23 +32,9 @@ class OverFlowTextSpan extends TextSpan {
     return typedOther.text == text &&
         typedOther.style == style &&
         typedOther.recognizer == recognizer &&
-        typedOther.background == background &&
         listEquals<TextSpan>(typedOther.children, children);
   }
 
   @override
-  int get hashCode =>
-      hashValues(style, text, recognizer, background, hashList(children));
-
-  @override
-  RenderComparison compareTo(TextSpan other) {
-    if (other is OverFlowTextSpan) {
-      if (other.background != background) {
-        return RenderComparison.paint;
-      }
-    }
-
-    // TODO: implement compareTo
-    return super.compareTo(other);
-  }
+  int get hashCode => hashValues(style, text, recognizer, hashList(children));
 }
