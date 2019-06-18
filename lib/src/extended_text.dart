@@ -202,8 +202,6 @@ class ExtendedText extends StatelessWidget {
     if (overFlowTextSpan != null) {
       effectiveOverFlowTextSpan = OverFlowTextSpan(
         recognizer: overFlowTextSpan.recognizer,
-        background:
-            overFlowTextSpan.background ?? Theme.of(context).canvasColor,
         text: overFlowTextSpan.text,
         style: overFlowTextSpan.style ?? effectiveTextStyle,
         children: overFlowTextSpan.children,

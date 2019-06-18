@@ -407,10 +407,18 @@ class ExtendedRenderParagraph extends RenderBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
+    Path clip = _paintTextOverflow(context, offset);
+    //clip rect of over flow
+    if (clip != null) {
+      context.canvas.save();
+      context.canvas.clipPath(clip);
+    }
     _paintSelection(context, offset);
     _paintSpecialText(context, offset);
     _paint(context, offset);
-    _paintTextOverflow(context, offset);
+    if (clip != null) {
+      context.canvas.restore();
+    }
   }
 
   void _paint(PaintingContext context, Offset offset) {
@@ -530,7 +538,9 @@ class ExtendedRenderParagraph extends RenderBox {
     _recognizers.clear();
     int offset = 0;
     text.visitTextSpan((TextSpan span) {
-      if (span.recognizer != null && (span.recognizer is TapGestureRecognizer || span.recognizer is LongPressGestureRecognizer)) {
+      if (span.recognizer != null &&
+          (span.recognizer is TapGestureRecognizer ||
+              span.recognizer is LongPressGestureRecognizer)) {
         final int length = span.semanticsLabel?.length ?? span.text.length;
         _recognizerOffsets.add(offset);
         _recognizerOffsets.add(offset + length);
@@ -747,7 +757,7 @@ class ExtendedRenderParagraph extends RenderBox {
     return endOffset;
   }
 
-  void _paintTextOverflow(PaintingContext context, Offset offset) {
+  Path _paintTextOverflow(PaintingContext context, Offset offset) {
     if (_hasVisualOverflow && overFlowTextSpan != null) {
       final Canvas canvas = context.canvas;
 
@@ -775,7 +785,7 @@ class ExtendedRenderParagraph extends RenderBox {
           _textPainter.text.getSpanForPosition(lastOnePosition);
 
       ///find overflow TextPosition that not clip the original text
-      Offset finalOverflowOffset = _findFinalOverflowOffset(
+      Offset finalOverFlowOffset = _findFinalOverflowOffset(
           rect: rect,
           x: rect.width - textPainter.width,
           endTextOffset: lastOnePosition.offset,
@@ -787,10 +797,10 @@ class ExtendedRenderParagraph extends RenderBox {
             Offset(bottomRight.dx + lastTextSpan.width / 2.0, bottomRight.dy);
       }
       final Rect overFlowTextSpanRect =
-          Rect.fromPoints(finalOverflowOffset, bottomRight);
+          Rect.fromPoints(finalOverFlowOffset, bottomRight);
 
-      canvas.drawRect(
-          overFlowTextSpanRect, Paint()..color = overFlowTextSpan.background);
+//      canvas.drawRect(
+//          overFlowTextSpanRect, Paint()..color =overFlowTextSpan.background);
 
       ///why BlendMode.clear not clear the text
 //      canvas.saveLayer(overFlowTextSpanRect, Paint());
@@ -801,13 +811,28 @@ class ExtendedRenderParagraph extends RenderBox {
 //      canvas.restore();
 
       textPainter.paint(
-          canvas, Offset(finalOverflowOffset.dx, overFlowTextSpanOffset.dy));
+          canvas, Offset(finalOverFlowOffset.dx, overFlowTextSpanOffset.dy));
 
       overFlowTextSpan.textPainterHelper.saveOffset(
-          Offset(finalOverflowOffset.dx, overFlowTextSpanOffset.dy));
+          Offset(finalOverFlowOffset.dx, overFlowTextSpanOffset.dy));
 
       canvas.restore();
+
+      Rect textRect = offset & size;
+      Rect overFlowRect = overFlowTextSpanRect.shift(offset);
+
+      return Path()
+        ..addPolygon(<Offset>[
+          textRect.topLeft,
+          textRect.topRight,
+          overFlowRect.topRight,
+          overFlowRect.topLeft,
+          overFlowRect.bottomLeft,
+          textRect.bottomLeft,
+        ], true);
     }
+
+    return null;
   }
 
   /// y find min y, so that over flow text will be covered
@@ -842,6 +867,10 @@ class ExtendedRenderParagraph extends RenderBox {
           endTextOffset: endTextOffset - 1,
           y: min(y, endOffset.dy));
     }
+    var list = _textPainter.getBoxesForSelection(TextSelection(
+        baseOffset: endTextOffset, extentOffset: endTextOffset + 20));
+    print(list[0]);
+
     return Offset(endOffset.dx, min(y, endOffset.dy));
   }
 
