@@ -12,14 +12,16 @@
 - [Flutter RichText 支持特殊文字效果](https://juejin.im/post/5c8bf4fce51d451066008fa2)
 - [Flutter RichText支持文本选择](https://juejin.im/post/5cff71d46fb9a07ea6486a0e)  
 
+欢迎加入[Flutter Candies](https://github.com/fluttercandies)，一起生产可爱的Flutter小糖果(QQ群181398081)
+
 ## 目录
 - [extended_text](#extendedtext)
   - [目录](#%E7%9B%AE%E5%BD%95)
   - [特殊文本](#%E7%89%B9%E6%AE%8A%E6%96%87%E6%9C%AC)
     - [创建特殊文本](#%E5%88%9B%E5%BB%BA%E7%89%B9%E6%AE%8A%E6%96%87%E6%9C%AC)
-    - [特殊文本Builder](#%E7%89%B9%E6%AE%8A%E6%96%87%E6%9C%ACbuilder)
+    - [特殊文本Builder](#%E7%89%B9%E6%AE%8A%E6%96%87%E6%9C%ACBuilder)
   - [图片](#%E5%9B%BE%E7%89%87)
-    - [ImageSpan](#imagespan)
+    - [ImageSpan](#ImageSpan)
     - [缓存图片](#%E7%BC%93%E5%AD%98%E5%9B%BE%E7%89%87)
   - [文本选择](#%E6%96%87%E6%9C%AC%E9%80%89%E6%8B%A9)
     - [文本选择控制器](#%E6%96%87%E6%9C%AC%E9%80%89%E6%8B%A9%E6%8E%A7%E5%88%B6%E5%99%A8)
@@ -390,10 +392,6 @@ Text背景相关的issue[24335](https://github.com/flutter/flutter/issues/24335)
 
 文本溢出相关issue [26748](https://github.com/flutter/flutter/issues/26748)
 
-| 参数       | 描述                               | 默认 |
-| ---------- | ---------------------------------- | ---- |
-| background | 用于覆盖溢出部分本来的文字的背景色 | -    |
-
 ```dart
   ExtendedText(...
       overFlowTextSpan: OverFlowTextSpan(children: <TextSpan>[
@@ -408,7 +406,7 @@ Text背景相关的issue[24335](https://github.com/flutter/flutter/issues/24335)
                       launch(
                           "https://github.com/fluttercandies/extended_text");
                     })
-            ], background: Theme.of(context).canvasColor),
+            ]),
             ...
           )
 ```
