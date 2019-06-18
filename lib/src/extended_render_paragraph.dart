@@ -867,10 +867,6 @@ class ExtendedRenderParagraph extends RenderBox {
           endTextOffset: endTextOffset - 1,
           y: min(y, endOffset.dy));
     }
-    var list = _textPainter.getBoxesForSelection(TextSelection(
-        baseOffset: endTextOffset, extentOffset: endTextOffset + 20));
-    print(list[0]);
-
     return Offset(endOffset.dx, min(y, endOffset.dy));
   }
 
