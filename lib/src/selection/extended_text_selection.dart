@@ -344,6 +344,15 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   TextEditingValue get textEditingValue => _value;
 
   @override
+  bool get copyEnabled => true;
+  @override
+  bool get cutEnabled => true;
+  @override
+  bool get pasteEnabled => true;
+  @override
+  bool get selectAllEnabled => true;
+
+  @override
   set textEditingValue(TextEditingValue value) {
     //value = _handleSpecialTextSpan(value);
     _selectionOverlay?.update(value);
