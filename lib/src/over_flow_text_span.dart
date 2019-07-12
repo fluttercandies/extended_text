@@ -11,7 +11,7 @@ class OverFlowTextSpan extends TextSpan {
   OverFlowTextSpan(
       {TextStyle style,
       String text,
-      List<TextSpan> children,
+      List<InlineSpan> children,
       GestureRecognizer recognizer})
       : _textPainterHelper = TextPainterHelper(),
         super(

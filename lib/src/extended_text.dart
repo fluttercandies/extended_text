@@ -1,5 +1,4 @@
 import 'package:extended_text/extended_text.dart';
-import 'package:extended_text/src/extended_render_paragraph.dart';
 import 'package:extended_text/src/extended_rich_text.dart';
 import 'package:extended_text/src/over_flow_text_span.dart';
 import 'package:flutter/foundation.dart';
@@ -16,6 +15,7 @@ class ExtendedText extends StatelessWidget {
   const ExtendedText(this.data,
       {Key key,
       this.style,
+      this.strutStyle,
       this.textAlign,
       this.textDirection,
       this.locale,
@@ -24,6 +24,7 @@ class ExtendedText extends StatelessWidget {
       this.textScaleFactor,
       this.maxLines,
       this.semanticsLabel,
+      this.textWidthBasis,
       this.specialTextSpanBuilder,
       this.onSpecialTextTap,
       this.overFlowTextSpan,
@@ -36,10 +37,11 @@ class ExtendedText extends StatelessWidget {
         textSpan = null,
         super(key: key);
 
-  /// Creates a text widget with a [TextSpan].
+  /// Creates a text widget with a [InlineSpan].
   const ExtendedText.rich(this.textSpan,
       {Key key,
       this.style,
+      this.strutStyle,
       this.textAlign,
       this.textDirection,
       this.locale,
@@ -48,6 +50,7 @@ class ExtendedText extends StatelessWidget {
       this.textScaleFactor,
       this.maxLines,
       this.semanticsLabel,
+      this.textWidthBasis,
       this.onSpecialTextTap,
       this.overFlowTextSpan,
       this.selectionEnabled: false,
@@ -90,10 +93,10 @@ class ExtendedText extends StatelessWidget {
   ///call back of SpecialText tap
   final SpecialTextGestureTapCallback onSpecialTextTap;
 
-  /// The text to display as a [TextSpan].
+  /// The text to display as a [InlineSpan].
   ///
   /// This will be null if [data] is provided instead.
-  final TextSpan textSpan;
+  final InlineSpan textSpan;
 
   /// If non-null, the style to use for this text.
   ///
@@ -101,6 +104,9 @@ class ExtendedText extends StatelessWidget {
   /// the closest enclosing [DefaultTextStyle]. Otherwise, the style will
   /// replace the closest enclosing [DefaultTextStyle].
   final TextStyle style;
+
+  /// {@macro flutter.painting.textPainter.strutStyle}
+  final StrutStyle strutStyle;
 
   /// How the text should be aligned horizontally.
   final TextAlign textAlign;
@@ -135,7 +141,7 @@ class ExtendedText extends StatelessWidget {
   final bool softWrap;
 
   /// How visual overflow should be handled.
-  final ExtendedTextOverflow overflow;
+  final TextOverflow overflow;
 
   /// The number of font pixels for each logical pixel.
   ///
@@ -163,7 +169,8 @@ class ExtendedText extends StatelessWidget {
   /// An alternative semantics label for this text.
   ///
   /// If present, the semantics of this widget will contain this value instead
-  /// of the actual text.
+  /// of the actual text. This will overwrite any of the semantics labels applied
+  /// directly to the [TextSpan]s.
   ///
   /// This is useful for replacing abbreviations or shorthands with the full
   /// text value:
@@ -173,6 +180,9 @@ class ExtendedText extends StatelessWidget {
   ///
   /// ```
   final String semanticsLabel;
+
+  /// {@macro flutter.dart:ui.text.TextWidthBasis}
+  final TextWidthBasis textWidthBasis;
 
 //  ExtendedRenderEditable get _renderEditable =>
 //      _editableTextKey.currentState.renderEditable;
@@ -196,8 +206,6 @@ class ExtendedText extends StatelessWidget {
         children: textSpan != null ? <TextSpan>[textSpan] : null,
       );
 
-    _createImageConfiguration(<TextSpan>[innerTextSpan], context);
-
     OverFlowTextSpan effectiveOverFlowTextSpan;
     if (overFlowTextSpan != null) {
       effectiveOverFlowTextSpan = OverFlowTextSpan(
@@ -206,17 +214,6 @@ class ExtendedText extends StatelessWidget {
         style: overFlowTextSpan.style ?? effectiveTextStyle,
         children: overFlowTextSpan.children,
       );
-    }
-
-    ExtendedTextOverflow extendedTextOverflow = overflow;
-    if (extendedTextOverflow == null) {
-      if (defaultTextStyle.overflow == TextOverflow.ellipsis) {
-        extendedTextOverflow = ExtendedTextOverflow.ellipsis;
-      } else if (defaultTextStyle.overflow == TextOverflow.clip) {
-        extendedTextOverflow = ExtendedTextOverflow.clip;
-      } else if (defaultTextStyle.overflow == TextOverflow.fade) {
-        extendedTextOverflow = ExtendedTextOverflow.fade;
-      }
     }
 
     Widget result;
@@ -228,7 +225,7 @@ class ExtendedText extends StatelessWidget {
         locale:
             locale, // RichText uses Localizations.localeOf to obtain a default if this is null
         softWrap: softWrap ?? defaultTextStyle.softWrap,
-        overflow: extendedTextOverflow,
+        overflow: overflow ?? defaultTextStyle.overflow,
         textScaleFactor:
             textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
         maxLines: maxLines ?? defaultTextStyle.maxLines,
@@ -248,7 +245,7 @@ class ExtendedText extends StatelessWidget {
         locale:
             locale, // RichText uses Localizations.localeOf to obtain a default if this is null
         softWrap: softWrap ?? defaultTextStyle.softWrap,
-        overflow: extendedTextOverflow,
+        overflow: overflow ?? defaultTextStyle.overflow,
         textScaleFactor:
             textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
         maxLines: maxLines ?? defaultTextStyle.maxLines,
@@ -267,17 +264,6 @@ class ExtendedText extends StatelessWidget {
     }
 
     return result;
-  }
-
-  void _createImageConfiguration(
-      List<TextSpan> textSpan, BuildContext context) {
-    textSpan.forEach((ts) {
-      if (ts is ImageSpan) {
-        ts.createImageConfiguration(context);
-      } else if (ts.children != null) {
-        _createImageConfiguration(ts.children, context);
-      }
-    });
   }
 
   @override
@@ -300,8 +286,8 @@ class ExtendedText extends StatelessWidget {
         ifTrue: 'wrapping at box width',
         ifFalse: 'no wrapping except at line break characters',
         showName: true));
-    properties.add(EnumProperty<ExtendedTextOverflow>('overflow', overflow,
-        defaultValue: null));
+    properties.add(
+        EnumProperty<TextOverflow>('overflow', overflow, defaultValue: null));
     properties.add(
         DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: null));
     properties.add(IntProperty('maxLines', maxLines, defaultValue: null));

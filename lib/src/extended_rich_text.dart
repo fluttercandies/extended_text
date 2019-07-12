@@ -9,7 +9,7 @@ import 'extended_text_typedef.dart';
 ///  * [TextSpan], which is used to describe the text in a paragraph.
 ///  * [Text], which automatically applies the ambient styles described by a
 ///    [DefaultTextStyle] to a single string.
-class ExtendedRichText extends LeafRenderObjectWidget {
+class ExtendedRichText extends MultiChildRenderObjectWidget {
   /// Creates a paragraph of rich text.
   ///
   /// The [text], [textAlign], [softWrap], [overflow], and [textScaleFactor]
@@ -20,27 +20,43 @@ class ExtendedRichText extends LeafRenderObjectWidget {
   ///
   /// The [textDirection], if null, defaults to the ambient [Directionality],
   /// which in that case must not be null.
-  const ExtendedRichText(
-      {Key key,
-      @required this.text,
-      this.textAlign = TextAlign.start,
-      this.textDirection,
-      this.softWrap = true,
-      this.overflow = ExtendedTextOverflow.clip,
-      this.textScaleFactor = 1.0,
-      this.maxLines,
-      this.locale,
-      this.overFlowTextSpan,
-      this.onSelectionChanged,
-      this.selection,
-      this.selectionColor})
-      : assert(text != null),
+  ExtendedRichText({
+    Key key,
+    @required this.text,
+    this.textAlign = TextAlign.start,
+    this.textDirection,
+    this.softWrap = true,
+    this.overflow = TextOverflow.clip,
+    this.textScaleFactor = 1.0,
+    this.maxLines,
+    this.locale,
+    this.overFlowTextSpan,
+    this.onSelectionChanged,
+    this.strutStyle,
+    this.textWidthBasis = TextWidthBasis.parent,
+    this.selection,
+    this.selectionColor,
+  })  : assert(text != null),
         assert(textAlign != null),
         assert(softWrap != null),
         assert(overflow != null),
         assert(textScaleFactor != null),
         assert(maxLines == null || maxLines > 0),
-        super(key: key);
+        assert(textWidthBasis != null),
+        super(key: key, children: _extractChildren(text));
+
+  // Traverses the InlineSpan tree and depth-first collects the list of
+  // child widgets that are created in WidgetSpans.
+  static List<Widget> _extractChildren(InlineSpan span) {
+    final List<Widget> result = <Widget>[];
+    span.visitChildren((InlineSpan span) {
+      if (span is WidgetSpan) {
+        result.add(span.child);
+      }
+      return true;
+    });
+    return result;
+  }
 
   /// The range of text that is currently selected.
   final TextSelection selection;
@@ -53,7 +69,7 @@ class ExtendedRichText extends LeafRenderObjectWidget {
   final OverFlowTextSpan overFlowTextSpan;
 
   /// The text to display in this widget.
-  final TextSpan text;
+  final InlineSpan text;
 
   /// How the text should be aligned horizontally.
   final TextAlign textAlign;
@@ -80,7 +96,7 @@ class ExtendedRichText extends LeafRenderObjectWidget {
   final bool softWrap;
 
   /// How visual overflow should be handled.
-  final ExtendedTextOverflow overflow;
+  final TextOverflow overflow;
 
   /// The number of font pixels for each logical pixel.
   ///
@@ -105,6 +121,11 @@ class ExtendedRichText extends LeafRenderObjectWidget {
   /// See [RenderParagraph.locale] for more information.
   final Locale locale;
 
+  /// {@macro flutter.painting.textPainter.strutStyle}
+  final StrutStyle strutStyle;
+
+  /// {@macro flutter.widgets.text.DefaultTextStyle.textWidthBasis}
+  final TextWidthBasis textWidthBasis;
   @override
   ExtendedRenderParagraph createRenderObject(BuildContext context) {
     assert(textDirection != null || debugCheckHasDirectionality(context));
@@ -115,6 +136,8 @@ class ExtendedRichText extends LeafRenderObjectWidget {
         overflow: overflow,
         textScaleFactor: textScaleFactor,
         maxLines: maxLines,
+        strutStyle: strutStyle,
+        textWidthBasis: textWidthBasis,
         locale: locale ??
             Localizations.localeOf(
               context,
@@ -138,6 +161,8 @@ class ExtendedRichText extends LeafRenderObjectWidget {
       ..overflow = overflow
       ..textScaleFactor = textScaleFactor
       ..maxLines = maxLines
+      ..strutStyle = strutStyle
+      ..textWidthBasis = textWidthBasis
       ..locale = locale ?? Localizations.localeOf(context, nullOk: true)
       ..overFlowTextSpan = overFlowTextSpan
       ..selection = selection
@@ -157,11 +182,14 @@ class ExtendedRichText extends LeafRenderObjectWidget {
         ifTrue: 'wrapping at box width',
         ifFalse: 'no wrapping except at line break characters',
         showName: true));
-    properties.add(EnumProperty<ExtendedTextOverflow>('overflow', overflow,
-        defaultValue: ExtendedTextOverflow.clip));
+    properties.add(EnumProperty<TextOverflow>('overflow', overflow,
+        defaultValue: TextOverflow.clip));
     properties.add(
         DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: 1.0));
     properties.add(IntProperty('maxLines', maxLines, ifNull: 'unlimited'));
+    properties.add(EnumProperty<TextWidthBasis>(
+        'textWidthBasis', textWidthBasis,
+        defaultValue: TextWidthBasis.parent));
     properties.add(StringProperty('text', text.toPlainText()));
   }
 }

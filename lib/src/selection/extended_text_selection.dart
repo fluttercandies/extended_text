@@ -51,7 +51,7 @@ class ExtendedTextSelection extends StatefulWidget {
   final bool softWrap;
 
   /// How visual overflow should be handled.
-  final ExtendedTextOverflow overflow;
+  final TextOverflow overflow;
 
   /// The number of font pixels for each logical pixel.
   ///
@@ -395,4 +395,20 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
           selection: TextSelection.collapsed(offset: 0));
     }
   }
+
+  @override
+  bool get copyEnabled => !textEditingValue.selection.isCollapsed;
+
+  @override
+  bool get cutEnabled => false;
+
+  @override
+  bool get pasteEnabled => false;
+
+  @override
+  bool get selectAllEnabled =>
+      textEditingValue.text.isNotEmpty &&
+      !(textEditingValue.selection.baseOffset == 0 &&
+          textEditingValue.selection.extentOffset ==
+              textEditingValue.text.length);
 }

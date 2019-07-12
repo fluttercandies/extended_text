@@ -9,7 +9,7 @@ class EmojiText extends SpecialText {
       : super(EmojiText.flag, "]", textStyle);
 
   @override
-  TextSpan finishText() {
+  InlineSpan finishText() {
     var key = toString();
     if (EmojiUitl.instance.emojiMap.containsKey(key)) {
       //fontsize id define image height
@@ -18,7 +18,6 @@ class EmojiText extends SpecialText {
 
       ///fontSize 26 and text height =30.0
       //final double fontSize = 26.0;
-
       return ImageSpan(AssetImage(EmojiUitl.instance.emojiMap[key]),
           actualText: key,
           imageWidth: size,

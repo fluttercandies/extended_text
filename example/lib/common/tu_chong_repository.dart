@@ -33,7 +33,7 @@ class TuChongRepository extends LoadingMoreBase<TuChongItem> {
     if (this.length == 0) {
       url = "https://api.tuchong.com/feed-app";
     } else {
-      int lastPostId = this[this.length - 1].post_id;
+      int lastPostId = this[this.length - 1].postId;
       url =
           "https://api.tuchong.com/feed-app?post_id=$lastPostId&page=$pageindex&type=loadmore";
     }
