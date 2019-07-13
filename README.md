@@ -134,22 +134,34 @@ class MySpecialTextSpanBuilder extends SpecialTextSpanBuilder {
 
 ### ImageSpan
 
-show image in text by using ImageSpan
+show inline image by using ImageSpan.
 
 ```dart
 ImageSpan(
-  this.image, {
-  @required this.imageWidth,
-  @required this.imageHeight,
-  this.margin,
-  this.beforePaintImage,
-  this.afterPaintImage,
-  this.fit: BoxFit.scaleDown,
-  String actualText: imageSpanTransparentPlaceholder,
-  int start: 0,
-  this.clearMemoryCacheIfFailed: true,
-  GestureRecognizer recognizer,
-})
+    ImageProvider image, {
+    Key key,
+    @required double imageWidth,
+    @required double imageHeight,
+    EdgeInsets margin,
+    int start: 0,
+    ui.PlaceholderAlignment alignment = ui.PlaceholderAlignment.bottom,
+    String actualText,
+    TextBaseline baseline,
+    TextStyle style,
+    BoxFit fit: BoxFit.scaleDown,
+    ImageLoadingBuilder loadingBuilder,
+    ImageFrameBuilder frameBuilder,
+    String semanticLabel,
+    bool excludeFromSemantics = false,
+    Color color,
+    BlendMode colorBlendMode,
+    AlignmentGeometry imageAlignment = Alignment.center,
+    ImageRepeat repeat = ImageRepeat.noRepeat,
+    Rect centerSlice,
+    bool matchTextDirection = false,
+    bool gaplessPlayback = false,
+    FilterQuality filterQuality = FilterQuality.low,
+  })
 
 ImageSpan(AssetImage("xxx.jpg"),
         imageWidth: size,
@@ -158,23 +170,25 @@ ImageSpan(AssetImage("xxx.jpg"),
   }
 ```
 
-| parameter                | description                                                                                    | default          |
-| ------------------------ | ---------------------------------------------------------------------------------------------- | ---------------- |
-| image                    | The image to display(ImageProvider).                                                           | -                |
-| imageWidth               | The width of image(not include margin)                                                         | required         |
-| imageHeight              | The height of image(not include margin)                                                        | required         |
-| margin                   | The margin of image                                                                            | -                |
-| beforePaintImage         | You can paint your placeholder or clip etc if needed                                           | -                |
-| afterPaintImage          | You can paint border,shadow etc if needed                                                      | -                |
-| fit                      | BoxFit                                                                                         | BoxFit.scaleDown |
-| actualText               | Actual text, take care of it when enable selection,something likes "\[love\]"                  | "\u200B"         |
-| start                    | Start index of text,take care of it when enable selection.                                     | 0                |
-| clearMemoryCacheIfFailed | When failed to load image, whether clear memory cache,if ture, image will reload in next time. | true             |
-| recognizer               | A gesture recognizer that will receive events that hit this text span.                         | -                |
+| parameter   | description                                                                   | default  |
+| ----------- | ----------------------------------------------------------------------------- | -------- |
+| image       | The image to display(ImageProvider).                                          | -        |
+| imageWidth  | The width of image(not include margin)                                        | required |
+| imageHeight | The height of image(not include margin)                                       | required |
+| margin      | The margin of image                                                           | -        |
+| actualText  | Actual text, take care of it when enable selection,something likes "\[love\]" | '\uFFFC' |
+| start       | Start index of text,take care of it when enable selection.                    | 0        |
 
 ### Cache Image
 
 if you want cache the network image, you can use ExtendedNetworkImageProvider and clear them with clearDiskCachedImages
+
+import extended_image_library
+
+```dart
+dependencies:
+  extended_image_library: ^0.1.4
+```
 
 ```dart
 ExtendedNetworkImageProvider(

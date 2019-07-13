@@ -154,18 +154,31 @@ class MySpecialTextSpanBuilder extends SpecialTextSpanBuilder {
 
 ```dart
 ImageSpan(
-  this.image, {
-  @required this.imageWidth,
-  @required this.imageHeight,
-  this.margin,
-  this.beforePaintImage,
-  this.afterPaintImage,
-  this.fit: BoxFit.scaleDown,
-  String actualText: imageSpanTransparentPlaceholder,
-  int start: 0,
-  this.clearMemoryCacheIfFailed: true,
-  GestureRecognizer recognizer,
-})
+    ImageProvider image, {
+    Key key,
+    @required double imageWidth,
+    @required double imageHeight,
+    EdgeInsets margin,
+    int start: 0,
+    ui.PlaceholderAlignment alignment = ui.PlaceholderAlignment.bottom,
+    String actualText,
+    TextBaseline baseline,
+    TextStyle style,
+    BoxFit fit: BoxFit.scaleDown,
+    ImageLoadingBuilder loadingBuilder,
+    ImageFrameBuilder frameBuilder,
+    String semanticLabel,
+    bool excludeFromSemantics = false,
+    Color color,
+    BlendMode colorBlendMode,
+    AlignmentGeometry imageAlignment = Alignment.center,
+    ImageRepeat repeat = ImageRepeat.noRepeat,
+    Rect centerSlice,
+    bool matchTextDirection = false,
+    bool gaplessPlayback = false,
+    FilterQuality filterQuality = FilterQuality.low,
+  })
+
 
 ImageSpan(AssetImage("xxx.jpg"),
         imageWidth: size,
@@ -174,23 +187,25 @@ ImageSpan(AssetImage("xxx.jpg"),
   }
 ```
 
-| 参数                     | 描述                                                                   | 默认             |
-| ------------------------ | ---------------------------------------------------------------------- | ---------------- |
-| image                    | 图片展示的Provider(ImageProvider)                                      | -                |
-| imageWidth               | 宽度，不包括 margin                                                    | 必填             |
-| imageHeight              | 高度，不包括 margin                                                    | 必填             |
-| margin                   | 图片的margin                                                           | -                |
-| beforePaintImage         | 在绘制图片之前的回调，可以在这个时机绘制占位或者做裁剪等               | -                |
-| afterPaintImage          | 在绘制图片之后的回调，可以在这个时机绘制边框或者阴影等                 | -                |
-| fit                      | BoxFit                                                                 | BoxFit.scaleDown |
-| actualText               | 真实的文本,当你开启文本选择功能的时候，必须设置,比如图片"\[love\]      | 空占位符"\u200B" |
-| start                    | 在文本字符串中的开始位置,当你开启文本选择功能的时候，必须设置          | 0                |
-| clearMemoryCacheIfFailed | 是否在图片加载失败之后清掉内存缓存，如果是ture的话，下次会重新加载图片 | true             |
-| recognizer               | 点击事件回调                                                           | -                |
+| 参数        | 描述                                                              | 默认             |
+| ----------- | ----------------------------------------------------------------- | ---------------- |
+| image       | 图片展示的Provider(ImageProvider)                                 | -                |
+| imageWidth  | 宽度，不包括 margin                                               | 必填             |
+| imageHeight | 高度，不包括 margin                                               | 必填             |
+| margin      | 图片的margin                                                      | -                |
+| actualText  | 真实的文本,当你开启文本选择功能的时候，必须设置,比如图片"\[love\] | 空占位符'\uFFFC' |
+| start       | 在文本字符串中的开始位置,当你开启文本选择功能的时候，必须设置     | 0                |
 
 ### 缓存图片
 
 你可以用ExtendedNetworkImageProvider来缓存文本中的图片，使用clearDiskCachedImages方法来清掉本地缓存
+
+引入 extended_image_library
+
+```dart
+dependencies:
+  extended_image_library: ^0.1.4
+```
 
 ```dart
 ExtendedNetworkImageProvider(
