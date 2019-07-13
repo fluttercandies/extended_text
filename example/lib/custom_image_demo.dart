@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:example/main.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:extended_text/extended_text.dart';
@@ -157,14 +159,22 @@ class CustomImageDemo extends StatelessWidget {
           },
         );
     }
+    return Container();
   }
 
   void onTap(BuildContext context, String url, List<String> list) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) {
-      return PicSwiper(
-        list.indexOf(url),
-        list.map<PicSwiperItem>((f) => PicSwiperItem(f)).toList(),
-      );
-    }));
+    var page = PicSwiper(
+      list.indexOf(url),
+      list.map<PicSwiperItem>((f) => PicSwiperItem(f)).toList(),
+    );
+    Navigator.push(
+        context,
+        Platform.isAndroid
+            ? TransparentMaterialPageRoute(builder: (_) {
+                return page;
+              })
+            : TransparentCupertinoPageRoute(builder: (_) {
+                return page;
+              }));
   }
 }

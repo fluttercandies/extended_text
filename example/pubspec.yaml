@@ -23,8 +23,8 @@ dependencies:
   url_launcher: ^5.0.2
   loading_more_list: any
   http_client_helper: any
-  pull_to_refresh_notification: ^0.3.1
-  extended_image: ^0.5.2
+  pull_to_refresh_notification: any
+  extended_image: any
   like_button: any
   oktoast: ^2.1.4
   flutter_screenutil: ^0.5.1

@@ -1375,151 +1375,33 @@ class ExtendedRenderParagraph extends RenderBox
 //    } else
     if (!selection.isCollapsed) {
       _layoutTextWithConstraints(constraints);
+      TextSelection textPainterSelection = selection;
+      if (handleSpecialText) {
+        textPainterSelection =
+            convertTextInputSelectionToTextPainterSelection(text, selection);
+      }
       final List<ui.TextBox> boxes =
-          _textPainter.getBoxesForSelection(selection);
+          _textPainter.getBoxesForSelection(textPainterSelection);
       final Offset start = Offset(boxes.first.start, boxes.first.bottom);
-      final Offset end = Offset(boxes.last.end, boxes.last.bottom);
+      Offset end = Offset(boxes.last.end, boxes.last.bottom);
+
+      if (_hasVisualOverflow && overFlowTextSpan != null) {
+        var overFlowOffset = overFlowTextSpan.textPainterHelper.offset;
+        if (overFlowOffset.dx < end.dx && overFlowOffset.dy < end.dy) {
+          end = Offset(overFlowOffset.dx, end.dy);
+        }
+      }
+
       return <TextSelectionPoint>[
         TextSelectionPoint(start, boxes.first.direction),
         TextSelectionPoint(end, boxes.last.direction),
       ];
-
-      ///zmt
-//      TextSelection finalTextSelection = selection.copyWith();
-//      TextSelection textPainterSelection = selection;
-//      if (handleSpecialText) {
-//        textPainterSelection = convertTextInputSelectionToTextPainterSelection(
-//            text, finalTextSelection);
-//      }
-//
-//      final Offset effectiveOffset = Offset.zero;
-//      Offset finalEnd;
-//
-//      if (_hasVisualOverflow) {
-//        if (overFlowTextSpan != null) {
-//          var position =
-//              getPositionForOffset(overFlowTextSpan.textPainterHelper.offset);
-//          if (position != null &&
-//              position.offset < textPainterSelection.extentOffset) {
-//            textPainterSelection =
-//                textPainterSelection.copyWith(extentOffset: position.offset);
-//            finalTextSelection = finalTextSelection.copyWith(
-//                extentOffset:
-//                    convertTextPainterPostionToTextInputPostion(text, position)
-//                        .offset);
-//          }
-//        } else {
-//          final List<ui.TextBox> boxes =
-//              _textPainter.getBoxesForSelection(textPainterSelection);
-//          //final Offset start = Offset(boxes.first.start, boxes.first.bottom);
-//          final Offset end = Offset(boxes.last.end, boxes.last.bottom);
-//
-//          if (_oldOverflow == TextOverflow.ellipsis) {
-//            finalEnd = end;
-//          } else {
-//            var position = getPositionForOffset(end);
-//            if (position != null &&
-//                position.offset < textPainterSelection.extentOffset) {
-//              textPainterSelection =
-//                  textPainterSelection.copyWith(extentOffset: position.offset);
-//              finalTextSelection = finalTextSelection.copyWith(
-//                  extentOffset: convertTextPainterPostionToTextInputPostion(
-//                          text, position)
-//                      .offset);
-//            }
-//          }
-//        }
-//      }
-//      double caretHeight;
-//      ValueChanged<double> caretHeightCallBack = (value) {
-//        caretHeight = value;
-//      };
-//
-//      final startOffset = _getCaretOffset(
-//          effectiveOffset,
-//          TextPosition(
-//              offset: textPainterSelection.baseOffset,
-//              affinity: selection.affinity),
-//          TextPosition(
-//              offset: selection.baseOffset, affinity: selection.affinity),
-//          caretHeightCallBack: caretHeightCallBack);
-//      final Offset start =
-//          Offset(0.0, caretHeight ?? preferredLineHeight) + startOffset;
-//
-//      caretHeight = null;
-//      final endOffset = _getCaretOffset(
-//          effectiveOffset,
-//          TextPosition(
-//              offset: textPainterSelection.extentOffset,
-//              affinity: selection.affinity),
-//          TextPosition(
-//              offset: selection.extentOffset, affinity: selection.affinity),
-//          caretHeightCallBack: caretHeightCallBack);
-//
-//      final Offset end = finalEnd ??
-//          Offset(0.0, caretHeight ?? preferredLineHeight) + endOffset;
-//
-//      return <TextSelectionPoint>[
-//        TextSelectionPoint(start, TextDirection.ltr),
-//        TextSelectionPoint(end, TextDirection.ltr),
-//      ];
-
     }
 
     return null;
   }
 
-  Offset _getCaretOffset(Offset effectiveOffset, TextPosition textPosition,
-      TextPosition textInputPosition,
-      {ValueChanged<double> caretHeightCallBack}) {
-    ///zmt
-    if (handleSpecialText) {
-      var textSpan = text.getSpanForPosition(TextPosition(
-          offset: textPosition.offset, affinity: TextAffinity.upstream));
-      if (textSpan != null && textSpan is ExtendedWidgetSpan) {
-        int index = _placeholderSpans.indexOf(textSpan);
-        if (index >= 0 && index < _textPainter.inlinePlaceholderBoxes.length) {
-          var box = _textPainter.inlinePlaceholderBoxes[index];
-          var rect = box.toRect();
-          if (textInputPosition.offset >= textSpan.end) {
-            caretHeightCallBack?.call(rect.height);
-            return rect.topRight;
-          } else if (textInputPosition.offset >= textSpan.start) {
-            caretHeightCallBack?.call(rect.height);
-            return rect.topLeft;
-          }
-        }
-      }
-
-      ///if first index, check by first span
-      var offset = textPosition.offset;
-      if (offset == 0) {
-        offset = 1;
-      }
-
-      ///last or has ExtendedWidgetSpan
-      var boxs = _textPainter.getBoxesForSelection(TextSelection(
-          baseOffset: offset - 1,
-          extentOffset: offset,
-          affinity: textPosition.affinity));
-      if (boxs.length > 0) {
-        var rect = boxs.toList().last.toRect();
-        caretHeightCallBack?.call(rect.height);
-        if (textPosition.offset == 0) {
-          return rect.topLeft;
-        } else {
-          return rect.topRight;
-        }
-      }
-    }
-
-    final Offset caretOffset =
-        _textPainter.getOffsetForCaret(textPosition, _caretPrototype) +
-            effectiveOffset;
-    return caretOffset;
-  }
-
-  Rect _caretPrototype = Rect.zero;
+  //Rect _caretPrototype = Rect.zero;
 
   /// Track whether position of the start of the selected text is within the viewport.
   ///
