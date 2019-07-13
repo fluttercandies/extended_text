@@ -1,4 +1,4 @@
-## [0.5.9]
+## [0.6.0]
 
 * Improve codes base on v1.7.8
 * Support WidgetSpan (ExtendedWidgetSpan)
