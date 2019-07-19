@@ -112,7 +112,7 @@ class ExtendedRenderParagraph extends RenderBox
   OverFlowTextSpan _overFlowTextSpan;
   final TextOverflow _oldOverflow;
   OverFlowTextSpan get overFlowTextSpan => _overFlowTextSpan;
-  set overFlowTextSpan(TextSpan value) {
+  set overFlowTextSpan(OverFlowTextSpan value) {
     if (value != _overFlowTextSpan) {
       if (value != null) {
         overflow = TextOverflow.clip;
