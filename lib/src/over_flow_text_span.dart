@@ -32,7 +32,7 @@ class OverFlowTextSpan extends TextSpan {
     return typedOther.text == text &&
         typedOther.style == style &&
         typedOther.recognizer == recognizer &&
-        listEquals<TextSpan>(typedOther.children, children);
+        listEquals<InlineSpan>(typedOther.children, children);
   }
 
   @override

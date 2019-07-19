@@ -1,3 +1,7 @@
+## [0.6.1]
+
+* Fix issue [type 'List<InlineSpan>' is not a subtype of type 'List<TextSpan>'](https://github.com/fluttercandies/extended_text/issues/20)
+
 ## [0.6.0]
 
 * Improve codes base on v1.7.8
