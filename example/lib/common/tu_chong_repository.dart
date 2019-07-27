@@ -8,14 +8,12 @@ class TuChongRepository extends LoadingMoreBase<TuChongItem> {
   int pageindex = 1;
 
   @override
-  // TODO: implement hasMore
   bool _hasMore = true;
   bool forceRefresh = false;
   bool get hasMore => (_hasMore && length < 100) || forceRefresh;
 
   @override
   Future<bool> refresh([bool clearBeforeRequest = false]) async {
-    // TODO: implement onRefresh
     _hasMore = true;
     pageindex = 1;
     //force to refresh list when you don't want clear list before request
