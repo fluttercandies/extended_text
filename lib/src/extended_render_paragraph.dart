@@ -651,8 +651,11 @@ class ExtendedRenderParagraph extends RenderBox
     }
   }
 
+  Offset _initialOffset;
+  Offset get _effectiveOffset => (_initialOffset ?? Offset.zero);
   @override
   void paint(PaintingContext context, Offset offset) {
+    _initialOffset = offset;
     // Ideally we could compute the min/max intrinsic width/height with a
     // non-destructive operation. However, currently, computing these values
     // will destroy state inside the painter. If that happens, we need to
@@ -1096,15 +1099,15 @@ class ExtendedRenderParagraph extends RenderBox
 
       Rect textRect = offset & size;
       Rect overFlowRect = overFlowTextSpanRect.shift(offset);
-
+      final double visibleRegionSlop = _textPainter.preferredLineHeight / 2.0;
       return Path()
         ..addPolygon(<Offset>[
           textRect.topLeft,
           textRect.topRight,
           overFlowRect.topRight,
           overFlowRect.topLeft,
-          overFlowRect.bottomLeft,
-          textRect.bottomLeft,
+          overFlowRect.bottomLeft.translate(0.0, visibleRegionSlop),
+          textRect.bottomLeft.translate(0.0, visibleRegionSlop),
         ], true);
     }
 
@@ -1373,6 +1376,7 @@ class ExtendedRenderParagraph extends RenderBox
 //
 //      return <TextSelectionPoint>[TextSelectionPoint(start, null)];
 //    } else
+
     if (!selection.isCollapsed) {
       _layoutTextWithConstraints(constraints);
       TextSelection textPainterSelection = selection;
@@ -1456,10 +1460,12 @@ class ExtendedRenderParagraph extends RenderBox
 
     final Rect visibleRegion = Offset.zero & size;
 
-    final Offset startOffset = _textPainter.getOffsetForCaret(
-      TextPosition(offset: selection.start, affinity: selection.affinity),
-      Rect.zero,
-    );
+    final Offset startOffset = _getCaretOffset(
+        TextPosition(
+          offset: selection.start,
+          affinity: selection.affinity,
+        ),
+        effectiveOffset: effectiveOffset);
 
     // TODO(justinmc): https://github.com/flutter/flutter/issues/31495
     // Check if the selection is visible with an approximation because a
@@ -1473,23 +1479,9 @@ class ExtendedRenderParagraph extends RenderBox
         .inflate(visibleRegionSlop)
         .contains(startOffset + effectiveOffset);
 
-    Offset endOffset = _textPainter.getOffsetForCaret(
-      TextPosition(offset: selection.end, affinity: selection.affinity),
-      Rect.zero,
-    );
-
-    if (handleSpecialText &&
-        selection.end > 0 &&
-        endOffset == Offset.zero &&
-        effectiveOffset == Offset.zero) {
-      var boxs = _textPainter.getBoxesForSelection(TextSelection(
-          baseOffset: selection.end - 1,
-          extentOffset: selection.end,
-          affinity: selection.affinity));
-      if (boxs.length > 0) {
-        endOffset = boxs.toList().last.toRect().topRight;
-      }
-    }
+    final Offset endOffset = _getCaretOffset(
+        TextPosition(offset: selection.end, affinity: selection.affinity),
+        effectiveOffset: effectiveOffset);
 
     _selectionEndInViewport.value = visibleRegion
         .inflate(visibleRegionSlop)
@@ -1499,5 +1491,40 @@ class ExtendedRenderParagraph extends RenderBox
   bool containsPosition(Offset position) {
     final Rect visibleRegion = Offset.zero & size;
     return visibleRegion.contains(globalToLocal(position));
+  }
+
+  Offset _getCaretOffset(TextPosition textPosition,
+      {ValueChanged<double> caretHeightCallBack, Offset effectiveOffset}) {
+    effectiveOffset ??= this._effectiveOffset;
+
+    ///zmt
+    if (handleSpecialText) {
+      ///if first index, check by first span
+      var offset = textPosition.offset;
+      if (offset == 0) {
+        offset = 1;
+      }
+
+      ///last or has ExtendedWidgetSpan
+
+      var boxs = _textPainter.getBoxesForSelection(TextSelection(
+          baseOffset: offset - 1,
+          extentOffset: offset,
+          affinity: textPosition.affinity));
+      if (boxs.length > 0) {
+        var rect = boxs.toList().last.toRect();
+        caretHeightCallBack?.call(rect.height);
+        if (textPosition.offset == 0) {
+          return rect.topLeft + effectiveOffset;
+        } else {
+          return rect.topRight + effectiveOffset;
+        }
+      }
+    }
+
+    final Offset caretOffset =
+        _textPainter.getOffsetForCaret(textPosition, Rect.zero) +
+            effectiveOffset;
+    return caretOffset;
   }
 }
