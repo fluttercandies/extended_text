@@ -1,3 +1,7 @@
+## [0.6.3]
+
+* Fix issue [ImageSpan is not TextSpan](https://github.com/fluttercandies/extended_text/issues/24)
+
 ## [0.6.2]
 
 * Fix wrong selection offset

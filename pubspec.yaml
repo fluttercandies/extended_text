@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
     
-  extended_text_library: ^0.4.2
+  extended_text_library: ^0.4.3
 
 dev_dependencies:
   flutter_test:
