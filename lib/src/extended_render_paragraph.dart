@@ -468,10 +468,10 @@ class ExtendedRenderParagraph extends RenderBox
       if (overFlowTextSpanOffset >= Offset.zero) {
         final TextPosition position =
             overFlowTextSpan.textPainterHelper.getPositionForOffset(offset);
-        final TextSpan span =
+        final InlineSpan span =
             overFlowTextSpan.textPainterHelper.getSpanForPosition(position);
 
-        if (span?.recognizer != null) {
+        if (span != null && span is TextSpan && span.recognizer != null) {
           span.recognizer.addPointer(event);
           return;
         }
