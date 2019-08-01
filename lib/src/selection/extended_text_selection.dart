@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -7,9 +8,7 @@ import 'package:flutter/services.dart';
 import '../extended_render_paragraph.dart';
 import '../extended_rich_text.dart';
 import '../over_flow_text_span.dart';
-import 'extended_text_selection_overlay.dart';
 import 'extended_text_selection_pointer_handler.dart';
-import 'selection_controls/extended_text_selection_controls.dart';
 
 ///
 ///  create by zmtzawqlp on 2019/6/5
@@ -87,7 +86,7 @@ class ExtendedTextSelection extends StatefulWidget {
 
   final String data;
 
-  final ExtendedTextSelectionControls textSelectionControls;
+  final TextSelectionControls textSelectionControls;
 
   ExtendedTextSelection(
       {this.onTap,
@@ -117,7 +116,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   ExtendedRenderParagraph get _renderParagraph =>
       _renderParagraphKey.currentContext.findRenderObject();
   ExtendedTextSelectionOverlay _selectionOverlay;
-  ExtendedTextSelectionControls _textSelectionControls;
+  TextSelectionControls _textSelectionControls;
   final LayerLink _layerLink = LayerLink();
   ExtendedTextSelectionPointerHandlerState _pointerHandlerState;
   @override
@@ -135,12 +134,12 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
       final ThemeData themeData = Theme.of(context);
       switch (themeData.platform) {
         case TargetPlatform.iOS:
-          _textSelectionControls ??= extendedCupertinoTextSelectionControls;
+          _textSelectionControls ??= cupertinoExtendedTextSelectionControls;
           break;
 
         case TargetPlatform.android:
         case TargetPlatform.fuchsia:
-          _textSelectionControls ??= extendedMaterialTextSelectionControls;
+          _textSelectionControls ??= materialExtendedTextSelectionControls;
           break;
       }
     }
@@ -174,13 +173,13 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     switch (themeData.platform) {
       case TargetPlatform.iOS:
         forcePressEnabled = true;
-        _textSelectionControls ??= extendedCupertinoTextSelectionControls;
+        _textSelectionControls ??= cupertinoExtendedTextSelectionControls;
         break;
 
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
         forcePressEnabled = false;
-        _textSelectionControls ??= extendedMaterialTextSelectionControls;
+        _textSelectionControls ??= materialExtendedTextSelectionControls;
         break;
     }
 
@@ -324,6 +323,8 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
         value: textEditingValue,
         dragStartBehavior: widget.dragStartBehavior,
         selectionDelegate: this,
+        onSelectionHandleTapped: _handleSelectionHandleTapped,
+        handlesVisible: true,
         selectionControls: _textSelectionControls);
     final bool longPress = cause == SelectionChangedCause.longPress;
     if (cause != SelectionChangedCause.keyboard &&
@@ -333,7 +334,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
 //        widget.onSelectionChanged(selection, cause);
   }
 
-  VoidCallback _semanticsOnCopy(ExtendedTextSelectionControls controls) {
+  VoidCallback _semanticsOnCopy(TextSelectionControls controls) {
     return controls?.canCopy(this) == true
         ? () => controls.handleCopy(this)
         : null;
@@ -377,6 +378,16 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     _selectionOverlay?.hide();
   }
 
+  /// Toggles the visibility of the toolbar.
+  void toggleToolbar() {
+    assert(_selectionOverlay != null);
+    if (_selectionOverlay.toolbarIsVisible) {
+      hideToolbar();
+    } else {
+      showToolbar();
+    }
+  }
+
   void _hideSelectionOverlayIfNeeded() {
     _selectionOverlay?.hide();
     _selectionOverlay = null;
@@ -411,4 +422,11 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
       !(textEditingValue.selection.baseOffset == 0 &&
           textEditingValue.selection.extentOffset ==
               textEditingValue.text.length);
+
+  /// Toggle the toolbar when a selection handle is tapped.
+  void _handleSelectionHandleTapped() {
+    if (textEditingValue.selection.isCollapsed) {
+      toggleToolbar();
+    }
+  }
 }

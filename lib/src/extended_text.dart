@@ -65,7 +65,7 @@ class ExtendedText extends StatelessWidget {
 
   /// An interface for building the selection UI, to be provided by the
   /// implementor of the toolbar widget or handle widget
-  final ExtendedTextSelectionControls textSelectionControls;
+  final TextSelectionControls textSelectionControls;
 
   ///DragStartBehavior for text selection
   final DragStartBehavior dragStartBehavior;

@@ -32,9 +32,9 @@ packages:
   extended_text_library:
     dependency: "direct main"
     description:
-      name: extended_text_library
-      url: "https://pub.flutter-io.cn"
-    source: hosted
+      path: "D:\\Flutter\\github\\FlutterCandies\\dev\\extended_text_library"
+      relative: false
+    source: path
     version: "0.4.2"
   flutter:
     dependency: "direct main"

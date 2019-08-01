@@ -15,7 +15,8 @@ const String _kEllipsis = '\u2026';
 class ExtendedRenderParagraph extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, TextParentData>,
-        RenderBoxContainerDefaultsMixin<RenderBox, TextParentData> {
+        RenderBoxContainerDefaultsMixin<RenderBox, TextParentData>,
+        ExtendedTextSelectionRenderObject {
   /// Creates a paragraph render object.
   ///
   /// The [text], [textAlign], [textDirection], [overflow], [softWrap], and
@@ -1358,8 +1359,7 @@ class ExtendedRenderParagraph extends RenderBox
   ///
   ///  * [getLocalRectForCaret], which is the equivalent but for
   ///    a [TextPosition] rather than a [TextSelection].
-  List<TextSelectionPoint> getEndpointsForSelection(TextSelection selection,
-      {bool toolbar: false}) {
+  List<TextSelectionPoint> getEndpointsForSelection(TextSelection selection) {
     assert(constraints != null);
 //    if (temp.isCollapsed && toolbar) {
 //      // TODO(mpcomplete): This doesn't work well at an RTL/LTR boundary.
@@ -1526,5 +1526,18 @@ class ExtendedRenderParagraph extends RenderBox
         _textPainter.getOffsetForCaret(textPosition, Rect.zero) +
             effectiveOffset;
     return caretOffset;
+  }
+
+  @override
+  Size getSize() {
+    return this.size;
+  }
+
+  @override
+  bool get isAttached => attached;
+
+  @override
+  Offset getlocalToGlobal(Offset point, {RenderObject ancestor}) {
+    return localToGlobal(point, ancestor: ancestor);
   }
 }
