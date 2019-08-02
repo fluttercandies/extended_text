@@ -35,7 +35,7 @@ packages:
       path: "D:\\Flutter\\github\\FlutterCandies\\dev\\extended_text_library"
       relative: false
     source: path
-    version: "0.4.2"
+    version: "0.4.4"
   flutter:
     dependency: "direct main"
     description: flutter
