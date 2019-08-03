@@ -1,6 +1,7 @@
 ## [0.6.4]
 
 * Improve codes about selection
+* Select all SpecialTextSpan which deleteAll is true when double tap or long tap
 
 ## [0.6.3]
 

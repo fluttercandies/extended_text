@@ -13,7 +13,7 @@ dependencies:
     
 #  extended_text_library: ^0.4.4
   extended_text_library:
-    path: D:\Flutter\github\FlutterCandies\dev\extended_text_library
+    path: E:\Flutter\FlutterCandies\dev\extended_text_library
 
 dev_dependencies:
   flutter_test:

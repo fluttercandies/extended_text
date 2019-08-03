@@ -966,11 +966,9 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
       selection = TextSelection(baseOffset: word.start, extentOffset: word.end);
     }
     return handleSpecialText
-        ? convertTextPainterSelectionToTextInputSelection(text, selection)
+        ? convertTextPainterSelectionToTextInputSelection(text, selection,
+        selectWord: true)
         : selection;
-//    if (position.offset >= word.end)
-//      return TextSelection.fromPosition(position);
-//    return TextSelection(baseOffset: word.start, extentOffset: word.end);
   }
 
   /// Move the selection to the beginning or end of a word.
