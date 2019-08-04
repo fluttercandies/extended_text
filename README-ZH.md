@@ -4,7 +4,7 @@
 
 文档语言: [English](README.md) | [中文简体](README-ZH.md)
 
-强大的官方Text扩展组件，支持特殊文本效果（比如图片，@人）,自定义背景，自定义文本溢出效果,文本选择
+官方Text扩展组件，支持特殊文本效果（比如图片，@人）,自定义背景，自定义文本溢出效果,文本选择以及自定义选择菜单和选择器
 
 - [Flutter RichText 支持图片显示和自定义图片效果](https://juejin.im/post/5c8be0d06fb9a049a42ff067)
 - [Flutter RichText 支持自定义文本溢出效果](https://juejin.im/post/5c8ca608f265da2dd6394001)
@@ -53,13 +53,16 @@ class AtText extends SpecialText {
   /// whether show background for @somebody
   final bool showAtBackground;
 
-  final BuilderType type;
   AtText(TextStyle textStyle, SpecialTextGestureTapCallback onTap,
-      {this.showAtBackground: false, this.type, this.start})
-      : super(flag, " ", textStyle, onTap: onTap);
+      {this.showAtBackground: false, this.start})
+      : super(
+          flag,
+          " ",
+          textStyle,
+        );
 
   @override
-  TextSpan finishText() {
+  InlineSpan finishText() {
     TextStyle textStyle =
         this.textStyle?.copyWith(color: Colors.blue, fontSize: 16.0);
 
@@ -75,23 +78,19 @@ class AtText extends SpecialText {
             ///caret can move into special text
             deleteAll: true,
             style: textStyle,
-            recognizer: type == BuilderType.extendedText
-                ? (TapGestureRecognizer()
-                  ..onTap = () {
-                    if (onTap != null) onTap(atText);
-                  })
-                : null)
+            recognizer: (TapGestureRecognizer()
+              ..onTap = () {
+                if (onTap != null) onTap(atText);
+              }))
         : SpecialTextSpan(
             text: atText,
             actualText: atText,
             start: start,
             style: textStyle,
-            recognizer: type == BuilderType.extendedText
-                ? (TapGestureRecognizer()
-                  ..onTap = () {
-                    if (onTap != null) onTap(atText);
-                  })
-                : null);
+            recognizer: (TapGestureRecognizer()
+              ..onTap = () {
+                if (onTap != null) onTap(atText);
+              }));
   }
 }
 
@@ -255,28 +254,58 @@ Future<bool> clearDiskCachedImages({Duration duration}) async
 
 ### 文本选择控制器
 
-extended_text提供了默认的控制器extendedMaterialTextSelectionControls/extendedCupertinoTextSelectionControls 
+extended_text提供了默认的控制器MaterialExtendedTextSelectionControls/CupertinoExtendedTextSelectionControls
 
 你可以通过重写，来定义工具栏和选择器
 
 ```dart
 class MyExtendedMaterialTextSelectionControls
-    extends ExtendedMaterialTextSelectionControls {
+    extends MaterialExtendedTextSelectionControls {
+  MyExtendedMaterialTextSelectionControls();
   @override
-  Widget buildToolbar(BuildContext context, Rect globalEditableRegion,
-      Offset position, TextSelectionDelegate delegate) {
+  Widget buildToolbar(
+    BuildContext context,
+    Rect globalEditableRegion,
+    double textLineHeight,
+    Offset position,
+    List<TextSelectionPoint> endpoints,
+    TextSelectionDelegate delegate,
+  ) {
     assert(debugCheckHasMediaQuery(context));
     assert(debugCheckHasMaterialLocalizations(context));
+
+    // The toolbar should appear below the TextField
+    // when there is not enough space above the TextField to show it.
+    final TextSelectionPoint startTextSelectionPoint = endpoints[0];
+    final TextSelectionPoint endTextSelectionPoint =
+        (endpoints.length > 1) ? endpoints[1] : null;
+    final double x = (endTextSelectionPoint == null)
+        ? startTextSelectionPoint.point.dx
+        : (startTextSelectionPoint.point.dx + endTextSelectionPoint.point.dx) /
+            2.0;
+    final double availableHeight = globalEditableRegion.top -
+        MediaQuery.of(context).padding.top -
+        _kToolbarScreenPadding;
+    final double y = (availableHeight < _kToolbarHeight)
+        ? startTextSelectionPoint.point.dy +
+            globalEditableRegion.height +
+            _kToolbarHeight +
+            _kToolbarScreenPadding
+        : startTextSelectionPoint.point.dy - textLineHeight * 2.0;
+    final Offset preciseMidpoint = Offset(x, y);
+
     return ConstrainedBox(
       constraints: BoxConstraints.tight(globalEditableRegion.size),
       child: CustomSingleChildLayout(
-        delegate: ExtendedTextSelectionToolbarLayout(
+        delegate: MaterialExtendedTextSelectionToolbarLayout(
           MediaQuery.of(context).size,
           globalEditableRegion,
-          position,
+          preciseMidpoint,
         ),
         child: _TextSelectionToolbar(
+          handleCut: canCut(delegate) ? () => handleCut(delegate) : null,
           handleCopy: canCopy(delegate) ? () => handleCopy(delegate) : null,
+          handlePaste: canPaste(delegate) ? () => handlePaste(delegate) : null,
           handleSelectAll:
               canSelectAll(delegate) ? () => handleSelectAll(delegate) : null,
           handleLike: () {
@@ -284,20 +313,61 @@ class MyExtendedMaterialTextSelectionControls
             launch(
                 "mailto:zmtzawqlp@live.com?subject=extended_text_share&body=${delegate.textEditingValue.text}");
             delegate.hideToolbar();
+            //clear selecction
+            delegate.textEditingValue = delegate.textEditingValue.copyWith(
+                selection: TextSelection.collapsed(
+                    offset: delegate.textEditingValue.selection.end));
           },
         ),
       ),
     );
   }
+
+  @override
+  Widget buildHandle(
+      BuildContext context, TextSelectionHandleType type, double textHeight) {
+    final Widget handle = SizedBox(
+      width: _kHandleSize,
+      height: _kHandleSize,
+      child: Image.asset("assets/love.png"),
+    );
+
+    // [handle] is a circle, with a rectangle in the top left quadrant of that
+    // circle (an onion pointing to 10:30). We rotate [handle] to point
+    // straight up or up-right depending on the handle type.
+    switch (type) {
+      case TextSelectionHandleType.left: // points up-right
+        return Transform.rotate(
+          angle: math.pi / 4.0,
+          child: handle,
+        );
+      case TextSelectionHandleType.right: // points up-left
+        return Transform.rotate(
+          angle: -math.pi / 4.0,
+          child: handle,
+        );
+      case TextSelectionHandleType.collapsed: // points up
+        return handle;
+    }
+    assert(type != null);
+    return null;
+  }
 }
 
 /// Manages a copy/paste text selection toolbar.
 class _TextSelectionToolbar extends StatelessWidget {
-  const _TextSelectionToolbar(
-      {Key key, this.handleCopy, this.handleSelectAll, this.handleLike})
-      : super(key: key);
+  const _TextSelectionToolbar({
+    Key key,
+    this.handleCopy,
+    this.handleSelectAll,
+    this.handleCut,
+    this.handlePaste,
+    this.handleLike,
+  }) : super(key: key);
 
+  final VoidCallback handleCut;
   final VoidCallback handleCopy;
+  final VoidCallback handlePaste;
   final VoidCallback handleSelectAll;
   final VoidCallback handleLike;
 
@@ -307,22 +377,34 @@ class _TextSelectionToolbar extends StatelessWidget {
     final MaterialLocalizations localizations =
         MaterialLocalizations.of(context);
 
+    if (handleCut != null)
+      items.add(FlatButton(
+          child: Text(localizations.cutButtonLabel), onPressed: handleCut));
     if (handleCopy != null)
       items.add(FlatButton(
           child: Text(localizations.copyButtonLabel), onPressed: handleCopy));
+    if (handlePaste != null)
+      items.add(FlatButton(
+        child: Text(localizations.pasteButtonLabel),
+        onPressed: handlePaste,
+      ));
     if (handleSelectAll != null)
       items.add(FlatButton(
           child: Text(localizations.selectAllButtonLabel),
           onPressed: handleSelectAll));
+
     if (handleLike != null)
       items.add(FlatButton(child: Icon(Icons.favorite), onPressed: handleLike));
 
+    // If there is no option available, build an empty widget.
+    if (items.isEmpty) {
+      return Container(width: 0.0, height: 0.0);
+    }
+
     return Material(
       elevation: 1.0,
-      child: Container(
-        height: 44.0,
-        child: Row(mainAxisSize: MainAxisSize.min, children: items),
-      ),
+      child: Wrap(children: items),
+      borderRadius: BorderRadius.all(Radius.circular(10.0)),
     );
   }
 }
