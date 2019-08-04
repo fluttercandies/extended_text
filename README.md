@@ -42,13 +42,16 @@ class AtText extends SpecialText {
   /// whether show background for @somebody
   final bool showAtBackground;
 
-  final BuilderType type;
   AtText(TextStyle textStyle, SpecialTextGestureTapCallback onTap,
-      {this.showAtBackground: false, this.type, this.start})
-      : super(flag, " ", textStyle, onTap: onTap);
+      {this.showAtBackground: false, this.start})
+      : super(
+          flag,
+          " ",
+          textStyle,
+        );
 
   @override
-  TextSpan finishText() {
+  InlineSpan finishText() {
     TextStyle textStyle =
         this.textStyle?.copyWith(color: Colors.blue, fontSize: 16.0);
 
@@ -64,23 +67,19 @@ class AtText extends SpecialText {
             ///caret can move into special text
             deleteAll: true,
             style: textStyle,
-            recognizer: type == BuilderType.extendedText
-                ? (TapGestureRecognizer()
-                  ..onTap = () {
-                    if (onTap != null) onTap(atText);
-                  })
-                : null)
+            recognizer: (TapGestureRecognizer()
+              ..onTap = () {
+                if (onTap != null) onTap(atText);
+              }))
         : SpecialTextSpan(
             text: atText,
             actualText: atText,
             start: start,
             style: textStyle,
-            recognizer: type == BuilderType.extendedText
-                ? (TapGestureRecognizer()
-                  ..onTap = () {
-                    if (onTap != null) onTap(atText);
-                  })
-                : null);
+            recognizer: (TapGestureRecognizer()
+              ..onTap = () {
+                if (onTap != null) onTap(atText);
+              }));
   }
 }
 
@@ -238,7 +237,7 @@ Future<bool> clearDiskCachedImages({Duration duration}) async
 
 ### TextSelectionControls
 
-default value of textSelectionControls are extendedMaterialTextSelectionControls/extendedCupertinoTextSelectionControls 
+default value of textSelectionControls are MaterialExtendedTextSelectionControls/CupertinoExtendedTextSelectionControls
 
 override buildToolbar or buildHandle to custom your toolbar widget or handle widget
 

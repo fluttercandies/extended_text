@@ -85,7 +85,7 @@ class MyExtendedMaterialTextSelectionControls
     final Widget handle = SizedBox(
       width: _kHandleSize,
       height: _kHandleSize,
-      child: Image.asset("assets/love.png"),
+      child: Image.asset("assets/40.png"),
     );
 
     // [handle] is a circle, with a rectangle in the top left quadrant of that
