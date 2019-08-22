@@ -56,9 +56,10 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
             textDirection: textDirection,
             textScaleFactor: textScaleFactor,
             maxLines: maxLines,
-            ellipsis: overFlowTextSpan != null
-                ? null
-                : (overflow == TextOverflow.ellipsis ? _kEllipsis : null),
+            ellipsis:
+                (overFlowTextSpan == null && overflow == TextOverflow.ellipsis)
+                    ? _kEllipsis
+                    : null,
             locale: locale,
             strutStyle: strutStyle,
             textWidthBasis: textWidthBasis),
@@ -818,23 +819,25 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
           rect.width - textPainter.width, rect.height - textPainter.height);
 
       ///find TextPosition near bottomRight
-      TextPosition lastOnePosition = getPositionForOffset(rect.bottomRight);
+      TextPosition lastOnePosition =
+          _textPainter.getPositionForOffset(rect.bottomRight);
 
-      final InlineSpan lastTextSpan =
-          _textPainter.text.getSpanForPosition(lastOnePosition);
+//      final InlineSpan lastTextSpan =
+//          _textPainter.text.getSpanForPosition(lastOnePosition);
 
       ///find overflow TextPosition that not clip the original text
       Offset finalOverFlowOffset = _findFinalOverflowOffset(
           rect: rect,
           x: rect.width - textPainter.width,
           endTextOffset: lastOnePosition.offset,
-          y: rect.bottom);
+          y: rect.bottom,
+          effectiveOffset: Offset.zero);
 
       Offset bottomRight = rect.bottomRight;
-      if (lastTextSpan is ExtendedWidgetSpan) {
-        bottomRight =
-            Offset(bottomRight.dx + lastTextSpan.size.width, bottomRight.dy);
-      }
+//      if (lastTextSpan is ExtendedWidgetSpan) {
+//        bottomRight =
+//            Offset(bottomRight.dx + lastTextSpan.size.width, bottomRight.dy);
+//      }
       final Rect overFlowTextSpanRect =
           Rect.fromPoints(finalOverFlowOffset, bottomRight);
 
@@ -860,6 +863,7 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
       Rect textRect = offset & size;
       Rect overFlowRect = overFlowTextSpanRect.shift(offset);
       final double visibleRegionSlop = _textPainter.preferredLineHeight / 2.0;
+
       return Path()
         ..addPolygon(<Offset>[
           textRect.topLeft,
@@ -875,23 +879,49 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
   }
 
   /// y find min y, so that over flow text will be covered
-  Offset _findFinalOverflowOffset(
-      {Rect rect, double x, int endTextOffset, double y}) {
-    Offset endOffset = getOffsetForCaret(
-      TextPosition(offset: endTextOffset),
-      rect,
-    );
-    final TextPosition position = getPositionForOffset(endOffset);
+  Offset _findFinalOverflowOffset({
+    Rect rect,
+    double x,
+    int endTextOffset,
+    double y,
+    Offset effectiveOffset,
+  }) {
+//    Offset endOffset = getOffsetForCaret(
+//      TextPosition(offset: endTextOffset),
+//      rect,
+//    );
+
+    Offset endOffset = getCaretOffset(
+        TextPosition(
+          offset: endTextOffset,
+        ),
+        handleSpecialText: handleSpecialText,
+        effectiveOffset: effectiveOffset);
+
+    if (endOffset == Offset.zero && endTextOffset > 0) {
+      return _findFinalOverflowOffset(
+          rect: rect,
+          x: x,
+          endTextOffset: endTextOffset - 1,
+          y: y,
+          effectiveOffset: effectiveOffset);
+    }
+
+    //final TextPosition position = getPositionForOffset(endOffset);
 
     ///handle image span
-    final InlineSpan textSpan = _textPainter.text.getSpanForPosition(position);
-    if (textSpan is ExtendedWidgetSpan) {
-      endOffset = Offset(endOffset.dx - textSpan.size.width, endOffset.dy);
-    }
+//    final InlineSpan textSpan = _textPainter.text.getSpanForPosition(position);
+//    if (textSpan is ExtendedWidgetSpan) {
+//      endOffset = Offset(endOffset.dx - textSpan.size.width, endOffset.dy);
+//    }
     //overflow
     if (endOffset == null || (endTextOffset != 0 && endOffset == Offset.zero)) {
       return _findFinalOverflowOffset(
-          rect: rect, x: x, endTextOffset: endTextOffset - 1, y: y);
+          rect: rect,
+          x: x,
+          endTextOffset: endTextOffset - 1,
+          y: y,
+          effectiveOffset: effectiveOffset);
     }
 
     if (endOffset.dx > x) {
@@ -899,7 +929,8 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
           rect: rect,
           x: x,
           endTextOffset: endTextOffset - 1,
-          y: min(y, endOffset.dy));
+          y: min(y, endOffset.dy),
+          effectiveOffset: effectiveOffset);
     }
     return Offset(endOffset.dx, min(y, endOffset.dy));
   }
