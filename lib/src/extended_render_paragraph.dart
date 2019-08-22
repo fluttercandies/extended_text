@@ -967,7 +967,7 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
     }
     return handleSpecialText
         ? convertTextPainterSelectionToTextInputSelection(text, selection,
-        selectWord: true)
+            selectWord: true)
         : selection;
   }
 
