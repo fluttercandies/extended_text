@@ -1,3 +1,7 @@
+## [0.6.5]
+
+* Fix kMinInteractiveSize is missing in high version of flutter
+
 ## [0.6.4]
 
 * Improve codes about selection
