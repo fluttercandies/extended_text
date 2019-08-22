@@ -1,4 +1,4 @@
-## [0.6.5]
+## [0.6.6]
 
 * Fix kMinInteractiveSize is missing in high version of flutter
 * Fix text overflow about WidgetSpan
