@@ -5,9 +5,13 @@ import 'package:extended_image/extended_image.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
 import 'package:extended_image_library/extended_image_library.dart';
+import '../common/pic_swiper.dart';
+import 'package:ff_annotation_route/ff_annotation_route.dart';
 
-import 'common/pic_swiper.dart';
-
+@FFRoute(
+    name: "fluttercandies://CustomImageDemo",
+    routeName: "CustomImage",
+    description: "custom inline-image in text")
 class CustomImageDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -163,18 +167,9 @@ class CustomImageDemo extends StatelessWidget {
   }
 
   void onTap(BuildContext context, String url, List<String> list) {
-    var page = PicSwiper(
-      list.indexOf(url),
-      list.map<PicSwiperItem>((f) => PicSwiperItem(f)).toList(),
-    );
-    Navigator.push(
-        context,
-        Platform.isAndroid
-            ? TransparentMaterialPageRoute(builder: (_) {
-                return page;
-              })
-            : TransparentCupertinoPageRoute(builder: (_) {
-                return page;
-              }));
+    Navigator.pushNamed(context, "fluttercandies://picswiper", arguments: {
+      "index": list.indexOf(url),
+      "pics": list.map<PicSwiperItem>((f) => PicSwiperItem(f)).toList(),
+    });
   }
 }

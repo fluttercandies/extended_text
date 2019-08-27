@@ -8,17 +8,23 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loading_more_list/loading_more_list.dart';
 import 'package:pull_to_refresh_notification/pull_to_refresh_notification.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'common/crop_image.dart';
-import 'common/my_extended_text_selection_controls.dart';
-import 'common/push_to_refresh_header.dart';
-import 'common/tu_chong_repository.dart';
-import 'common/tu_chong_source.dart';
 import 'package:like_button/like_button.dart';
+
+import '../common/crop_image.dart';
+import '../common/my_extended_text_selection_controls.dart';
+import '../common/push_to_refresh_header.dart';
+import '../common/tu_chong_repository.dart';
+import '../common/tu_chong_source.dart';
+import 'package:ff_annotation_route/ff_annotation_route.dart';
 
 ///
 ///  create by zmtzawqlp on 2019/6/10
 ///
 
+@FFRoute(
+    name: "fluttercandies://TextSelectionDemo",
+    routeName: "TextSelection",
+    description: "text selection support")
 class TextSelectionDemo extends StatefulWidget {
   @override
   _TextSelectionDemoState createState() => _TextSelectionDemoState();
