@@ -3,6 +3,12 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:ff_annotation_route/ff_annotation_route.dart';
+
+@FFRoute(
+    name: "fluttercandies://BackgroundTextDemo",
+    routeName: "BackgroundText",
+    description: "workaround for issue 24335/24337 about background")
 class BackgroundTextDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

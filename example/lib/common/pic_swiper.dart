@@ -7,11 +7,18 @@ import 'package:oktoast/oktoast.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/rendering.dart';
+import 'package:ff_annotation_route/ff_annotation_route.dart';
 
+@FFRoute(
+    name: "fluttercandies://picswiper",
+    routeName: "PicSwiper",
+    argumentNames: ["index", "pics"],
+    showStatusBar: false,
+    pageRouteType: PageRouteType.transparent)
 class PicSwiper extends StatefulWidget {
   final int index;
   final List<PicSwiperItem> pics;
-  PicSwiper(this.index, this.pics);
+  PicSwiper({this.index, this.pics});
   @override
   _PicSwiperState createState() => _PicSwiperState();
 }

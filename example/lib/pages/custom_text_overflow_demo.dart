@@ -4,6 +4,12 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:ff_annotation_route/ff_annotation_route.dart';
+
+@FFRoute(
+    name: "fluttercandies://CustomTextOverflowDemo",
+    routeName: "CustomTextOverflow",
+    description: "workaround for issue 26748. how to custom text overflow")
 class CustomTextOverflowDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
