@@ -11,11 +11,7 @@ class AtText extends SpecialText {
 
   AtText(TextStyle textStyle, SpecialTextGestureTapCallback onTap,
       {this.showAtBackground: false, this.start})
-      : super(
-          flag,
-          " ",
-          textStyle,
-        );
+      : super(flag, " ", textStyle, onTap: onTap);
 
   @override
   InlineSpan finishText() {
