@@ -111,17 +111,31 @@ class ExtendedTextSelection extends StatefulWidget {
 }
 
 class ExtendedTextSelectionState extends State<ExtendedTextSelection>
-    implements TextSelectionDelegate {
+    implements
+        ExtendedTextSelectionGestureDetectorBuilderDelegate,
+        TextSelectionDelegate {
   final GlobalKey _renderParagraphKey = GlobalKey();
   ExtendedRenderParagraph get _renderParagraph =>
       _renderParagraphKey.currentContext.findRenderObject();
   ExtendedTextSelectionOverlay _selectionOverlay;
   TextSelectionControls _textSelectionControls;
-  final LayerLink _layerLink = LayerLink();
+  final LayerLink _toolbarLayerLink = LayerLink();
+  final LayerLink _startHandleLayerLink = LayerLink();
+  final LayerLink _endHandleLayerLink = LayerLink();
   ExtendedTextSelectionPointerHandlerState _pointerHandlerState;
+  CommonTextSelectionGestureDetectorBuilder _selectionGestureDetectorBuilder;
   @override
   void initState() {
     _textSelectionControls = widget.textSelectionControls;
+    _selectionGestureDetectorBuilder =
+        CommonTextSelectionGestureDetectorBuilder(
+      delegate: this,
+      hideToolbar: hideToolbar,
+      showToolbar: showToolbar,
+      onTap: widget.onTap,
+      context: context,
+      requestKeyboard: null,
+    );
     textEditingValue = TextEditingValue(
         text: widget.data, selection: TextSelection.collapsed(offset: 0));
     super.initState();
@@ -134,12 +148,12 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
       final ThemeData themeData = Theme.of(context);
       switch (themeData.platform) {
         case TargetPlatform.iOS:
-          _textSelectionControls ??= cupertinoExtendedTextSelectionControls;
+          _textSelectionControls ??= extendedCupertinoTextSelectionControls;
           break;
 
         case TargetPlatform.android:
         case TargetPlatform.fuchsia:
-          _textSelectionControls ??= materialExtendedTextSelectionControls;
+          _textSelectionControls ??= extendedMaterialTextSelectionControls;
           break;
       }
     }
@@ -161,156 +175,67 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   @override
   Widget build(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
-    _pointerHandlerState = context.ancestorStateOfType(
-        TypeMatcher<ExtendedTextSelectionPointerHandlerState>());
+    _pointerHandlerState = context
+        .findAncestorStateOfType<ExtendedTextSelectionPointerHandlerState>();
     if (_pointerHandlerState != null) {
       if (!_pointerHandlerState.selectionStates.contains(this)) {
         _pointerHandlerState.selectionStates.add(this);
       }
     }
-    bool forcePressEnabled;
 
     switch (themeData.platform) {
       case TargetPlatform.iOS:
         forcePressEnabled = true;
-        _textSelectionControls ??= cupertinoExtendedTextSelectionControls;
+        _textSelectionControls ??= extendedCupertinoTextSelectionControls;
         break;
 
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
         forcePressEnabled = false;
-        _textSelectionControls ??= materialExtendedTextSelectionControls;
+        _textSelectionControls ??= extendedMaterialTextSelectionControls;
         break;
     }
 
-    Widget result = TextSelectionGestureDetector(
-        onTapDown: _handleTapDown,
-        onForcePressStart: forcePressEnabled ? _handleForcePressStarted : null,
-        onSingleTapUp: _handleSingleTapUp,
-        // onSingleTapCancel: _handleSingleTapCancel,
-        onSingleLongTapStart: _handleSingleLongTapStart,
-        onSingleLongTapMoveUpdate: _handleSingleLongTapMoveUpdate,
-        onSingleLongTapEnd: _handleSingleLongTapEnd,
-        onDoubleTapDown: _handleDoubleTapDown,
-        onDragSelectionStart: _handleMouseDragSelectionStart,
-        onDragSelectionUpdate: _handleMouseDragSelectionUpdate,
-        behavior: HitTestBehavior.translucent,
-        child: RepaintBoundary(
-            child: CompositedTransformTarget(
-                link: _layerLink,
-                child: Semantics(
-                  onCopy: _semanticsOnCopy(_textSelectionControls),
-                  child: ExtendedRichText(
-                      textAlign: widget.textAlign,
-                      textDirection: widget
-                          .textDirection, // RichText uses Directionality.of to obtain a default if this is null.
-                      locale: widget
-                          .locale, // RichText uses Localizations.localeOf to obtain a default if this is null
-                      softWrap: widget.softWrap,
-                      overflow: widget.overflow,
-                      textScaleFactor: widget.textScaleFactor,
-                      maxLines: widget.maxLines,
-                      text: widget.text,
-                      overFlowTextSpan: widget.overFlowTextSpan,
-                      key: _renderParagraphKey,
-                      selectionColor: widget.selectionColor,
-                      selection: textEditingValue.selection,
-                      onSelectionChanged: _handleSelectionChanged),
-                ))));
+    Widget result = RepaintBoundary(
+        child: CompositedTransformTarget(
+            link: _toolbarLayerLink,
+            child: Semantics(
+              onCopy: _semanticsOnCopy(_textSelectionControls),
+              child: ExtendedRichText(
+                textAlign: widget.textAlign,
+                textDirection: widget
+                    .textDirection, // RichText uses Directionality.of to obtain a default if this is null.
+                locale: widget
+                    .locale, // RichText uses Localizations.localeOf to obtain a default if this is null
+                softWrap: widget.softWrap,
+                overflow: widget.overflow,
+                textScaleFactor: widget.textScaleFactor,
+                maxLines: widget.maxLines,
+                text: widget.text,
+                overFlowTextSpan: widget.overFlowTextSpan,
+                key: _renderParagraphKey,
+                selectionColor: widget.selectionColor,
+                selection: textEditingValue.selection,
+                onSelectionChanged: _handleSelectionChanged,
+                startHandleLayerLink: _startHandleLayerLink,
+                endHandleLayerLink: _endHandleLayerLink,
+              ),
+            )));
 
+    result = _selectionGestureDetectorBuilder.buildGestureDetector(
+      behavior: HitTestBehavior.translucent,
+      child: result,
+    );
     return result;
   }
 
-  void _handleTapDown(TapDownDetails details) {
-    _renderParagraph.handleTapDown(details);
+  VoidCallback _semanticsOnCopy(TextSelectionControls controls) {
+    return controls?.canCopy(this) == true
+        ? () => controls.handleCopy(this)
+        : null;
   }
 
-  void _handleForcePressStarted(ForcePressDetails details) {
-    _renderParagraph.selectWordsInRange(
-      from: details.globalPosition,
-      cause: SelectionChangedCause.forcePress,
-    );
-    showToolbar();
-  }
-
-  void _handleSingleTapUp(TapUpDetails details) {
-    switch (Theme.of(context).platform) {
-      case TargetPlatform.iOS:
-        _renderParagraph.selectWordEdge(cause: SelectionChangedCause.tap);
-        break;
-      case TargetPlatform.android:
-      case TargetPlatform.fuchsia:
-        _renderParagraph.selectPosition(cause: SelectionChangedCause.tap);
-        break;
-    }
-
-    if (widget.onTap != null) widget.onTap();
-  }
-
-  void _handleSingleLongTapStart(LongPressStartDetails details) {
-    switch (Theme.of(context).platform) {
-      case TargetPlatform.iOS:
-        _renderParagraph.selectPositionAt(
-          from: details.globalPosition,
-          cause: SelectionChangedCause.longPress,
-        );
-        break;
-      case TargetPlatform.android:
-      case TargetPlatform.fuchsia:
-        _renderParagraph.selectWord(cause: SelectionChangedCause.longPress);
-        Feedback.forLongPress(context);
-        break;
-    }
-  }
-
-  void _handleSingleLongTapMoveUpdate(LongPressMoveUpdateDetails details) {
-    switch (Theme.of(context).platform) {
-      case TargetPlatform.iOS:
-        _renderParagraph.selectPositionAt(
-          from: details.globalPosition,
-          cause: SelectionChangedCause.longPress,
-        );
-        break;
-      case TargetPlatform.android:
-      case TargetPlatform.fuchsia:
-        _renderParagraph.selectWordsInRange(
-          from: details.globalPosition - details.offsetFromOrigin,
-          to: details.globalPosition,
-          cause: SelectionChangedCause.longPress,
-        );
-        break;
-    }
-  }
-
-  void _handleSingleLongTapEnd(LongPressEndDetails details) {
-    showToolbar();
-  }
-
-  void _handleDoubleTapDown(TapDownDetails details) {
-    _renderParagraph.selectWord(cause: SelectionChangedCause.doubleTap);
-    showToolbar();
-  }
-
-  void _handleMouseDragSelectionStart(DragStartDetails details) {
-    _renderParagraph.selectPositionAt(
-      from: details.globalPosition,
-      cause: SelectionChangedCause.drag,
-    );
-  }
-
-  void _handleMouseDragSelectionUpdate(
-    DragStartDetails startDetails,
-    DragUpdateDetails updateDetails,
-  ) {
-    _renderParagraph.selectPositionAt(
-      from: startDetails.globalPosition,
-      to: updateDetails.globalPosition,
-      cause: SelectionChangedCause.drag,
-    );
-  }
-
-  void _handleSelectionChanged(TextSelection selection,
-      ExtendedRenderParagraph renderObject, SelectionChangedCause cause) {
+  void _handleSelectionChanged(TextSelection selection, SelectionChangedCause cause) {
     textEditingValue = textEditingValue?.copyWith(selection: selection);
     _hideSelectionOverlayIfNeeded();
     //todo
@@ -318,8 +243,10 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     _selectionOverlay = ExtendedTextSelectionOverlay(
         context: context,
         debugRequiredFor: widget,
-        layerLink: _layerLink,
-        renderObject: renderObject,
+        toolbarLayerLink: _toolbarLayerLink,
+        startHandleLayerLink: _startHandleLayerLink,
+        endHandleLayerLink: _endHandleLayerLink,
+        renderObject: _renderParagraph,
         value: textEditingValue,
         dragStartBehavior: widget.dragStartBehavior,
         selectionDelegate: this,
@@ -332,12 +259,6 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
       _selectionOverlay.showHandles();
 //      if (widget.onSelectionChanged != null)
 //        widget.onSelectionChanged(selection, cause);
-  }
-
-  VoidCallback _semanticsOnCopy(TextSelectionControls controls) {
-    return controls?.canCopy(this) == true
-        ? () => controls.handleCopy(this)
-        : null;
   }
 
   TextEditingValue _value;
@@ -355,6 +276,22 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     }
     //_formatAndSetValue(value);
   }
+
+  @override
+  bool get copyEnabled => !textEditingValue.selection.isCollapsed;
+
+  @override
+  bool get cutEnabled => false;
+
+  @override
+  bool get pasteEnabled => false;
+
+  @override
+  bool get selectAllEnabled =>
+      textEditingValue.text.isNotEmpty &&
+      !(textEditingValue.selection.baseOffset == 0 &&
+          textEditingValue.selection.extentOffset ==
+              textEditingValue.text.length);
 
   @override
   void bringIntoView(TextPosition position) {
@@ -407,26 +344,19 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     }
   }
 
-  @override
-  bool get copyEnabled => !textEditingValue.selection.isCollapsed;
-
-  @override
-  bool get cutEnabled => false;
-
-  @override
-  bool get pasteEnabled => false;
-
-  @override
-  bool get selectAllEnabled =>
-      textEditingValue.text.isNotEmpty &&
-      !(textEditingValue.selection.baseOffset == 0 &&
-          textEditingValue.selection.extentOffset ==
-              textEditingValue.text.length);
-
   /// Toggle the toolbar when a selection handle is tapped.
   void _handleSelectionHandleTapped() {
     if (textEditingValue.selection.isCollapsed) {
       toggleToolbar();
     }
   }
+
+  @override
+  bool forcePressEnabled;
+
+  @override
+  ExtendedTextSelectionRenderObject get renderEditable => _renderParagraph;
+
+  @override
+  bool get selectionEnabled => true;
 }

@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:example/main.dart';
 import 'package:extended_image/extended_image.dart';

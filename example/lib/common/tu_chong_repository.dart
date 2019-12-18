@@ -4,13 +4,21 @@ import 'package:example/common/tu_chong_source.dart';
 import 'dart:async';
 import 'dart:convert';
 
+Future<bool> onLikeButtonTap(bool isLiked, TuChongItem item) {
+  ///send your request here
+  return Future<bool>.delayed(const Duration(milliseconds: 50), () {
+    item.isFavorite = !item.isFavorite;
+    item.favorites = item.isFavorite ? item.favorites + 1 : item.favorites - 1;
+    return item.isFavorite;
+  });
+}
+
 class TuChongRepository extends LoadingMoreBase<TuChongItem> {
   int pageindex = 1;
-
-  @override
   bool _hasMore = true;
   bool forceRefresh = false;
-  bool get hasMore => (_hasMore && length < 100) || forceRefresh;
+  @override
+  bool get hasMore => (_hasMore && length < 300) || forceRefresh;
 
   @override
   Future<bool> refresh([bool clearBeforeRequest = false]) async {
@@ -26,7 +34,6 @@ class TuChongRepository extends LoadingMoreBase<TuChongItem> {
 
   @override
   Future<bool> loadData([bool isloadMoreAction = false]) async {
-    // TODO: implement getData
     String url = "";
     if (this.length == 0) {
       url = "https://api.tuchong.com/feed-app";
@@ -38,7 +45,7 @@ class TuChongRepository extends LoadingMoreBase<TuChongItem> {
     bool isSuccess = false;
     try {
       //to show loading more clearly, in your app,remove this
-      //await Future.delayed(Duration(milliseconds: 500, seconds: 1));
+      await Future.delayed(Duration(milliseconds: 500));
 
       var result = await HttpClientHelper.get(url);
 
@@ -46,21 +53,19 @@ class TuChongRepository extends LoadingMoreBase<TuChongItem> {
       if (pageindex == 1) {
         this.clear();
       }
-
-      source.feedList.forEach((item) {
-        if (item.hasImage && !this.contains(item) && hasMore) {
-          this.add(item);
-        }
-      });
+      for (var item in source.feedList) {
+        if (item.hasImage && !this.contains(item) && hasMore) this.add(item);
+      }
 
       _hasMore = source.feedList.length != 0;
       pageindex++;
 //      this.clear();
 //      _hasMore=false;
       isSuccess = true;
-    } catch (exception) {
+    } catch (exception, stack) {
       isSuccess = false;
       print(exception);
+      print(stack);
     }
     return isSuccess;
   }
