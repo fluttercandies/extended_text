@@ -1,3 +1,8 @@
+## [0.6.7]
+
+* codes base on 1.12.13+hotfix.5
+* set limitation of flutter sdk >=1.12.13 <1.12.16
+
 ## [0.6.6]
 
 * Fix kMinInteractiveSize is missing in high version of flutter

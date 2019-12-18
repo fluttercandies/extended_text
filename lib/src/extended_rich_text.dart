@@ -2,8 +2,8 @@ import 'package:extended_text/src/extended_render_paragraph.dart';
 import 'package:extended_text/src/over_flow_text_span.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:extended_text_library/extended_text_library.dart';
 
-import 'extended_text_typedef.dart';
 
 ///  * [TextStyle], which discusses how to style text.
 ///  * [TextSpan], which is used to describe the text in a paragraph.
@@ -36,6 +36,8 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
     this.textWidthBasis = TextWidthBasis.parent,
     this.selection,
     this.selectionColor,
+    this.startHandleLayerLink,
+    this.endHandleLayerLink,
   })  : assert(text != null),
         assert(textAlign != null),
         assert(softWrap != null),
@@ -126,27 +128,35 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
 
   /// {@macro flutter.widgets.text.DefaultTextStyle.textWidthBasis}
   final TextWidthBasis textWidthBasis;
+
+  final LayerLink startHandleLayerLink;
+  final LayerLink endHandleLayerLink;
+
   @override
   ExtendedRenderParagraph createRenderObject(BuildContext context) {
     assert(textDirection != null || debugCheckHasDirectionality(context));
-    return ExtendedRenderParagraph(text,
-        textAlign: textAlign,
-        textDirection: textDirection ?? Directionality.of(context),
-        softWrap: softWrap,
-        overflow: overflow,
-        textScaleFactor: textScaleFactor,
-        maxLines: maxLines,
-        strutStyle: strutStyle,
-        textWidthBasis: textWidthBasis,
-        locale: locale ??
-            Localizations.localeOf(
-              context,
-              nullOk: true,
-            ),
-        overFlowTextSpan: overFlowTextSpan,
-        selection: selection,
-        onSelectionChanged: onSelectionChanged,
-        selectionColor: selectionColor);
+    return ExtendedRenderParagraph(
+      text,
+      textAlign: textAlign,
+      textDirection: textDirection ?? Directionality.of(context),
+      softWrap: softWrap,
+      overflow: overflow,
+      textScaleFactor: textScaleFactor,
+      maxLines: maxLines,
+      strutStyle: strutStyle,
+      textWidthBasis: textWidthBasis,
+      locale: locale ??
+          Localizations.localeOf(
+            context,
+            nullOk: true,
+          ),
+      overFlowTextSpan: overFlowTextSpan,
+      selection: selection,
+      onSelectionChanged: onSelectionChanged,
+      selectionColor: selectionColor,
+      startHandleLayerLink: startHandleLayerLink,
+      endHandleLayerLink: endHandleLayerLink,
+    );
   }
 
   @override
@@ -167,7 +177,9 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       ..overFlowTextSpan = overFlowTextSpan
       ..selection = selection
       ..selectionColor = selectionColor
-      ..onSelectionChanged = onSelectionChanged;
+      ..onSelectionChanged = onSelectionChanged
+      ..startHandleLayerLink = startHandleLayerLink
+      ..endHandleLayerLink = endHandleLayerLink;
   }
 
   @override

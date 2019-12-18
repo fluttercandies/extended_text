@@ -1,6 +1,8 @@
 import 'dart:convert' show json;
+import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:extended_image/extended_image.dart';
 
 class TuChongSource {
   int counts;
@@ -80,11 +82,14 @@ class TuChongItem {
   List<dynamic> rewardListPrefix;
   List<dynamic> sites;
   List<String> tags;
+  List<Color> tagColors = List<Color>();
   Site site;
 
   bool get hasImage {
     return images != null && images.length > 0;
   }
+
+  Size imageRawSize;
 
   Size get imageSize {
     if (!hasImage) return Size(0, 0);
@@ -93,11 +98,21 @@ class TuChongItem {
 
   String get imageUrl {
     if (!hasImage) return "";
-    return "https://photo.tuchong.com/" +
-        images[0].userId.toString() +
-        "/f/" +
-        images[0].imgId.toString() +
-        ".jpg";
+    return "https://photo.tuchong.com/${images[0].userId}/f/${images[0].imgId}.jpg";
+  }
+
+  String get avatarUrl => site.icon;
+
+  String get imageTitle {
+    if (!hasImage) return title;
+
+    return images[0].title;
+  }
+
+  String get imageDescription {
+    if (!hasImage) return content;
+
+    return images[0].description;
   }
 
   TuChongItem.fromParams(
@@ -208,9 +223,12 @@ class TuChongItem {
     }
 
     tags = jsonRes['tags'] == null ? null : [];
-
+    final int maxNum = 6;
     for (var tagsItem in tags == null ? [] : jsonRes['tags']) {
       tags.add(tagsItem);
+      tagColors.add(Color.fromARGB(255, Random.secure().nextInt(255),
+          Random.secure().nextInt(255), Random.secure().nextInt(255)));
+      if (tags.length == maxNum) break;
     }
 
     site = jsonRes['site'] == null ? null : new Site.fromJson(jsonRes['site']);
@@ -302,6 +320,9 @@ class ImageItem {
   String description;
   String excerpt;
   String title;
+  String get imageUrl {
+    return "https://photo.tuchong.com/$userId/f/$imgId.jpg";
+  }
 
   ImageItem.fromParams(
       {this.height,
@@ -325,5 +346,19 @@ class ImageItem {
   @override
   String toString() {
     return '{"height": $height,"img_id": $imgId,"user_id": $userId,"width": $width,"description": ${description != null ? '${json.encode(description)}' : 'null'},"excerpt": ${excerpt != null ? '${json.encode(excerpt)}' : 'null'},"title": ${title != null ? '${json.encode(title)}' : 'null'}}';
+  }
+
+  ImageProvider createNetworkImage() {
+    return ExtendedNetworkImageProvider(imageUrl);
+  }
+
+  ImageProvider createResizeImage() {
+    return ResizeImage(ExtendedNetworkImageProvider(imageUrl),
+        width: width ~/ 5, height: height ~/ 5);
+  }
+
+  void clearCache() {
+    createNetworkImage().evict();
+    createResizeImage().evict();
   }
 }

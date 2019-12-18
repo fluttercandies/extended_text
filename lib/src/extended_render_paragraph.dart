@@ -5,15 +5,12 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:ui' as ui show Gradient, Shader, TextBox;
-import 'dart:math';
-
-import 'extended_text_typedef.dart';
+import 'dart:math' as math;
 
 const String _kEllipsis = '\u2026';
 
 /// A render object that displays a paragraph of text
-class ExtendedRenderParagraph extends ExtendedTextRenderBox
-    with ExtendedTextSelectionRenderObject {
+class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   /// Creates a paragraph render object.
   ///
   /// The [text], [textAlign], [textDirection], [overflow], [softWrap], and
@@ -32,6 +29,8 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
     TextWidthBasis textWidthBasis = TextWidthBasis.parent,
     Locale locale,
     OverFlowTextSpan overFlowTextSpan,
+    @required LayerLink startHandleLayerLink,
+    @required LayerLink endHandleLayerLink,
     this.onSelectionChanged,
     Color selectionColor,
     TextSelection selection,
@@ -50,6 +49,8 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
         _softWrap = softWrap,
         _overflow = overFlowTextSpan != null ? TextOverflow.clip : overflow,
         _oldOverflow = overflow,
+        _startHandleLayerLink = startHandleLayerLink,
+        _endHandleLayerLink = endHandleLayerLink,
         _textPainter = TextPainter(
             text: text,
             textAlign: textAlign,
@@ -81,6 +82,30 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
   bool get handleSpecialText => _handleSpecialText;
 
   List<ui.TextBox> _selectionRects;
+
+  /// The [LayerLink] of start selection handle.
+  ///
+  /// [RenderEditable] is responsible for calculating the [Offset] of this
+  /// [LayerLink], which will be used as [CompositedTransformTarget] of start handle.
+  LayerLink get startHandleLayerLink => _startHandleLayerLink;
+  LayerLink _startHandleLayerLink;
+  set startHandleLayerLink(LayerLink value) {
+    if (_startHandleLayerLink == value) return;
+    _startHandleLayerLink = value;
+    markNeedsPaint();
+  }
+
+  /// The [LayerLink] of end selection handle.
+  ///
+  /// [RenderEditable] is responsible for calculating the [Offset] of this
+  /// [LayerLink], which will be used as [CompositedTransformTarget] of end handle.
+  LayerLink get endHandleLayerLink => _endHandleLayerLink;
+  LayerLink _endHandleLayerLink;
+  set endHandleLayerLink(LayerLink value) {
+    if (_endHandleLayerLink == value) return;
+    _endHandleLayerLink = value;
+    markNeedsPaint();
+  }
 
   /// The region of text that is selected, if any.
   TextSelection get selection => _selection;
@@ -132,14 +157,16 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
       case RenderComparison.paint:
         _textPainter.text = value;
         extractPlaceholderSpans(value);
+        _cachedPlainText = null;
         markNeedsPaint();
         markNeedsSemanticsUpdate();
         break;
       case RenderComparison.layout:
         _textPainter.text = value;
+        _cachedPlainText = null;
         _overflowShader = null;
         extractPlaceholderSpans(value);
-        markNeedsLayout();
+        markNeedsTextLayout();
         break;
     }
   }
@@ -150,7 +177,7 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
     assert(value != null);
     if (_textPainter.textAlign == value) return;
     _textPainter.textAlign = value;
-    markNeedsPaint();
+    markNeedsTextLayout();
   }
 
   /// The directionality of the text.
@@ -171,7 +198,7 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
     assert(value != null);
     if (_textPainter.textDirection == value) return;
     _textPainter.textDirection = value;
-    markNeedsLayout();
+    markNeedsTextLayout();
   }
 
   /// Whether the text should break at soft line breaks.
@@ -188,7 +215,7 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
     assert(value != null);
     if (_softWrap == value) return;
     _softWrap = value;
-    markNeedsLayout();
+    markNeedsTextLayout();
   }
 
   /// How visual overflow should be handled.
@@ -201,7 +228,7 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
     if (_overflow == temp) return;
     _overflow = temp;
     _textPainter.ellipsis = value == TextOverflow.ellipsis ? _kEllipsis : null;
-    markNeedsLayout();
+    markNeedsTextLayout();
   }
 
   /// The number of font pixels for each logical pixel.
@@ -214,7 +241,7 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
     if (_textPainter.textScaleFactor == value) return;
     _textPainter.textScaleFactor = value;
     _overflowShader = null;
-    markNeedsLayout();
+    markNeedsTextLayout();
   }
 
   /// An optional maximum number of lines for the text to span, wrapping if necessary.
@@ -228,7 +255,7 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
     if (_textPainter.maxLines == value) return;
     _textPainter.maxLines = value;
     _overflowShader = null;
-    markNeedsLayout();
+    markNeedsTextLayout();
   }
 
   /// Used by this paragraph's internal [TextPainter] to select a locale-specific
@@ -245,7 +272,7 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
     if (_textPainter.locale == value) return;
     _textPainter.locale = value;
     _overflowShader = null;
-    markNeedsLayout();
+    markNeedsTextLayout();
   }
 
   /// {@macro flutter.painting.textPainter.strutStyle}
@@ -256,7 +283,7 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
     if (_textPainter.strutStyle == value) return;
     _textPainter.strutStyle = value;
     _overflowShader = null;
-    markNeedsLayout();
+    markNeedsTextLayout();
   }
 
   /// {@macro flutter.widgets.basic.TextWidthBasis}
@@ -266,7 +293,7 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
     if (_textPainter.textWidthBasis == value) return;
     _textPainter.textWidthBasis = value;
     _overflowShader = null;
-    markNeedsLayout();
+    markNeedsTextLayout();
   }
 
   @override
@@ -275,46 +302,18 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
     assert(constraints != null);
     assert(constraints.debugAssertIsValid());
     _layoutTextWithConstraints(constraints);
-    return _textPainter.computeDistanceToActualBaseline(baseline);
+    // (garyq): Since our metric for ideographic baseline is currently
+    // inaccurate and the non-alphabetic baselines are based off of the
+    // alphabetic baseline, we use the alphabetic for now to produce correct
+    // layouts. We should eventually change this back to pass the `baseline`
+    // property when the ideographic baseline is properly implemented
+    // (https://github.com/flutter/flutter/issues/22625).
+    return _textPainter
+        .computeDistanceToActualBaseline(TextBaseline.alphabetic);
   }
 
   @override
   bool hitTestSelf(Offset position) => true;
-
-  @override
-  bool hitTestChildren(BoxHitTestResult result, {Offset position}) {
-    RenderBox child = firstChild;
-    int childIndex = 0;
-    while (child != null &&
-        childIndex < _textPainter.inlinePlaceholderBoxes.length) {
-      final TextParentData textParentData = child.parentData;
-      final Matrix4 transform = Matrix4.translationValues(
-          textParentData.offset.dx, textParentData.offset.dy, 0.0)
-        ..scale(
-            textParentData.scale, textParentData.scale, textParentData.scale);
-      final bool isHit = result.addWithPaintTransform(
-        transform: transform,
-        position: position,
-        hitTest: (BoxHitTestResult result, Offset transformed) {
-          assert(() {
-            final Offset manualPosition =
-                (position - textParentData.offset) / textParentData.scale;
-            return (transformed.dx - manualPosition.dx).abs() <
-                    precisionErrorTolerance &&
-                (transformed.dy - manualPosition.dy).abs() <
-                    precisionErrorTolerance;
-          }());
-          return child.hitTest(result, position: transformed);
-        },
-      );
-      if (isHit) {
-        return true;
-      }
-      child = childAfter(child);
-      childIndex += 1;
-    }
-    return false;
-  }
 
   @override
   void handleEvent(PointerEvent event, BoxHitTestEntry entry) {
@@ -363,7 +362,10 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
   @override
   void performLayout() {
     layoutChildren(constraints);
-    _layoutTextWithConstraints(constraints);
+    layoutText(
+        minWidth: constraints.minWidth,
+        maxWidth: constraints.maxWidth,
+        forceLayout: true);
     setParentData();
 
     // We grab _textPainter.size and _textPainter.didExceedMaxLines here because
@@ -378,7 +380,7 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
     final bool didOverflowHeight =
         size.height < textSize.height || textDidExceedMaxLines;
     final bool didOverflowWidth = size.width < textSize.width;
-    // TODO(abarth): We're only measuring the sizes of the line boxes here. If
+    // (abarth): We're only measuring the sizes of the line boxes here. If
     // the glyphs draw outside the line boxes, we might think that there isn't
     // visual overflow when there actually is visual overflow. This can become
     // a problem if we start having horizontal overflow and introduce a clip
@@ -445,7 +447,7 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
     // will destroy state inside the painter. If that happens, we need to
     // get back the correct state by calling _layout again.
     //
-    // TODO(abarth): Make computing the min/max intrinsic width/height
+    // (abarth): Make computing the min/max intrinsic width/height
     // a non-destructive operation.
     //
     // If you remove this call, make sure that changing the textAlign still
@@ -472,6 +474,7 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
     if (clip != null) {
       context.canvas.restore();
     }
+    paintHandleLayers(context, super.paint);
   }
 
   void _paint(PaintingContext context, Offset offset) {
@@ -562,28 +565,65 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
     return _textPainter.size;
   }
 
-  // The offsets for each span that requires custom semantics.
-  final List<int> _inlineSemanticsOffsets = <int>[];
-  // Holds either [GestureRecognizer] or null (for placeholders) to generate
-  // proper semnatics configurations.
-  final List<dynamic> _inlineSemanticsElements = <dynamic>[];
+  /// Collected during [describeSemanticsConfiguration], used by
+  /// [assembleSemanticsNode] and [_combineSemanticsInfo].
+  List<InlineSpanSemanticsInformation> _semanticsInfo;
+
+  /// Combines _semanticsInfo entries where permissible, determined by
+  /// [InlineSpanSemanticsInformation.requiresOwnNode].
+  List<InlineSpanSemanticsInformation> _combineSemanticsInfo() {
+    assert(_semanticsInfo != null);
+    final List<InlineSpanSemanticsInformation> combined =
+        <InlineSpanSemanticsInformation>[];
+    String workingText = '';
+    String workingLabel;
+    for (InlineSpanSemanticsInformation info in _semanticsInfo) {
+      if (info.requiresOwnNode) {
+        if (workingText != null) {
+          combined.add(InlineSpanSemanticsInformation(
+            workingText,
+            semanticsLabel: workingLabel ?? workingText,
+          ));
+          workingText = '';
+          workingLabel = null;
+        }
+        combined.add(info);
+      } else {
+        workingText += info.text;
+        workingLabel ??= '';
+        if (info.semanticsLabel != null) {
+          workingLabel += info.semanticsLabel;
+        } else {
+          workingLabel += info.text;
+        }
+      }
+    }
+    if (workingText != null) {
+      combined.add(InlineSpanSemanticsInformation(
+        workingText,
+        semanticsLabel: workingLabel,
+      ));
+    } else {
+      assert(workingLabel != null);
+    }
+    return combined;
+  }
 
   @override
   void describeSemanticsConfiguration(SemanticsConfiguration config) {
     super.describeSemanticsConfiguration(config);
-    _inlineSemanticsOffsets.clear();
-    _inlineSemanticsElements.clear();
-    final Accumulator offset = Accumulator();
-    text.visitChildren((InlineSpan span) {
-      span.describeSemantics(
-          offset, _inlineSemanticsOffsets, _inlineSemanticsElements);
-      return true;
-    });
-    if (_inlineSemanticsOffsets.isNotEmpty) {
+    _semanticsInfo = text.getSemanticsInformation();
+
+    if (_semanticsInfo.any(
+        (InlineSpanSemanticsInformation info) => info.recognizer != null)) {
       config.explicitChildNodes = true;
       config.isSemanticBoundary = true;
     } else {
-      config.label = text.toPlainText();
+      final StringBuffer buffer = StringBuffer();
+      for (InlineSpanSemanticsInformation info in _semanticsInfo) {
+        buffer.write(info.semanticsLabel ?? info.text);
+      }
+      config.label = buffer.toString();
       config.textDirection = textDirection;
     }
   }
@@ -591,23 +631,23 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
   @override
   void assembleSemanticsNode(SemanticsNode node, SemanticsConfiguration config,
       Iterable<SemanticsNode> children) {
-    assert(_inlineSemanticsOffsets.isNotEmpty);
-    assert(_inlineSemanticsOffsets.length.isEven);
-    assert(_inlineSemanticsElements.isNotEmpty);
+    assert(_semanticsInfo != null && _semanticsInfo.isNotEmpty);
     final List<SemanticsNode> newChildren = <SemanticsNode>[];
-    final String rawLabel = text.toPlainText();
-    int current = 0;
-    double order = -1.0;
     TextDirection currentDirection = textDirection;
     Rect currentRect;
-
-    SemanticsConfiguration buildSemanticsConfig(int start, int end) {
+    double ordinal = 0.0;
+    int start = 0;
+    int placeholderIndex = 0;
+    RenderBox child = firstChild;
+    for (InlineSpanSemanticsInformation info in _combineSemanticsInfo()) {
       final TextDirection initialDirection = currentDirection;
-      final TextSelection selection =
-          TextSelection(baseOffset: start, extentOffset: end);
+      final TextSelection selection = TextSelection(
+        baseOffset: start,
+        extentOffset: start + info.text.length,
+      );
       final List<ui.TextBox> rects = getBoxesForSelection(selection);
       if (rects.isEmpty) {
-        return null;
+        continue;
       }
       Rect rect = rects.first.toRect();
       currentDirection = rects.first.direction;
@@ -618,73 +658,22 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
       // Any of the text boxes may have had infinite dimensions.
       // We shouldn't pass infinite dimensions up to the bridges.
       rect = Rect.fromLTWH(
-        max(0.0, rect.left),
-        max(0.0, rect.top),
-        min(rect.width, constraints.maxWidth),
-        min(rect.height, constraints.maxHeight),
+        math.max(0.0, rect.left),
+        math.max(0.0, rect.top),
+        math.min(rect.width, constraints.maxWidth),
+        math.min(rect.height, constraints.maxHeight),
       );
       // round the current rectangle to make this API testable and add some
       // padding so that the accessibility rects do not overlap with the text.
-      // TODO(jonahwilliams): implement this for all text accessibility rects.
       currentRect = Rect.fromLTRB(
         rect.left.floorToDouble() - 4.0,
         rect.top.floorToDouble() - 4.0,
         rect.right.ceilToDouble() + 4.0,
         rect.bottom.ceilToDouble() + 4.0,
       );
-      order += 1;
-      final SemanticsConfiguration configuration = SemanticsConfiguration()
-        ..sortKey = OrdinalSortKey(order)
-        ..textDirection = initialDirection
-        ..label = rawLabel.substring(start, end);
-      return configuration;
-    }
 
-    int childIndex = 0;
-    RenderBox child = firstChild;
-    for (int i = 0, j = 0; i < _inlineSemanticsOffsets.length; i += 2, j++) {
-      final int start = _inlineSemanticsOffsets[i];
-      final int end = _inlineSemanticsOffsets[i + 1];
-      // Add semantics for any text between the previous recognizer/widget and this one.
-      if (current != start) {
-        final SemanticsNode node = SemanticsNode();
-        final SemanticsConfiguration configuration =
-            buildSemanticsConfig(current, start);
-        if (configuration == null) {
-          continue;
-        }
-        node.updateWith(config: configuration);
-        node.rect = currentRect;
-        newChildren.add(node);
-      }
-      final dynamic inlineElement = _inlineSemanticsElements[j];
-      final SemanticsConfiguration configuration =
-          buildSemanticsConfig(start, end);
-      if (configuration == null) {
-        continue;
-      }
-      if (inlineElement != null) {
-        // Add semantics for this recognizer.
-        final SemanticsNode node = SemanticsNode();
-        if (inlineElement is TapGestureRecognizer) {
-          final TapGestureRecognizer recognizer = inlineElement;
-          configuration.onTap = recognizer.onTap;
-        } else if (inlineElement is LongPressGestureRecognizer) {
-          final LongPressGestureRecognizer recognizer = inlineElement;
-          configuration.onLongPress = recognizer.onLongPress;
-        } else {
-          assert(false);
-        }
-        node.updateWith(config: configuration);
-        node.rect = currentRect;
-        newChildren.add(node);
-      } else if (childIndex < children.length) {
-        // Add semantics for this placeholder. Semantics are precomputed in the children
-        // argument.
-        // Placeholders should not get a label, which would come through as an
-        // object replacement character.
-        configuration.label = '';
-        final SemanticsNode childNode = children.elementAt(childIndex);
+      if (info.isPlaceholder) {
+        final SemanticsNode childNode = children.elementAt(placeholderIndex++);
         final TextParentData parentData = child.parentData;
         childNode.rect = Rect.fromLTWH(
           childNode.rect.left,
@@ -692,21 +681,32 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
           childNode.rect.width * parentData.scale,
           childNode.rect.height * parentData.scale,
         );
-        newChildren.add(children.elementAt(childIndex));
-        childIndex += 1;
+        newChildren.add(childNode);
         child = childAfter(child);
+      } else {
+        final SemanticsConfiguration configuration = SemanticsConfiguration()
+          ..sortKey = OrdinalSortKey(ordinal++)
+          ..textDirection = initialDirection
+          ..label = info.semanticsLabel ?? info.text;
+        if (info.recognizer != null) {
+          if (info.recognizer is TapGestureRecognizer) {
+            final TapGestureRecognizer recognizer = info.recognizer;
+            configuration.onTap = recognizer.onTap;
+            configuration.isLink = true;
+          } else if (info.recognizer is LongPressGestureRecognizer) {
+            final LongPressGestureRecognizer recognizer = info.recognizer;
+            configuration.onLongPress = recognizer.onLongPress;
+          } else {
+            assert(false);
+          }
+        }
+        newChildren.add(
+          SemanticsNode()
+            ..updateWith(config: configuration)
+            ..rect = currentRect,
+        );
       }
-      current = end;
-    }
-    if (current < rawLabel.length) {
-      final SemanticsNode node = SemanticsNode();
-      final SemanticsConfiguration configuration =
-          buildSemanticsConfig(current, rawLabel.length);
-      if (configuration != null) {
-        node.updateWith(config: configuration);
-        node.rect = currentRect;
-        newChildren.add(node);
-      }
+      start += info.text.length;
     }
     node.updateWith(config: config, childrenInInversePaintOrder: newChildren);
   }
@@ -929,26 +929,10 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
           rect: rect,
           x: x,
           endTextOffset: endTextOffset - 1,
-          y: min(y, endOffset.dy),
+          y: math.min(y, endOffset.dy),
           effectiveOffset: effectiveOffset);
     }
-    return Offset(endOffset.dx, min(y, endOffset.dy));
-  }
-
-  ///selection
-  Offset _lastTapDownPosition;
-
-  ///
-  ///Offset _lastTapDownPosition;
-
-  /// If [ignorePointer] is false (the default) then this method is called by
-  /// the internal gesture recognizer's [TapGestureRecognizer.onTapDown]
-  /// callback.
-  ///
-  /// When [ignorePointer] is true, an ancestor widget must respond to tap
-  /// down events by calling this method.
-  void handleTapDown(TapDownDetails details) {
-    _lastTapDownPosition = details.globalPosition;
+    return Offset(endOffset.dx, math.min(y, endOffset.dy));
   }
 
   /// Selects the set words of a paragraph in a given range of global positions.
@@ -980,7 +964,6 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
           extentOffset: lastWord.extent.offset,
           affinity: firstWord.affinity,
         ),
-        this,
         cause,
       );
     }
@@ -1008,35 +991,34 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
   void selectWordEdge({@required SelectionChangedCause cause}) {
     assert(cause != null);
     _layoutTextWithConstraints(constraints);
-    assert(_lastTapDownPosition != null);
+    assert(lastTapDownPosition != null);
     if (onSelectionChanged != null) {
-      final TextPosition position = _textPainter
-          .getPositionForOffset(globalToLocal(_lastTapDownPosition));
+      final TextPosition position =
+          _textPainter.getPositionForOffset(globalToLocal(lastTapDownPosition));
 
       final TextRange word = _textPainter.getWordBoundary(position);
+      final TextRange lineBoundary = _textPainter.getLineBoundary(position);
+      final bool endOfLine =
+          lineBoundary?.end == position.offset && position.affinity != null;
       TextSelection selection;
 
       ///zmt
       if (position.offset - word.start <= 1) {
-        selection = handleSpecialText
-            ? convertTextPainterSelectionToTextInputSelection(
-                text,
-                TextSelection.collapsed(
-                    offset: word.start, affinity: TextAffinity.downstream))
-            : TextSelection.collapsed(
-                offset: word.start, affinity: TextAffinity.downstream);
+        selection = TextSelection.collapsed(
+            offset: word.start,
+            affinity: endOfLine ? position.affinity : TextAffinity.downstream);
       } else {
-        selection = handleSpecialText
-            ? convertTextPainterSelectionToTextInputSelection(
-                text,
-                TextSelection.collapsed(
-                    offset: word.end, affinity: TextAffinity.upstream))
-            : TextSelection.collapsed(
-                offset: word.end, affinity: TextAffinity.upstream);
+        selection = TextSelection.collapsed(
+            offset: word.end,
+            affinity: endOfLine ? position.affinity : TextAffinity.upstream);
       }
+
+      selection = handleSpecialText
+          ? convertTextPainterSelectionToTextInputSelection(text, selection)
+          : selection;
+
       onSelectionChanged(
         selection,
-        this,
         cause,
       );
     }
@@ -1053,7 +1035,7 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
   /// programmatically manipulate its `value` or `selection` directly.
   /// {@endtemplate}
   void selectPosition({@required SelectionChangedCause cause}) {
-    selectPositionAt(from: _lastTapDownPosition, cause: cause);
+    selectPositionAt(from: lastTapDownPosition, cause: cause);
   }
 
   /// Select text between the global positions [from] and [to].
@@ -1083,8 +1065,8 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
       int extentOffset = fromPosition.offset;
 
       if (toPosition != null) {
-        baseOffset = min(fromPosition.offset, toPosition.offset);
-        extentOffset = max(fromPosition.offset, toPosition.offset);
+        baseOffset = math.min(fromPosition.offset, toPosition.offset);
+        extentOffset = math.max(fromPosition.offset, toPosition.offset);
       }
 
       final TextSelection newSelection = TextSelection(
@@ -1094,7 +1076,7 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
       );
       // Call [onSelectionChanged] only when the selection actually changed.
       if (newSelection != _selection) {
-        onSelectionChanged(newSelection, this, cause);
+        onSelectionChanged(newSelection, cause);
       }
     }
   }
@@ -1103,7 +1085,7 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
   ///
   /// {@macro flutter.rendering.editable.select}
   void selectWord({@required SelectionChangedCause cause}) {
-    selectWordsInRange(from: _lastTapDownPosition, cause: cause);
+    selectWordsInRange(from: lastTapDownPosition, cause: cause);
   }
 
   void _paintSelection(PaintingContext context, Offset effectiveOffset) {
@@ -1124,14 +1106,7 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
       _selectionRects ??= _textPainter.getBoxesForSelection(actualSelection);
 
       assert(_selectionRects != null);
-      final Paint paint = Paint()..color = _selectionColor;
-
-      ///zmt
-      for (int i = 0; i < _selectionRects.length; i++) {
-        var box = _selectionRects[i];
-        var rect = box.toRect();
-        context.canvas.drawRect(rect.shift(effectiveOffset), paint);
-      }
+      paintSelection(context.canvas, effectiveOffset);
     }
   }
 
@@ -1150,7 +1125,7 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
   List<TextSelectionPoint> getEndpointsForSelection(TextSelection selection) {
     assert(constraints != null);
 //    if (temp.isCollapsed && toolbar) {
-//      // TODO(mpcomplete): This doesn't work well at an RTL/LTR boundary.
+//      // (mpcomplete): This doesn't work well at an RTL/LTR boundary.
 ////      final Offset caretOffset =
 ////          _textPainter.getOffsetForCaret(temp.extent, _caretPrototype);
 //
@@ -1257,7 +1232,7 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
       handleSpecialText: handleSpecialText,
     );
 
-    // TODO(justinmc): https://github.com/flutter/flutter/issues/31495
+    // (justinmc): https://github.com/flutter/flutter/issues/31495
     // Check if the selection is visible with an approximation because a
     // difference between rounded and unrounded values causes the caret to be
     // reported as having a slightly (< 0.5) negative y offset. This rounding
@@ -1286,18 +1261,37 @@ class ExtendedRenderParagraph extends ExtendedTextRenderBox
   }
 
   @override
-  Size getSize() {
-    return this.size;
-  }
-
-  @override
   bool get isAttached => attached;
 
   @override
-  Offset getlocalToGlobal(Offset point, {RenderObject ancestor}) {
-    return localToGlobal(point, ancestor: ancestor);
+  TextPainter get textPainter => _textPainter;
+
+  @override
+  double get caretMargin => 0.0;
+
+  @override
+  bool get forceLine => false;
+
+  @override
+  bool get isMultiline => maxLines != 1;
+
+  @override
+  bool get obscureText => false;
+
+  @override
+  Offset get paintOffset => Offset.zero;
+
+  // Retuns a cached plain text version of the text in the painter.
+  String _cachedPlainText;
+  @override
+  String get plainText {
+    _cachedPlainText ??= textSpanToActualText(_textPainter.text);
+    return _cachedPlainText;
   }
 
   @override
-  TextPainter get textPainter => _textPainter;
+  List<TextBox> get selectionRects => _selectionRects;
+
+  @override
+  Offset get effectiveOffset => Offset.zero;
 }

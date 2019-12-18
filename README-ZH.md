@@ -16,20 +16,20 @@
 
 ## 目录
 - [extended_text](#extendedtext)
-  - [目录](#%E7%9B%AE%E5%BD%95)
-  - [特殊文本](#%E7%89%B9%E6%AE%8A%E6%96%87%E6%9C%AC)
-    - [创建特殊文本](#%E5%88%9B%E5%BB%BA%E7%89%B9%E6%AE%8A%E6%96%87%E6%9C%AC)
-    - [特殊文本Builder](#%E7%89%B9%E6%AE%8A%E6%96%87%E6%9C%ACBuilder)
-  - [图片](#%E5%9B%BE%E7%89%87)
-    - [ImageSpan](#ImageSpan)
-    - [缓存图片](#%E7%BC%93%E5%AD%98%E5%9B%BE%E7%89%87)
-  - [文本选择](#%E6%96%87%E6%9C%AC%E9%80%89%E6%8B%A9)
-    - [文本选择控制器](#%E6%96%87%E6%9C%AC%E9%80%89%E6%8B%A9%E6%8E%A7%E5%88%B6%E5%99%A8)
-    - [工具栏和选择器的控制](#%E5%B7%A5%E5%85%B7%E6%A0%8F%E5%92%8C%E9%80%89%E6%8B%A9%E5%99%A8%E7%9A%84%E6%8E%A7%E5%88%B6)
-      - [默认行为](#%E9%BB%98%E8%AE%A4%E8%A1%8C%E4%B8%BA)
-      - [自定义行为](#%E8%87%AA%E5%AE%9A%E4%B9%89%E8%A1%8C%E4%B8%BA)
-  - [自定义背景](#%E8%87%AA%E5%AE%9A%E4%B9%89%E8%83%8C%E6%99%AF)
-  - [自定义文本溢出](#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%87%E6%9C%AC%E6%BA%A2%E5%87%BA)
+  - [目录](#%e7%9b%ae%e5%bd%95)
+  - [特殊文本](#%e7%89%b9%e6%ae%8a%e6%96%87%e6%9c%ac)
+    - [创建特殊文本](#%e5%88%9b%e5%bb%ba%e7%89%b9%e6%ae%8a%e6%96%87%e6%9c%ac)
+    - [特殊文本Builder](#%e7%89%b9%e6%ae%8a%e6%96%87%e6%9c%acbuilder)
+  - [图片](#%e5%9b%be%e7%89%87)
+    - [ImageSpan](#imagespan)
+    - [缓存图片](#%e7%bc%93%e5%ad%98%e5%9b%be%e7%89%87)
+  - [文本选择](#%e6%96%87%e6%9c%ac%e9%80%89%e6%8b%a9)
+    - [文本选择控制器](#%e6%96%87%e6%9c%ac%e9%80%89%e6%8b%a9%e6%8e%a7%e5%88%b6%e5%99%a8)
+    - [工具栏和选择器的控制](#%e5%b7%a5%e5%85%b7%e6%a0%8f%e5%92%8c%e9%80%89%e6%8b%a9%e5%99%a8%e7%9a%84%e6%8e%a7%e5%88%b6)
+      - [默认行为](#%e9%bb%98%e8%ae%a4%e8%a1%8c%e4%b8%ba)
+      - [自定义行为](#%e8%87%aa%e5%ae%9a%e4%b9%89%e8%a1%8c%e4%b8%ba)
+  - [自定义背景](#%e8%87%aa%e5%ae%9a%e4%b9%89%e8%83%8c%e6%99%af)
+  - [自定义文本溢出](#%e8%87%aa%e5%ae%9a%e4%b9%89%e6%96%87%e6%9c%ac%e6%ba%a2%e5%87%ba)
 
 ## 特殊文本
 
@@ -238,7 +238,7 @@ ExtendedNetworkImageProvider(
 Future<bool> clearDiskCachedImages({Duration duration}) async
 ```
 
-[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/custom_image_demo.dart)
+[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/pages/custom_image_demo.dart)
 
 
 ## 文本选择
@@ -460,7 +460,7 @@ class _TextSelectionToolbar extends StatelessWidget {
       },
     );
 ```
-[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/text_selection_demo.dart)
+[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/pages/text_selection_demo.dart)
 
 ## 自定义背景
 
@@ -481,7 +481,7 @@ Text背景相关的issue[24335](https://github.com/flutter/flutter/issues/24335)
 | clipBorderRadius | 用于裁剪背景                               | -    |
 | paintBackground  | 绘制背景的回调，你可以按照你的想法绘画背景 | -    |
 
-[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/background_text_demo.dart)
+[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/pages/background_text_demo.dart)
 
 ## 自定义文本溢出
 
@@ -508,4 +508,4 @@ Text背景相关的issue[24335](https://github.com/flutter/flutter/issues/24335)
           )
 ```
 
-[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/custom_text_overflow_demo.dart)
+[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/pages/custom_text_overflow_demo.dart)
