@@ -8,20 +8,20 @@ Extended official text to build special text like inline image or @somebody quic
 
 ## Table of contents
 - [extended_text](#extendedtext)
-  - [Table of contents](#Table-of-contents)
-  - [Speical Text](#Speical-Text)
-    - [Create Speical Text](#Create-Speical-Text)
-    - [SpecialTextSpanBuilder](#SpecialTextSpanBuilder)
-  - [Image](#Image)
-    - [ImageSpan](#ImageSpan)
-    - [Cache Image](#Cache-Image)
-  - [Selection](#Selection)
-    - [TextSelectionControls](#TextSelectionControls)
-    - [Control ToolBar Handle](#Control-ToolBar-Handle)
-      - [Default Behavior](#Default-Behavior)
-      - [Custom Behavior](#Custom-Behavior)
-  - [Custom Background](#Custom-Background)
-  - [Custom Overflow](#Custom-Overflow)
+  - [Table of contents](#table-of-contents)
+  - [Speical Text](#speical-text)
+    - [Create Speical Text](#create-speical-text)
+    - [SpecialTextSpanBuilder](#specialtextspanbuilder)
+  - [Image](#image)
+    - [ImageSpan](#imagespan)
+    - [Cache Image](#cache-image)
+  - [Selection](#selection)
+    - [TextSelectionControls](#textselectioncontrols)
+    - [Control ToolBar Handle](#control-toolbar-handle)
+      - [Default Behavior](#default-behavior)
+      - [Custom Behavior](#custom-behavior)
+  - [Custom Background](#custom-background)
+  - [Custom Overflow](#custom-overflow)
 
 ## Speical Text
 
@@ -221,7 +221,7 @@ ExtendedNetworkImageProvider(
 Future<bool> clearDiskCachedImages({Duration duration}) async
 ```
 
-[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/custom_image_demo.dart)
+[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/pages/custom_image_demo.dart)
 
 
 ## Selection
@@ -443,7 +443,7 @@ get selectionStates(ExtendedTextSelectionState) by builder call back, and handle
       },
     );
 ```
-[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/text_selection_demo.dart)
+[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/pages/text_selection_demo.dart)
 
 ## Custom Background
 
@@ -464,7 +464,7 @@ refer to issues [24335](https://github.com/flutter/flutter/issues/24335)/[24337]
 | clipBorderRadius | Clip BorderRadius                                            | -       |
 | paintBackground  | Paint background call back, you can paint background by self | -       |
 
-[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/background_text_demo.dart)
+[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/pages/background_text_demo.dart)
 
 ## Custom Overflow
 
@@ -491,4 +491,4 @@ refer to issue [26748](https://github.com/flutter/flutter/issues/26748)
           )
 ```
 
-[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/custom_text_overflow_demo.dart)
+[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/pages/custom_text_overflow_demo.dart)
