@@ -1,3 +1,7 @@
+## [0.6.8]
+
+* extract method for TextSelection
+
 ## [0.6.7]
 
 * codes base on 1.12.13+hotfix.5
