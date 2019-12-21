@@ -1,3 +1,7 @@
+## [0.6.9]
+
+* Fix issue that TextPainter was not layout
+  
 ## [0.6.8]
 
 * extract method for TextSelection
