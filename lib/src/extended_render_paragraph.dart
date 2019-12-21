@@ -301,7 +301,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     assert(!debugNeedsLayout);
     assert(constraints != null);
     assert(constraints.debugAssertIsValid());
-    _layoutTextWithConstraints(constraints);
+    layoutTextWithConstraints(constraints);
     // (garyq): Since our metric for ideographic baseline is currently
     // inaccurate and the non-alphabetic baselines are based off of the
     // alphabetic baseline, we use the alphabetic for now to produce correct
@@ -319,7 +319,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   void handleEvent(PointerEvent event, BoxHitTestEntry entry) {
     assert(debugHandleEvent(event, entry));
     if (event is! PointerDownEvent) return;
-    _layoutTextWithConstraints(constraints);
+    layoutTextWithConstraints(constraints);
     final Offset offset = entry.localPosition;
     if (_hasVisualOverflow && overFlowTextSpan != null) {
       var overFlowTextSpanOffset =
@@ -354,10 +354,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   /// Used to test this object. Not for use in production.
   @visibleForTesting
   bool get debugHasOverflowShader => _overflowShader != null;
-
-  void _layoutTextWithConstraints(BoxConstraints constraints) {
-    layoutText(minWidth: constraints.minWidth, maxWidth: constraints.maxWidth);
-  }
 
   @override
   void performLayout() {
@@ -452,7 +448,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     //
     // If you remove this call, make sure that changing the textAlign still
     // works properly.
-    _layoutTextWithConstraints(constraints);
+    layoutTextWithConstraints(constraints);
 
     assert(() {
       if (debugRepaintTextRainbowEnabled) {
@@ -510,7 +506,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   /// Valid only after [layout].
   Offset getOffsetForCaret(TextPosition position, Rect caretPrototype) {
     assert(!debugNeedsLayout);
-    _layoutTextWithConstraints(constraints);
+    layoutTextWithConstraints(constraints);
     return _textPainter.getOffsetForCaret(position, caretPrototype);
   }
 
@@ -523,7 +519,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   /// Valid only after [layout].
   List<ui.TextBox> getBoxesForSelection(TextSelection selection) {
     assert(!debugNeedsLayout);
-    _layoutTextWithConstraints(constraints);
+    layoutTextWithConstraints(constraints);
     return _textPainter.getBoxesForSelection(selection);
   }
 
@@ -532,7 +528,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   /// Valid only after [layout].
   TextPosition getPositionForOffset(Offset offset) {
     assert(!debugNeedsLayout);
-    _layoutTextWithConstraints(constraints);
+    layoutTextWithConstraints(constraints);
     return _textPainter.getPositionForOffset(offset);
   }
 
@@ -547,7 +543,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   /// Valid only after [layout].
   TextRange getWordBoundary(TextPosition position) {
     assert(!debugNeedsLayout);
-    _layoutTextWithConstraints(constraints);
+    layoutTextWithConstraints(constraints);
     return _textPainter.getWordBoundary(position);
   }
 
@@ -988,7 +984,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 //    } else
 
     if (!selection.isCollapsed) {
-      _layoutTextWithConstraints(constraints);
+      layoutTextWithConstraints(constraints);
       TextSelection textPainterSelection = selection;
       if (handleSpecialText) {
         textPainterSelection =
@@ -1046,7 +1042,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   final ValueNotifier<bool> _selectionEndInViewport = ValueNotifier<bool>(true);
 
   TextPosition getPositionForPoint(Offset globalPosition) {
-    _layoutTextWithConstraints(constraints);
+    layoutTextWithConstraints(constraints);
     var result =
         _textPainter.getPositionForOffset(globalToLocal(globalPosition));
 
