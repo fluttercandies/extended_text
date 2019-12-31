@@ -145,17 +145,18 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   void didUpdateWidget(ExtendedTextSelection oldWidget) {
     if (oldWidget.textSelectionControls != this.widget.textSelectionControls) {
       _textSelectionControls = widget.textSelectionControls;
-      final ThemeData themeData = Theme.of(context);
-      switch (themeData.platform) {
-        case TargetPlatform.iOS:
-          _textSelectionControls ??= extendedCupertinoTextSelectionControls;
-          break;
+      // final ThemeData themeData = Theme.of(context);
+      // switch (themeData.platform) {
+      //   case TargetPlatform.iOS:
+      //     _textSelectionControls ??= extendedCupertinoTextSelectionControls;
+      //     break;
 
-        case TargetPlatform.android:
-        case TargetPlatform.fuchsia:
-          _textSelectionControls ??= extendedMaterialTextSelectionControls;
-          break;
-      }
+      //   case TargetPlatform.android:
+      //   case TargetPlatform.fuchsia:
+      //     _textSelectionControls ??= extendedMaterialTextSelectionControls;
+      //     break;
+      // }
+      _textSelectionControls ??= extendedMaterialTextSelectionControls;
     }
 
     if (oldWidget.data != this.widget.data) {
@@ -174,7 +175,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData themeData = Theme.of(context);
+    // final ThemeData themeData = Theme.of(context);
     _pointerHandlerState = context
         .findAncestorStateOfType<ExtendedTextSelectionPointerHandlerState>();
     if (_pointerHandlerState != null) {
@@ -183,18 +184,20 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
       }
     }
 
-    switch (themeData.platform) {
-      case TargetPlatform.iOS:
-        forcePressEnabled = true;
-        _textSelectionControls ??= extendedCupertinoTextSelectionControls;
-        break;
+    _textSelectionControls ??= extendedMaterialTextSelectionControls;
 
-      case TargetPlatform.android:
-      case TargetPlatform.fuchsia:
-        forcePressEnabled = false;
-        _textSelectionControls ??= extendedMaterialTextSelectionControls;
-        break;
-    }
+    // switch (themeData.platform) {
+    //   case TargetPlatform.iOS:
+    //     forcePressEnabled = true;
+    //     _textSelectionControls ??= extendedCupertinoTextSelectionControls;
+    //     break;
+
+    //   case TargetPlatform.android:
+    //   case TargetPlatform.fuchsia:
+    //     forcePressEnabled = false;
+    //     _textSelectionControls ??= extendedMaterialTextSelectionControls;
+    //     break;
+    // }
 
     Widget result = RepaintBoundary(
         child: CompositedTransformTarget(
@@ -235,7 +238,8 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
         : null;
   }
 
-  void _handleSelectionChanged(TextSelection selection, SelectionChangedCause cause) {
+  void _handleSelectionChanged(
+      TextSelection selection, SelectionChangedCause cause) {
     textEditingValue = textEditingValue?.copyWith(selection: selection);
     _hideSelectionOverlayIfNeeded();
     //todo
