@@ -669,15 +669,18 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
       );
 
       if (info.isPlaceholder) {
-        final SemanticsNode childNode = children.elementAt(placeholderIndex++);
-        final TextParentData parentData = child.parentData;
-        childNode.rect = Rect.fromLTWH(
-          childNode.rect.left,
-          childNode.rect.top,
-          childNode.rect.width * parentData.scale,
-          childNode.rect.height * parentData.scale,
-        );
-        newChildren.add(childNode);
+        placeholderIndex++;
+        if (placeholderIndex < children.length) {
+          final SemanticsNode childNode = children.elementAt(placeholderIndex);
+          final TextParentData parentData = child.parentData;
+          childNode.rect = Rect.fromLTWH(
+            childNode.rect.left,
+            childNode.rect.top,
+            childNode.rect.width * parentData.scale,
+            childNode.rect.height * parentData.scale,
+          );
+          newChildren.add(childNode);
+        }
         child = childAfter(child);
       } else {
         final SemanticsConfiguration configuration = SemanticsConfiguration()
