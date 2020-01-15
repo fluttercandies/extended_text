@@ -1,3 +1,7 @@
+## [0.7.0]
+
+* Fix issue that Index out of range for overflow WidgetSpan
+  
 ## [0.6.9]
 
 * Fix issue that TextPainter was not layout
