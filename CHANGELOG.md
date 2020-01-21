@@ -1,3 +1,7 @@
+## [0.7.1]
+
+* Fix error about TargetPlatform.macOS
+  
 ## [0.7.0]
 
 * Fix issue that Index out of range for overflow WidgetSpan
