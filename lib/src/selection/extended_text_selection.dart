@@ -147,13 +147,13 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
       _textSelectionControls = widget.textSelectionControls;
       final ThemeData themeData = Theme.of(context);
       switch (themeData.platform) {
-        case TargetPlatform.iOS:
-          _textSelectionControls ??= extendedCupertinoTextSelectionControls;
-          break;
-
         case TargetPlatform.android:
         case TargetPlatform.fuchsia:
           _textSelectionControls ??= extendedMaterialTextSelectionControls;
+          break;
+        case TargetPlatform.iOS:
+        default:
+          _textSelectionControls ??= extendedCupertinoTextSelectionControls;
           break;
       }
     }
@@ -184,15 +184,15 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     }
 
     switch (themeData.platform) {
-      case TargetPlatform.iOS:
-        forcePressEnabled = true;
-        _textSelectionControls ??= extendedCupertinoTextSelectionControls;
-        break;
-
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
         forcePressEnabled = false;
         _textSelectionControls ??= extendedMaterialTextSelectionControls;
+        break;
+      case TargetPlatform.iOS:
+      default:
+        forcePressEnabled = true;
+        _textSelectionControls ??= extendedCupertinoTextSelectionControls;
         break;
     }
 
@@ -235,7 +235,8 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
         : null;
   }
 
-  void _handleSelectionChanged(TextSelection selection, SelectionChangedCause cause) {
+  void _handleSelectionChanged(
+      TextSelection selection, SelectionChangedCause cause) {
     textEditingValue = textEditingValue?.copyWith(selection: selection);
     _hideSelectionOverlayIfNeeded();
     //todo
