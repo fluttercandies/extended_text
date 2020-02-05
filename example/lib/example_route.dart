@@ -4,11 +4,11 @@
 // **************************************************************************
 
 import 'package:flutter/widgets.dart';
-import 'common/pic_swiper.dart';
 import 'pages/background_text_demo.dart';
 import 'pages/custom_image_demo.dart';
 import 'pages/custom_text_overflow_demo.dart';
 import 'pages/main_page.dart';
+import 'pages/pic_swiper_page.dart';
 import 'pages/text_demo.dart';
 import 'pages/text_selection_demo.dart';
 
@@ -16,7 +16,7 @@ RouteResult getRouteResult({String name, Map<String, dynamic> arguments}) {
   switch (name) {
     case "fluttercandies://picswiper":
       return RouteResult(
-        widget: PicSwiper(
+        widget: PicSwiperPage(
           index: arguments['index'],
           pics: arguments['pics'],
         ),
