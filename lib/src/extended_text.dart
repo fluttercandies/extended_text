@@ -206,6 +206,8 @@ class ExtendedText extends StatelessWidget {
         children: textSpan != null ? <TextSpan>[textSpan] : null,
       );
 
+    //_createImageConfiguration(<InlineSpan>[innerTextSpan], context);
+
     OverFlowTextSpan effectiveOverFlowTextSpan;
     if (overFlowTextSpan != null) {
       effectiveOverFlowTextSpan = OverFlowTextSpan(
@@ -265,6 +267,17 @@ class ExtendedText extends StatelessWidget {
 
     return result;
   }
+
+  //   void _createImageConfiguration(
+  //     List<InlineSpan> textSpan, BuildContext context) {
+  //   textSpan.forEach((ts) {
+  //     if (ts is PaintingImageSpan) {
+  //       ts.createImageConfiguration(context);
+  //     } else if (ts.children != null) {
+  //       _createImageConfiguration(ts.children, context);
+  //     }
+  //   });
+  // }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
