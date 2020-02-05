@@ -1,7 +1,8 @@
-import 'package:example/special_text/my_special_text_span_builder.dart';
+
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_candies_demo_library/flutter_candies_demo_library.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ff_annotation_route/ff_annotation_route.dart';

@@ -1,11 +1,10 @@
-
 import 'package:example/main.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
 import 'package:extended_image_library/extended_image_library.dart';
-import '../common/pic_swiper.dart';
 import 'package:ff_annotation_route/ff_annotation_route.dart';
+import 'package:flutter_candies_demo_library/flutter_candies_demo_library.dart';
 
 @FFRoute(
     name: "fluttercandies://CustomImageDemo",
@@ -168,7 +167,7 @@ class CustomImageDemo extends StatelessWidget {
   void onTap(BuildContext context, String url, List<String> list) {
     Navigator.pushNamed(context, "fluttercandies://picswiper", arguments: {
       "index": list.indexOf(url),
-      "pics": list.map<PicSwiperItem>((f) => PicSwiperItem(f)).toList(),
+      "pics": list.map<PicSwiperItem>((f) => PicSwiperItem(picUrl: f)).toList(),
     });
   }
 }

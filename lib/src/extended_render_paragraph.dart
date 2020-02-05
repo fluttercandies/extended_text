@@ -775,7 +775,27 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 
         ts.paint(canvas, topLeftOffset, rect,
             endOffset: endOffset, wholeTextPainter: _textPainter);
-      } else if (ts is TextSpan && ts.children != null) {
+      } 
+      // else if (ts is PaintingImageSpan) {
+      //   ///imageSpanTransparentPlaceholder \u200B has no width, and we define image width by
+      //   ///use letterSpacing,so the actual top-left offset of image should be subtract letterSpacing(width)/2.0
+      //   Offset imageSpanOffset = topLeftOffset - Offset(ts.width / 2.0, 0.0);
+
+      //   if (!ts.paint(canvas, imageSpanOffset)) {
+      //     //image not ready
+      //     ts.resolveImage(
+      //         listener: (ImageInfo imageInfo, bool synchronousCall) {
+      //       if (synchronousCall)
+      //         ts.paint(canvas, imageSpanOffset);
+      //       else {
+      //         if (owner == null || !owner.debugDoingPaint) {
+      //           markNeedsPaint();
+      //         }
+      //       }
+      //     });
+      //   }
+      // }
+      else if (ts is TextSpan && ts.children != null) {
         _paintSpecialTextChildren(ts.children, canvas, rect,
             textOffset: textOffset);
       }
