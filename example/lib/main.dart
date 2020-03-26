@@ -3,7 +3,6 @@ import 'package:extended_image_library/extended_image_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_candies_demo_library/flutter_candies_demo_library.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:image_picker_saver/image_picker_saver.dart';
@@ -31,19 +30,6 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      navigatorObservers: [
-        FFNavigatorObserver(routeChange: (name) {
-          //you can track page here
-          // print(name);
-        }, showStatusBarChange: (bool showStatusBar) {
-          if (showStatusBar) {
-            SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-            SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
-          } else {
-            SystemChrome.setEnabledSystemUIOverlays([]);
-          }
-        })
-      ],
       builder: (c, w) {
         ScreenUtil.init(width: 750, height: 1334, allowFontScaling: true);
         // ScreenUtil.instance =
