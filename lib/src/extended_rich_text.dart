@@ -1,9 +1,9 @@
+import 'dart:ui';
 import 'package:extended_text/src/extended_render_paragraph.dart';
 import 'package:extended_text/src/over_flow_text_span.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:extended_text_library/extended_text_library.dart';
-
 
 ///  * [TextStyle], which discusses how to style text.
 ///  * [TextSpan], which is used to describe the text in a paragraph.
@@ -38,6 +38,9 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
     this.selectionColor,
     this.startHandleLayerLink,
     this.endHandleLayerLink,
+    this.textHeightBehavior,
+    this.selectionHeightStyle = BoxHeightStyle.tight,
+    this.selectionWidthStyle = BoxWidthStyle.tight,
   })  : assert(text != null),
         assert(textAlign != null),
         assert(softWrap != null),
@@ -59,6 +62,9 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
     });
     return result;
   }
+
+  final BoxHeightStyle selectionHeightStyle;
+  final BoxWidthStyle selectionWidthStyle;
 
   /// The range of text that is currently selected.
   final TextSelection selection;
@@ -129,6 +135,8 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
   /// {@macro flutter.widgets.text.DefaultTextStyle.textWidthBasis}
   final TextWidthBasis textWidthBasis;
 
+  final TextHeightBehavior textHeightBehavior;
+
   final LayerLink startHandleLayerLink;
   final LayerLink endHandleLayerLink;
 
@@ -156,6 +164,9 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       selectionColor: selectionColor,
       startHandleLayerLink: startHandleLayerLink,
       endHandleLayerLink: endHandleLayerLink,
+      textHeightBehavior: textHeightBehavior,
+      selectionWidthStyle: selectionWidthStyle,
+      selectionHeightStyle: selectionHeightStyle,
     );
   }
 
@@ -179,7 +190,10 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       ..selectionColor = selectionColor
       ..onSelectionChanged = onSelectionChanged
       ..startHandleLayerLink = startHandleLayerLink
-      ..endHandleLayerLink = endHandleLayerLink;
+      ..endHandleLayerLink = endHandleLayerLink
+      ..textHeightBehavior = textHeightBehavior
+      ..selectionWidthStyle = selectionWidthStyle
+      ..selectionHeightStyle = selectionHeightStyle;
   }
 
   @override

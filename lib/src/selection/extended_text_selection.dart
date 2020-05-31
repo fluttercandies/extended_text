@@ -15,6 +15,44 @@ import 'extended_text_selection_pointer_handler.dart';
 ///
 
 class ExtendedTextSelection extends StatefulWidget {
+  const ExtendedTextSelection(
+      {this.onTap,
+      this.softWrap,
+      this.locale,
+      this.textDirection,
+      this.textAlign,
+      this.maxLines,
+      this.textScaleFactor,
+      this.overflow,
+      this.text,
+      this.overFlowTextSpan,
+      this.selectionColor,
+      this.dragStartBehavior,
+      this.data,
+      this.textSelectionControls,
+      this.textWidthBasis,
+      this.textHeightBehavior,
+      this.selectionHeightStyle = BoxHeightStyle.tight,
+      this.selectionWidthStyle = BoxWidthStyle.tight,
+      Key key})
+      : assert(selectionHeightStyle != null),
+        assert(selectionWidthStyle != null),
+        super(key: key);
+
+  /// Controls how tall the selection highlight boxes are computed to be.
+  ///
+  /// See [ui.BoxHeightStyle] for details on available styles.
+  final BoxHeightStyle selectionHeightStyle;
+
+  /// Controls how wide the selection highlight boxes are computed to be.
+  ///
+  /// See [ui.BoxWidthStyle] for details on available styles.
+  final BoxWidthStyle selectionWidthStyle;
+
+  final TextHeightBehavior textHeightBehavior;
+
+  final TextWidthBasis textWidthBasis;
+
   final GestureTapCallback onTap;
 
   /// How the text should be aligned horizontally.
@@ -88,24 +126,6 @@ class ExtendedTextSelection extends StatefulWidget {
 
   final TextSelectionControls textSelectionControls;
 
-  ExtendedTextSelection(
-      {this.onTap,
-      this.softWrap,
-      this.locale,
-      this.textDirection,
-      this.textAlign,
-      this.maxLines,
-      this.textScaleFactor,
-      this.overflow,
-      this.text,
-      this.overFlowTextSpan,
-      this.selectionColor,
-      this.dragStartBehavior,
-      this.data,
-      this.textSelectionControls,
-      Key key})
-      : super(key: key);
-
   @override
   ExtendedTextSelectionState createState() => ExtendedTextSelectionState();
 }
@@ -116,7 +136,8 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
         TextSelectionDelegate {
   final GlobalKey _renderParagraphKey = GlobalKey();
   ExtendedRenderParagraph get _renderParagraph =>
-      _renderParagraphKey.currentContext.findRenderObject();
+      _renderParagraphKey.currentContext.findRenderObject()
+          as ExtendedRenderParagraph;
   ExtendedTextSelectionOverlay _selectionOverlay;
   TextSelectionControls _textSelectionControls;
   final LayerLink _toolbarLayerLink = LayerLink();
@@ -137,13 +158,13 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
       requestKeyboard: null,
     );
     textEditingValue = TextEditingValue(
-        text: widget.data, selection: TextSelection.collapsed(offset: 0));
+        text: widget.data, selection: const TextSelection.collapsed(offset: 0));
     super.initState();
   }
 
   @override
   void didUpdateWidget(ExtendedTextSelection oldWidget) {
-    if (oldWidget.textSelectionControls != this.widget.textSelectionControls) {
+    if (oldWidget.textSelectionControls != widget.textSelectionControls) {
       _textSelectionControls = widget.textSelectionControls;
       final ThemeData themeData = Theme.of(context);
       switch (themeData.platform) {
@@ -158,9 +179,10 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
       }
     }
 
-    if (oldWidget.data != this.widget.data) {
+    if (oldWidget.data != widget.data) {
       textEditingValue = TextEditingValue(
-          text: widget.data, selection: TextSelection.collapsed(offset: 0));
+          text: widget.data,
+          selection: const TextSelection.collapsed(offset: 0));
     }
 
     super.didUpdateWidget(oldWidget);
@@ -219,6 +241,9 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
                 onSelectionChanged: _handleSelectionChanged,
                 startHandleLayerLink: _startHandleLayerLink,
                 endHandleLayerLink: _endHandleLayerLink,
+                textWidthBasis: widget.textWidthBasis,
+                selectionWidthStyle: widget.selectionWidthStyle,
+                selectionHeightStyle: widget.selectionHeightStyle,
               ),
             )));
 
@@ -306,7 +331,9 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   /// Returns `false` if a toolbar couldn't be shown such as when no text
   /// selection currently exists.
   bool showToolbar() {
-    if (_selectionOverlay == null) return false;
+    if (_selectionOverlay == null) {
+      return false;
+    }
     _selectionOverlay.showToolbar();
     return true;
   }
@@ -341,7 +368,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   void clearSelection() {
     if (!textEditingValue.selection.isCollapsed) {
       textEditingValue = textEditingValue.copyWith(
-          selection: TextSelection.collapsed(offset: 0));
+          selection: const TextSelection.collapsed(offset: 0));
     }
   }
 

@@ -7,22 +7,22 @@ import 'package:ff_annotation_route/ff_annotation_route.dart';
 import 'package:flutter_candies_demo_library/flutter_candies_demo_library.dart';
 
 @FFRoute(
-    name: "fluttercandies://CustomImageDemo",
-    routeName: "CustomImage",
-    description: "custom inline-image in text")
+    name: 'fluttercandies://CustomImageDemo',
+    routeName: 'CustomImage',
+    description: 'custom inline-image in text')
 class CustomImageDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("custom inline-image in text"),
+        title: const Text('custom inline-image in text'),
       ),
       body: Container(
-        padding: EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20.0),
         child: ExtendedText.rich(
           TextSpan(children: <InlineSpan>[
-            TextSpan(text: "click image show it in photo view.\n"),
-            TextSpan(text: "This is an image with placeholder."),
+            const TextSpan(text: 'click image show it in photo view.\n'),
+            const TextSpan(text: 'This is an image with placeholder.'),
             WidgetSpan(
               child: GestureDetector(
                   onTap: () {
@@ -33,7 +33,7 @@ class CustomImageDemo extends StatelessWidget {
                       height: 80.0,
                       loadStateChanged: loadStateChanged)),
             ),
-            TextSpan(text: "This is an image with border"),
+            const TextSpan(text: 'This is an image with border'),
             WidgetSpan(
               child: GestureDetector(
                   onTap: () {
@@ -54,7 +54,7 @@ class CustomImageDemo extends StatelessWidget {
                       shape: BoxShape.rectangle,
                       loadStateChanged: loadStateChanged)),
             ),
-            TextSpan(text: "This is an image with borderRadius"),
+            const TextSpan(text: 'This is an image with borderRadius'),
             WidgetSpan(
               child: GestureDetector(
                   onTap: () {
@@ -72,11 +72,12 @@ class CustomImageDemo extends StatelessWidget {
                       width: 80.0,
                       height: 60.0,
                       border: Border.all(color: Colors.red, width: 1.0),
-                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(10.0)),
                       shape: BoxShape.rectangle,
                       loadStateChanged: loadStateChanged)),
             ),
-            TextSpan(text: "This is an circle image with border\n"),
+            const TextSpan(text: 'This is an circle image with border\n'),
             WidgetSpan(
               child: GestureDetector(
                   onTap: () {
@@ -111,13 +112,13 @@ class CustomImageDemo extends StatelessWidget {
 
           ///clear local cahced
           clearDiskCachedImages().then((bool done) {
-//            showToast(done ? "clear succeed" : "clear failed",
+//            showToast(done ? 'clear succeed' : 'clear failed',
 //                position: ToastPosition(align: Alignment.center));
             print(done);
           });
         },
-        child: Text(
-          "clear cache",
+        child: const Text(
+          'clear cache',
           textAlign: TextAlign.center,
           style: TextStyle(
             inherit: false,
@@ -142,15 +143,15 @@ class CustomImageDemo extends StatelessWidget {
             fit: StackFit.expand,
             children: <Widget>[
               Image.asset(
-                "assets/failed.jpg",
+                'assets/failed.jpg',
                 fit: BoxFit.fill,
               ),
-              Positioned(
+              const Positioned(
                 bottom: 0.0,
                 left: 0.0,
                 right: 0.0,
                 child: Text(
-                  "load image failed, click to reload",
+                  'load image failed, click to reload',
                   textAlign: TextAlign.center,
                 ),
               )
@@ -165,9 +166,11 @@ class CustomImageDemo extends StatelessWidget {
   }
 
   void onTap(BuildContext context, String url, List<String> list) {
-    Navigator.pushNamed(context, "fluttercandies://picswiper", arguments: {
-      "index": list.indexOf(url),
-      "pics": list.map<PicSwiperItem>((f) => PicSwiperItem(picUrl: f)).toList(),
-    });
+    Navigator.pushNamed(context, 'fluttercandies://picswiper',
+        arguments: <String, dynamic>{
+          'index': list.indexOf(url),
+          'pics':
+              list.map<PicSwiperItem>((String f) => PicSwiperItem(picUrl: f)).toList(),
+        });
   }
 }
