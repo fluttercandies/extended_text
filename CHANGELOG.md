@@ -1,3 +1,7 @@
+## [1.0.1]
+
+* Fix wrong calculation about selection handles.
+
 ## [1.0.0]
 
 * Merge code from 1.17.0
