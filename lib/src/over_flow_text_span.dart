@@ -4,10 +4,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class OverFlowTextSpan extends TextSpan {
-  ///helper for textPainter
-  final TextPainterHelper _textPainterHelper;
-  TextPainterHelper get textPainterHelper => _textPainterHelper;
-
   OverFlowTextSpan(
       {TextStyle style,
       String text,
@@ -20,19 +16,27 @@ class OverFlowTextSpan extends TextSpan {
             children: children,
             recognizer: recognizer);
 
+  ///helper for textPainter
+  final TextPainterHelper _textPainterHelper;
+  TextPainterHelper get textPainterHelper => _textPainterHelper;
+
   TextPainter layout(TextPainter painter) {
     return _textPainterHelper.layout(painter, this, compareChildren: true);
   }
 
   @override
   bool operator ==(dynamic other) {
-    if (identical(this, other)) return true;
-    if (other.runtimeType != runtimeType) return false;
-    final OverFlowTextSpan typedOther = other;
-    return typedOther.text == text &&
-        typedOther.style == style &&
-        typedOther.recognizer == recognizer &&
-        listEquals<InlineSpan>(typedOther.children, children);
+    if (identical(this, other)) {
+      return true;
+    }
+    if (other.runtimeType != runtimeType) {
+      return false;
+    }
+    return other is OverFlowTextSpan &&
+        other.text == text &&
+        other.style == style &&
+        other.recognizer == recognizer &&
+        listEquals<InlineSpan>(other.children, children);
   }
 
   @override

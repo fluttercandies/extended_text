@@ -5,68 +5,91 @@
 
 import 'package:flutter/widgets.dart';
 
+import 'package:flutter_candies_demo_library/flutter_candies_demo_library_route.dart';
 import 'pages/background_text_demo.dart';
 import 'pages/custom_image_demo.dart';
 import 'pages/custom_text_overflow_demo.dart';
 import 'pages/main_page.dart';
-import 'pages/pic_swiper_page.dart';
 import 'pages/text_demo.dart';
 import 'pages/text_selection_demo.dart';
 
+// ignore_for_file: argument_type_not_assignable
 RouteResult getRouteResult({String name, Map<String, dynamic> arguments}) {
   switch (name) {
-    case "fluttercandies://BackgroundTextDemo":
+    case 'fluttercandies://BackgroundTextDemo':
       return RouteResult(
+        name: name,
         widget: BackgroundTextDemo(),
-        routeName: "BackgroundText",
-        description: "workaround for issue 24335/24337 about background",
+        routeName: 'BackgroundText',
+        description: 'workaround for issue 24335/24337 about background',
       );
-    case "fluttercandies://CustomImageDemo":
+    case 'fluttercandies://CustomImageDemo':
       return RouteResult(
+        name: name,
         widget: CustomImageDemo(),
-        routeName: "CustomImage",
-        description: "custom inline-image in text",
+        routeName: 'CustomImage',
+        description: 'custom inline-image in text',
       );
-    case "fluttercandies://CustomTextOverflowDemo":
+    case 'fluttercandies://CustomTextOverflowDemo':
       return RouteResult(
+        name: name,
         widget: CustomTextOverflowDemo(),
-        routeName: "CustomTextOverflow",
-        description: "workaround for issue 26748. how to custom text overflow",
+        routeName: 'CustomTextOverflow',
+        description: 'workaround for issue 26748. how to custom text overflow',
       );
-    case "fluttercandies://TextDemo":
+    case 'fluttercandies://TextDemo':
       return RouteResult(
+        name: name,
         widget: TextDemo(),
-        routeName: "Text",
-        description: "quickly build special text",
+        routeName: 'Text',
+        description: 'quickly build special text',
       );
-    case "fluttercandies://TextSelectionDemo":
+    case 'fluttercandies://TextSelectionDemo':
       return RouteResult(
+        name: name,
         widget: TextSelectionDemo(),
-        routeName: "TextSelection",
-        description: "text selection support",
+        routeName: 'TextSelection',
+        description: 'text selection support',
       );
-    case "fluttercandies://mainpage":
+    case 'fluttercandies://mainpage':
       return RouteResult(
+        name: name,
         widget: MainPage(),
-        routeName: "MainPage",
+        routeName: 'MainPage',
       );
-    case "fluttercandies://picswiper":
+    case 'fluttercandies://picswiper':
       return RouteResult(
-        widget: PicSwiperPage(
+        name: name,
+        widget: PicSwiper(
           index: arguments['index'],
           pics: arguments['pics'],
           tuChongItem: arguments['tuChongItem'],
         ),
         showStatusBar: false,
-        routeName: "PicSwiper",
+        routeName: 'PicSwiper',
         pageRouteType: PageRouteType.transparent,
       );
     default:
-      return RouteResult();
+      return const RouteResult(name: 'flutterCandies://notfound');
   }
 }
 
 class RouteResult {
+  const RouteResult({
+    @required this.name,
+    this.widget,
+    this.showStatusBar = true,
+    this.routeName = '',
+    this.pageRouteType,
+    this.description = '',
+    this.exts,
+  });
+
+  /// The name of the route (e.g., "/settings").
+  ///
+  /// If null, the route is anonymous.
+  final String name;
+
   /// The Widget return base on route
   final Widget widget;
 
@@ -82,23 +105,12 @@ class RouteResult {
   /// The description of route
   final String description;
 
-  const RouteResult({
-    this.widget,
-    this.showStatusBar = true,
-    this.routeName = '',
-    this.pageRouteType,
-    this.description = '',
-  });
+  /// The extend arguments
+  final Map<String, dynamic> exts;
 }
 
-enum PageRouteType { material, cupertino, transparent }
-
-List<String> routeNames = [
-  "fluttercandies://BackgroundTextDemo",
-  "fluttercandies://CustomImageDemo",
-  "fluttercandies://CustomTextOverflowDemo",
-  "fluttercandies://TextDemo",
-  "fluttercandies://TextSelectionDemo",
-  "fluttercandies://mainpage",
-  "fluttercandies://picswiper"
-];
+enum PageRouteType {
+  material,
+  cupertino,
+  transparent,
+}

@@ -18,9 +18,9 @@ import 'package:flutter/foundation.dart';
 import 'package:ff_annotation_route/ff_annotation_route.dart';
 
 @FFRoute(
-    name: "fluttercandies://TextSelectionDemo",
-    routeName: "TextSelection",
-    description: "text selection support")
+    name: 'fluttercandies://TextSelectionDemo',
+    routeName: 'TextSelection',
+    description: 'text selection support')
 class TextSelectionDemo extends StatefulWidget {
   @override
   _TextSelectionDemoState createState() => _TextSelectionDemoState();
@@ -30,7 +30,7 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
   MyExtendedMaterialTextSelectionControls
       _myExtendedMaterialTextSelectionControls;
   final String _attachContent =
-      "[love]Extended text help you to build rich text quickly. any special text you will have with extended text.It's my pleasure to invite you to join \$FlutterCandies\$ if you want to improve flutter .[love] if you meet any problem, please let me konw @zmtzawqlp .[sun_glasses]";
+      '[love]Extended text help you to build rich text quickly. any special text you will have with extended text.It\'s my pleasure to invite you to join \$FlutterCandies\$ if you want to improve flutter .[love] if you meet any problem, please let me konw @zmtzawqlp .[sun_glasses]';
   @override
   void initState() {
     _myExtendedMaterialTextSelectionControls =
@@ -53,21 +53,21 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
   @override
   Widget build(BuildContext context) {
     final double margin = ScreenUtil.instance.setWidth(22);
-    Widget result = Material(
+    final Widget result = Material(
       child: Column(
         children: <Widget>[
           AppBar(
-            title: Text("text selection support"),
+            title: const Text('text selection support'),
           ),
           Container(
             padding: EdgeInsets.all(margin),
-            child: Text(
-                "click image to show photo view, support zoom/pan image. horizontal and vertical page view are supported."),
+            child: const Text(
+                'click image to show photo view, support zoom/pan image. horizontal and vertical page view are supported.'),
           ),
           Expanded(
             child: LayoutBuilder(
-              builder: (c, data) {
-                final crossAxisCount =
+              builder: (BuildContext c, BoxConstraints data) {
+                final int crossAxisCount =
                     max(data.maxWidth ~/ ScreenUtil.instance.screenWidthDp, 1);
                 return PullToRefreshNotification(
                     pullBackOnRefresh: false,
@@ -76,14 +76,15 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                     onRefresh: onRefresh,
                     child: LoadingMoreCustomScrollView(
                       showGlowLeading: false,
-                      physics: ClampingScrollPhysics(),
+                      physics: const ClampingScrollPhysics(),
                       slivers: <Widget>[
                         SliverToBoxAdapter(
-                          child: PullToRefreshContainer((info) {
+                          child: PullToRefreshContainer(
+                              (PullToRefreshScrollNotificationInfo info) {
                             return PullToRefreshHeader(info, dateTimeNow);
                           }),
                         ),
-                        LoadingMoreSliverList(
+                        LoadingMoreSliverList<TuChongItem>(
                           SliverListConfig<TuChongItem>(
                             waterfallFlowDelegate: WaterfallFlowDelegate(
                               crossAxisCount: crossAxisCount,
@@ -101,15 +102,16 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                             //     }
                             //   });
                             // },
-                            itemBuilder: (context, item, index) {
+                            itemBuilder: (BuildContext context,
+                                TuChongItem item, int index) {
                               String title = item.site.name;
-                              if (title == null || title == "") {
-                                title = "Image$index";
+                              if (title == null || title == '') {
+                                title = 'Image$index';
                               }
 
-                              var content =
+                              String content =
                                   item.content ?? (item.excerpt ?? title);
-                              content += this._attachContent;
+                              content += _attachContent;
 
                               return Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -130,13 +132,14 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                                               color:
                                                   Colors.grey.withOpacity(0.4),
                                               width: 1.0),
-                                          loadStateChanged: (state) {
+                                          loadStateChanged:
+                                              (ExtendedImageState state) {
                                             if (state.extendedImageLoadState ==
                                                 LoadState.completed) {
                                               return null;
                                             }
                                             return Image.asset(
-                                              "assets/avatar.jpg",
+                                              'assets/avatar.jpg',
                                               package:
                                                   'flutter_candies_demo_library',
                                             );
@@ -159,11 +162,15 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                                     child: ExtendedText(
                                       content,
                                       onSpecialTextTap: (dynamic parameter) {
-                                        if (parameter.startsWith("\$")) {
+                                        if (parameter
+                                            .toString()
+                                            .startsWith('\$')) {
                                           launch(
-                                              "https://github.com/fluttercandies");
-                                        } else if (parameter.startsWith("@")) {
-                                          launch("mailto:zmtzawqlp@live.com");
+                                              'https://github.com/fluttercandies');
+                                        } else if (parameter
+                                            .toString()
+                                            .startsWith('@')) {
+                                          launch('mailto:zmtzawqlp@live.com');
                                         }
                                       },
                                       specialTextSpanBuilder:
@@ -176,17 +183,18 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                                           ? null
                                           : OverFlowTextSpan(
                                               children: <TextSpan>[
-                                                TextSpan(text: '  \u2026  '),
+                                                const TextSpan(
+                                                    text: '  \u2026  '),
                                                 TextSpan(
-                                                    text: "more detail",
-                                                    style: TextStyle(
+                                                    text: 'more detail',
+                                                    style: const TextStyle(
                                                       color: Colors.blue,
                                                     ),
                                                     recognizer:
                                                         TapGestureRecognizer()
                                                           ..onTap = () {
                                                             launch(
-                                                                "https://github.com/fluttercandies/extended_text");
+                                                                'https://github.com/fluttercandies/extended_text');
                                                           })
                                               ],
                                             ),
@@ -238,21 +246,21 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
       //default behavior
       // child: result,
       //custom your behavior
-      builder: (states) {
+      builder: (List<ExtendedTextSelectionState> states) {
         return Listener(
           child: result,
           behavior: HitTestBehavior.translucent,
-          onPointerDown: (value) {
-            for (var state in states) {
+          onPointerDown: (PointerDownEvent value) {
+            for (final ExtendedTextSelectionState state in states) {
               if (!state.containsPosition(value.position)) {
                 //clear other selection
                 state.clearSelection();
               }
             }
           },
-          onPointerMove: (value) {
+          onPointerMove: (PointerMoveEvent value) {
             //clear other selection
-            for (var state in states) {
+            for (final ExtendedTextSelectionState state in states) {
               state.clearSelection();
             }
           },
@@ -264,7 +272,7 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
   Future<bool> onLikeButtonTap(bool isLiked, TuChongItem item) {
     ///send your request here
     ///
-    final Completer<bool> completer = new Completer<bool>();
+    final Completer<bool> completer = Completer<bool>();
     Timer(const Duration(milliseconds: 200), () {
       item.isFavorite = !item.isFavorite;
       item.favorites =

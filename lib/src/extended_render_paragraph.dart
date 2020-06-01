@@ -1,11 +1,20 @@
+import 'dart:collection';
+import 'dart:math' as math;
+import 'dart:ui' as ui
+    show
+        Gradient,
+        Shader,
+        TextBox,
+        TextHeightBehavior,
+        BoxWidthStyle,
+        BoxHeightStyle;
+
 import 'package:extended_text/src/over_flow_text_span.dart';
 import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'dart:ui' as ui show Gradient, Shader, TextBox;
-import 'dart:math' as math;
 
 const String _kEllipsis = '\u2026';
 
@@ -36,6 +45,9 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     TextSelection selection,
     StrutStyle strutStyle,
     List<RenderBox> children,
+    ui.TextHeightBehavior textHeightBehavior,
+    ui.BoxHeightStyle selectionHeightStyle = ui.BoxHeightStyle.tight,
+    ui.BoxWidthStyle selectionWidthStyle = ui.BoxWidthStyle.tight,
   })  : assert(text != null),
         assert(text.debugAssertIsValid()),
         assert(textAlign != null),
@@ -52,21 +64,25 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         _startHandleLayerLink = startHandleLayerLink,
         _endHandleLayerLink = endHandleLayerLink,
         _textPainter = TextPainter(
-            text: text,
-            textAlign: textAlign,
-            textDirection: textDirection,
-            textScaleFactor: textScaleFactor,
-            maxLines: maxLines,
-            ellipsis:
-                (overFlowTextSpan == null && overflow == TextOverflow.ellipsis)
-                    ? _kEllipsis
-                    : null,
-            locale: locale,
-            strutStyle: strutStyle,
-            textWidthBasis: textWidthBasis),
+          text: text,
+          textAlign: textAlign,
+          textDirection: textDirection,
+          textScaleFactor: textScaleFactor,
+          maxLines: maxLines,
+          ellipsis:
+              (overFlowTextSpan == null && overflow == TextOverflow.ellipsis)
+                  ? _kEllipsis
+                  : null,
+          locale: locale,
+          strutStyle: strutStyle,
+          textWidthBasis: textWidthBasis,
+          textHeightBehavior: textHeightBehavior,
+        ),
         _overFlowTextSpan = overFlowTextSpan,
         _selectionColor = selectionColor,
-        _selection = selection {
+        _selection = selection,
+        _selectionHeightStyle = selectionHeightStyle,
+        _selectionWidthStyle = selectionWidthStyle {
     addAll(children);
     extractPlaceholderSpans(text);
   }
@@ -74,11 +90,14 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   ///TextSelection
 
   /// Called when the selection changes.
+  @override
   TextSelectionChangedHandler onSelectionChanged;
 
+  @override
   double get preferredLineHeight => _textPainter.preferredLineHeight;
 
   bool _handleSpecialText = false;
+  @override
   bool get handleSpecialText => _handleSpecialText;
 
   List<ui.TextBox> _selectionRects;
@@ -87,10 +106,13 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   ///
   /// [RenderEditable] is responsible for calculating the [Offset] of this
   /// [LayerLink], which will be used as [CompositedTransformTarget] of start handle.
+  @override
   LayerLink get startHandleLayerLink => _startHandleLayerLink;
   LayerLink _startHandleLayerLink;
   set startHandleLayerLink(LayerLink value) {
-    if (_startHandleLayerLink == value) return;
+    if (_startHandleLayerLink == value) {
+      return;
+    }
     _startHandleLayerLink = value;
     markNeedsPaint();
   }
@@ -99,19 +121,25 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   ///
   /// [RenderEditable] is responsible for calculating the [Offset] of this
   /// [LayerLink], which will be used as [CompositedTransformTarget] of end handle.
+  @override
   LayerLink get endHandleLayerLink => _endHandleLayerLink;
   LayerLink _endHandleLayerLink;
   set endHandleLayerLink(LayerLink value) {
-    if (_endHandleLayerLink == value) return;
+    if (_endHandleLayerLink == value) {
+      return;
+    }
     _endHandleLayerLink = value;
     markNeedsPaint();
   }
 
   /// The region of text that is selected, if any.
+  @override
   TextSelection get selection => _selection;
   TextSelection _selection;
   set selection(TextSelection value) {
-    if (_selection == value) return;
+    if (_selection == value) {
+      return;
+    }
     _selection = value;
     _selectionRects = null;
     markNeedsPaint();
@@ -119,10 +147,13 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   }
 
   /// The color to use when painting the selection.
+  @override
   Color get selectionColor => _selectionColor;
   Color _selectionColor;
   set selectionColor(Color value) {
-    if (_selectionColor == value) return;
+    if (_selectionColor == value) {
+      return;
+    }
     _selectionColor = value;
     markNeedsPaint();
   }
@@ -146,6 +177,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   final TextPainter _textPainter;
 
   /// The text to display
+  @override
   InlineSpan get text => _textPainter.text;
   set text(InlineSpan value) {
     assert(value != null);
@@ -175,7 +207,9 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   TextAlign get textAlign => _textPainter.textAlign;
   set textAlign(TextAlign value) {
     assert(value != null);
-    if (_textPainter.textAlign == value) return;
+    if (_textPainter.textAlign == value) {
+      return;
+    }
     _textPainter.textAlign = value;
     markNeedsTextLayout();
   }
@@ -193,10 +227,13 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   /// its left.
   ///
   /// This must not be null.
+  @override
   TextDirection get textDirection => _textPainter.textDirection;
   set textDirection(TextDirection value) {
     assert(value != null);
-    if (_textPainter.textDirection == value) return;
+    if (_textPainter.textDirection == value) {
+      return;
+    }
     _textPainter.textDirection = value;
     markNeedsTextLayout();
   }
@@ -213,7 +250,9 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   bool _softWrap;
   set softWrap(bool value) {
     assert(value != null);
-    if (_softWrap == value) return;
+    if (_softWrap == value) {
+      return;
+    }
     _softWrap = value;
     markNeedsTextLayout();
   }
@@ -224,8 +263,11 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   TextOverflow _overflow;
   set overflow(TextOverflow value) {
     assert(value != null);
-    var temp = overFlowTextSpan != null ? TextOverflow.clip : value;
-    if (_overflow == temp) return;
+    final TextOverflow temp =
+        overFlowTextSpan != null ? TextOverflow.clip : value;
+    if (_overflow == temp) {
+      return;
+    }
     _overflow = temp;
     _textPainter.ellipsis = value == TextOverflow.ellipsis ? _kEllipsis : null;
     markNeedsTextLayout();
@@ -238,7 +280,9 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   double get textScaleFactor => _textPainter.textScaleFactor;
   set textScaleFactor(double value) {
     assert(value != null);
-    if (_textPainter.textScaleFactor == value) return;
+    if (_textPainter.textScaleFactor == value) {
+      return;
+    }
     _textPainter.textScaleFactor = value;
     _overflowShader = null;
     markNeedsTextLayout();
@@ -252,7 +296,9 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   /// The value may be null. If it is not null, then it must be greater than zero.
   set maxLines(int value) {
     assert(value == null || value > 0);
-    if (_textPainter.maxLines == value) return;
+    if (_textPainter.maxLines == value) {
+      return;
+    }
     _textPainter.maxLines = value;
     _overflowShader = null;
     markNeedsTextLayout();
@@ -269,7 +315,9 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 
   /// The value may be null.
   set locale(Locale value) {
-    if (_textPainter.locale == value) return;
+    if (_textPainter.locale == value) {
+      return;
+    }
     _textPainter.locale = value;
     _overflowShader = null;
     markNeedsTextLayout();
@@ -280,7 +328,9 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 
   /// The value may be null.
   set strutStyle(StrutStyle value) {
-    if (_textPainter.strutStyle == value) return;
+    if (_textPainter.strutStyle == value) {
+      return;
+    }
     _textPainter.strutStyle = value;
     _overflowShader = null;
     markNeedsTextLayout();
@@ -290,10 +340,52 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   TextWidthBasis get textWidthBasis => _textPainter.textWidthBasis;
   set textWidthBasis(TextWidthBasis value) {
     assert(value != null);
-    if (_textPainter.textWidthBasis == value) return;
+    if (_textPainter.textWidthBasis == value) {
+      return;
+    }
     _textPainter.textWidthBasis = value;
     _overflowShader = null;
     markNeedsTextLayout();
+  }
+
+  /// {@macro flutter.dart:ui.textHeightBehavior}
+  ui.TextHeightBehavior get textHeightBehavior =>
+      _textPainter.textHeightBehavior;
+  set textHeightBehavior(ui.TextHeightBehavior value) {
+    if (_textPainter.textHeightBehavior == value) {
+      return;
+    }
+    _textPainter.textHeightBehavior = value;
+    _overflowShader = null;
+    markNeedsLayout();
+  }
+
+  /// Controls how tall the selection highlight boxes are computed to be.
+  ///
+  /// See [ui.BoxHeightStyle] for details on available styles.
+  ui.BoxHeightStyle get selectionHeightStyle => _selectionHeightStyle;
+  ui.BoxHeightStyle _selectionHeightStyle;
+  set selectionHeightStyle(ui.BoxHeightStyle value) {
+    assert(value != null);
+    if (_selectionHeightStyle == value) {
+      return;
+    }
+    _selectionHeightStyle = value;
+    markNeedsPaint();
+  }
+
+  /// Controls how wide the selection highlight boxes are computed to be.
+  ///
+  /// See [ui.BoxWidthStyle] for details on available styles.
+  ui.BoxWidthStyle get selectionWidthStyle => _selectionWidthStyle;
+  ui.BoxWidthStyle _selectionWidthStyle;
+  set selectionWidthStyle(ui.BoxWidthStyle value) {
+    assert(value != null);
+    if (_selectionWidthStyle == value) {
+      return;
+    }
+    _selectionWidthStyle = value;
+    markNeedsPaint();
   }
 
   @override
@@ -318,11 +410,15 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   @override
   void handleEvent(PointerEvent event, BoxHitTestEntry entry) {
     assert(debugHandleEvent(event, entry));
-    if (event is! PointerDownEvent) return;
+    if (event is! PointerDownEvent) {
+      return;
+    }
     layoutTextWithConstraints(constraints);
     final Offset offset = entry.localPosition;
-    if (_hasVisualOverflow && overFlowTextSpan != null) {
-      var overFlowTextSpanOffset =
+    if (_hasVisualOverflow &&
+        overFlowTextSpan != null &&
+        overFlowTextSpan.textPainterHelper.offset != null) {
+      final Offset overFlowTextSpanOffset =
           offset - overFlowTextSpan.textPainterHelper.offset;
       if (overFlowTextSpanOffset >= Offset.zero) {
         final TextPosition position =
@@ -331,7 +427,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
             overFlowTextSpan.textPainterHelper.getSpanForPosition(position);
 
         if (span != null && span is TextSpan && span.recognizer != null) {
-          span.recognizer.addPointer(event);
+          span.recognizer.addPointer(event as PointerDownEvent);
           return;
         }
       }
@@ -340,7 +436,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     final TextPosition position = _textPainter.getPositionForOffset(offset);
     final InlineSpan span = _textPainter.text.getSpanForPosition(position);
     if (span != null && span is TextSpan) {
-      span.recognizer?.addPointer(event);
+      span.recognizer?.addPointer(event as PointerDownEvent);
     }
   }
 
@@ -457,8 +553,19 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
       }
       return true;
     }());
+    if (_needsClipping) {
+      final Rect bounds = offset & size;
+      if (_overflowShader != null) {
+        // This layer limits what the shader below blends with to be just the
+        // text (as opposed to the text and its background).
+        context.canvas.saveLayer(bounds, Paint());
+      } else {
+        context.canvas.save();
+      }
+      context.canvas.clipRect(bounds);
+    }
 
-    Path clip = _paintTextOverflow(context, offset);
+    final Path clip = _paintTextOverflow(context, offset);
     //clip rect of over flow
     if (clip != null) {
       context.canvas.save();
@@ -471,6 +578,17 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
       context.canvas.restore();
     }
     paintHandleLayers(context, super.paint);
+
+    if (_needsClipping) {
+      if (_overflowShader != null) {
+        context.canvas.translate(offset.dx, offset.dy);
+        final Paint paint = Paint()
+          ..blendMode = BlendMode.modulate
+          ..shader = _overflowShader;
+        context.canvas.drawRect(Offset.zero & size, paint);
+      }
+      context.canvas.restore();
+    }
   }
 
   void _paint(PaintingContext context, Offset offset) {
@@ -573,7 +691,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         <InlineSpanSemanticsInformation>[];
     String workingText = '';
     String workingLabel;
-    for (InlineSpanSemanticsInformation info in _semanticsInfo) {
+    for (final InlineSpanSemanticsInformation info in _semanticsInfo) {
       if (info.requiresOwnNode) {
         if (workingText != null) {
           combined.add(InlineSpanSemanticsInformation(
@@ -616,7 +734,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
       config.isSemanticBoundary = true;
     } else {
       final StringBuffer buffer = StringBuffer();
-      for (InlineSpanSemanticsInformation info in _semanticsInfo) {
+      for (final InlineSpanSemanticsInformation info in _semanticsInfo) {
         buffer.write(info.semanticsLabel ?? info.text);
       }
       config.label = buffer.toString();
@@ -624,6 +742,11 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     }
   }
 
+  // Caches [SemanticsNode]s created during [assembleSemanticsNode] so they
+  // can be re-used when [assembleSemanticsNode] is called again. This ensures
+  // stable ids for the [SemanticsNode]s of [TextSpan]s across
+  // [assembleSemanticsNode] invocations.
+  Queue<SemanticsNode> _cachedChildNodes;
   @override
   void assembleSemanticsNode(SemanticsNode node, SemanticsConfiguration config,
       Iterable<SemanticsNode> children) {
@@ -635,7 +758,8 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     int start = 0;
     int placeholderIndex = 0;
     RenderBox child = firstChild;
-    for (InlineSpanSemanticsInformation info in _combineSemanticsInfo()) {
+    final Queue<SemanticsNode> newChildCache = Queue<SemanticsNode>();
+    for (final InlineSpanSemanticsInformation info in _combineSemanticsInfo()) {
       final TextDirection initialDirection = currentDirection;
       final TextSelection selection = TextSelection(
         baseOffset: start,
@@ -647,7 +771,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
       }
       Rect rect = rects.first.toRect();
       currentDirection = rects.first.direction;
-      for (ui.TextBox textBox in rects.skip(1)) {
+      for (final ui.TextBox textBox in rects.skip(1)) {
         rect = rect.expandToInclude(textBox.toRect());
         currentDirection = textBox.direction;
       }
@@ -672,7 +796,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         placeholderIndex++;
         if (placeholderIndex < children.length) {
           final SemanticsNode childNode = children.elementAt(placeholderIndex);
-          final TextParentData parentData = child.parentData;
+          final TextParentData parentData = child.parentData as TextParentData;
           childNode.rect = Rect.fromLTWH(
             childNode.rect.left,
             childNode.rect.top,
@@ -689,25 +813,37 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
           ..label = info.semanticsLabel ?? info.text;
         if (info.recognizer != null) {
           if (info.recognizer is TapGestureRecognizer) {
-            final TapGestureRecognizer recognizer = info.recognizer;
+            final TapGestureRecognizer recognizer =
+                info.recognizer as TapGestureRecognizer;
             configuration.onTap = recognizer.onTap;
             configuration.isLink = true;
           } else if (info.recognizer is LongPressGestureRecognizer) {
-            final LongPressGestureRecognizer recognizer = info.recognizer;
+            final LongPressGestureRecognizer recognizer =
+                info.recognizer as LongPressGestureRecognizer;
             configuration.onLongPress = recognizer.onLongPress;
           } else {
             assert(false);
           }
         }
-        newChildren.add(
-          SemanticsNode()
-            ..updateWith(config: configuration)
-            ..rect = currentRect,
-        );
+        final SemanticsNode newChild = (_cachedChildNodes?.isNotEmpty == true)
+            ? _cachedChildNodes.removeFirst()
+            : SemanticsNode();
+        newChild
+          ..updateWith(config: configuration)
+          ..rect = currentRect;
+        newChildCache.addLast(newChild);
+        newChildren.add(newChild);
       }
       start += info.text.length;
     }
+    _cachedChildNodes = newChildCache;
     node.updateWith(config: config, childrenInInversePaintOrder: newChildren);
+  }
+
+  @override
+  void clearSemantics() {
+    super.clearSemantics();
+    _cachedChildNodes = null;
   }
 
   @override
@@ -745,16 +881,16 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     canvas.translate(offset.dx, offset.dy);
 
     ///we have move the canvas, so rect top left should be (0,0)
-    final Rect rect = Offset(0.0, 0.0) & size;
+    final Rect rect = const Offset(0.0, 0.0) & size;
     _paintSpecialTextChildren(<InlineSpan>[text], canvas, rect);
     canvas.restore();
   }
 
   void _paintSpecialTextChildren(
       List<InlineSpan> textSpans, Canvas canvas, Rect rect,
-      {int textOffset: 0}) {
-    for (InlineSpan ts in textSpans) {
-      Offset topLeftOffset = getOffsetForCaret(
+      {int textOffset = 0}) {
+    for (final InlineSpan ts in textSpans) {
+      final Offset topLeftOffset = getOffsetForCaret(
         TextPosition(offset: textOffset),
         rect,
       );
@@ -765,17 +901,17 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
       }
 
       if (ts is BackgroundTextSpan) {
-        var painter = ts.layout(_textPainter);
-        Rect textRect = topLeftOffset & painter.size;
+        final TextPainter painter = ts.layout(_textPainter);
+        final Rect textRect = topLeftOffset & painter.size;
         Offset endOffset;
         if (textRect.right > rect.right) {
-          int endTextOffset = textOffset + ts.toPlainText().length;
+          final int endTextOffset = textOffset + ts.toPlainText().length;
           endOffset = _findEndOffset(rect, endTextOffset);
         }
 
         ts.paint(canvas, topLeftOffset, rect,
             endOffset: endOffset, wholeTextPainter: _textPainter);
-      } 
+      }
       // else if (ts is PaintingImageSpan) {
       //   ///imageSpanTransparentPlaceholder \u200B has no width, and we define image width by
       //   ///use letterSpacing,so the actual top-left offset of image should be subtract letterSpacing(width)/2.0
@@ -805,7 +941,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   }
 
   Offset _findEndOffset(Rect rect, int endTextOffset) {
-    Offset endOffset = getOffsetForCaret(
+    final Offset endOffset = getOffsetForCaret(
       TextPosition(offset: endTextOffset, affinity: TextAffinity.upstream),
       rect,
     );
@@ -821,8 +957,8 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
       final Canvas canvas = context.canvas;
 
       ///we will move the canvas, so rect top left should be (0,0)
-      final Rect rect = Offset(0.0, 0.0) & size;
-      var textPainter = overFlowTextSpan.layout(_textPainter);
+      final Rect rect = const Offset(0.0, 0.0) & size;
+      final TextPainter textPainter = overFlowTextSpan.layout(_textPainter);
 
       //overFlowTextSpan can't be more one line.
       assert(
@@ -838,21 +974,21 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
           rect.width - textPainter.width, rect.height - textPainter.height);
 
       ///find TextPosition near bottomRight
-      TextPosition lastOnePosition =
+      final TextPosition lastOnePosition =
           _textPainter.getPositionForOffset(rect.bottomRight);
 
 //      final InlineSpan lastTextSpan =
 //          _textPainter.text.getSpanForPosition(lastOnePosition);
 
       ///find overflow TextPosition that not clip the original text
-      Offset finalOverFlowOffset = _findFinalOverflowOffset(
+      final Offset finalOverFlowOffset = _findFinalOverflowOffset(
           rect: rect,
           x: rect.width - textPainter.width,
           endTextOffset: lastOnePosition.offset,
           y: rect.bottom,
           effectiveOffset: Offset.zero);
 
-      Offset bottomRight = rect.bottomRight;
+      final Offset bottomRight = rect.bottomRight;
 //      if (lastTextSpan is ExtendedWidgetSpan) {
 //        bottomRight =
 //            Offset(bottomRight.dx + lastTextSpan.size.width, bottomRight.dy);
@@ -879,8 +1015,8 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 
       canvas.restore();
 
-      Rect textRect = offset & size;
-      Rect overFlowRect = overFlowTextSpanRect.shift(offset);
+      final Rect textRect = offset & size;
+      final Rect overFlowRect = overFlowTextSpanRect.shift(offset);
       final double visibleRegionSlop = _textPainter.preferredLineHeight / 2.0;
 
       return Path()
@@ -909,8 +1045,8 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 //      TextPosition(offset: endTextOffset),
 //      rect,
 //    );
-
-    Offset endOffset = getCaretOffset(
+    
+    final Offset endOffset = getCaretOffset(
         TextPosition(
           offset: endTextOffset,
         ),
@@ -955,11 +1091,13 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   }
 
   void _paintSelection(PaintingContext context, Offset effectiveOffset) {
-    if (_selection == null) return;
+    if (_selection == null) {
+      return;
+    }
     bool showSelection = false;
 
     ///zmt
-    var actualSelection = handleSpecialText
+    final TextSelection actualSelection = handleSpecialText
         ? convertTextInputSelectionToTextPainterSelection(text, _selection)
         : _selection;
 
@@ -988,6 +1126,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   ///
   ///  * [getLocalRectForCaret], which is the equivalent but for
   ///    a [TextPosition] rather than a [TextSelection].
+  @override
   List<TextSelectionPoint> getEndpointsForSelection(TextSelection selection) {
     assert(constraints != null);
 //    if (temp.isCollapsed && toolbar) {
@@ -1019,7 +1158,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
       Offset end = Offset(boxes.last.end, boxes.last.bottom);
 
       if (_hasVisualOverflow && overFlowTextSpan != null) {
-        var overFlowOffset = overFlowTextSpan.textPainterHelper.offset;
+        final Offset overFlowOffset = overFlowTextSpan.textPainterHelper.offset;
         if (overFlowOffset.dx < end.dx && overFlowOffset.dy < end.dy) {
           end = Offset(overFlowOffset.dx, end.dy);
         }
@@ -1046,6 +1185,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   /// This bool indicates whether the text is scrolled so that the handle is
   /// inside the text field viewport, as opposed to whether it is actually
   /// visible on the screen.
+  @override
   ValueListenable<bool> get selectionStartInViewport =>
       _selectionStartInViewport;
   final ValueNotifier<bool> _selectionStartInViewport =
@@ -1061,19 +1201,23 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   /// This bool indicates whether the text is scrolled so that the handle is
   /// inside the text field viewport, as opposed to whether it is actually
   /// visible on the screen.
+  @override
   ValueListenable<bool> get selectionEndInViewport => _selectionEndInViewport;
   final ValueNotifier<bool> _selectionEndInViewport = ValueNotifier<bool>(true);
 
+  @override
   TextPosition getPositionForPoint(Offset globalPosition) {
     layoutTextWithConstraints(constraints);
-    var result =
+    final TextPosition result =
         _textPainter.getPositionForOffset(globalToLocal(globalPosition));
 
     ///never drag over the over flow text span
     if (_hasVisualOverflow && overFlowTextSpan != null) {
-      var position =
+      final TextPosition position =
           getPositionForOffset(overFlowTextSpan.textPainterHelper.offset);
-      if (result.offset > position.offset) return position;
+      if (result.offset > position.offset) {
+        return position;
+      }
     }
 
     return result;

@@ -1,3 +1,4 @@
+import 'dart:ui' as ui show TextHeightBehavior, BoxWidthStyle, BoxHeightStyle;
 import 'package:extended_text/extended_text.dart';
 import 'package:extended_text/src/extended_rich_text.dart';
 import 'package:extended_text/src/over_flow_text_span.dart';
@@ -5,63 +6,80 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-import 'package:extended_text/src/selection/extended_text_selection.dart';
-
 class ExtendedText extends StatelessWidget {
   /// Creates a text widget.
   ///
   /// If the [style] argument is null, the text will use the style from the
   /// closest enclosing [DefaultTextStyle].
-  const ExtendedText(this.data,
-      {Key key,
-      this.style,
-      this.strutStyle,
-      this.textAlign,
-      this.textDirection,
-      this.locale,
-      this.softWrap,
-      this.overflow,
-      this.textScaleFactor,
-      this.maxLines,
-      this.semanticsLabel,
-      this.textWidthBasis,
-      this.specialTextSpanBuilder,
-      this.onSpecialTextTap,
-      this.overFlowTextSpan,
-      this.selectionEnabled: false,
-      this.onTap,
-      this.selectionColor,
-      this.dragStartBehavior: DragStartBehavior.start,
-      this.textSelectionControls})
-      : assert(data != null),
+  const ExtendedText(
+    this.data, {
+    Key key,
+    this.style,
+    this.strutStyle,
+    this.textAlign,
+    this.textDirection,
+    this.locale,
+    this.softWrap,
+    this.overflow,
+    this.textScaleFactor,
+    this.maxLines,
+    this.semanticsLabel,
+    this.textWidthBasis,
+    this.textHeightBehavior,
+    this.specialTextSpanBuilder,
+    this.onSpecialTextTap,
+    this.overFlowTextSpan,
+    this.selectionEnabled = false,
+    this.onTap,
+    this.selectionColor,
+    this.dragStartBehavior = DragStartBehavior.start,
+    this.textSelectionControls,
+    this.selectionHeightStyle = ui.BoxHeightStyle.tight,
+    this.selectionWidthStyle = ui.BoxWidthStyle.tight,
+  })  : assert(data != null),
+       
         textSpan = null,
         super(key: key);
 
   /// Creates a text widget with a [InlineSpan].
-  const ExtendedText.rich(this.textSpan,
-      {Key key,
-      this.style,
-      this.strutStyle,
-      this.textAlign,
-      this.textDirection,
-      this.locale,
-      this.softWrap,
-      this.overflow,
-      this.textScaleFactor,
-      this.maxLines,
-      this.semanticsLabel,
-      this.textWidthBasis,
-      this.onSpecialTextTap,
-      this.overFlowTextSpan,
-      this.selectionEnabled: false,
-      this.onTap,
-      this.selectionColor,
-      this.dragStartBehavior: DragStartBehavior.start,
-      this.textSelectionControls})
-      : assert(textSpan != null),
+  const ExtendedText.rich(
+    this.textSpan, {
+    Key key,
+    this.style,
+    this.strutStyle,
+    this.textAlign,
+    this.textDirection,
+    this.locale,
+    this.softWrap,
+    this.overflow,
+    this.textScaleFactor,
+    this.maxLines,
+    this.semanticsLabel,
+    this.textWidthBasis,
+    this.textHeightBehavior,
+    this.onSpecialTextTap,
+    this.overFlowTextSpan,
+    this.selectionEnabled = false,
+    this.onTap,
+    this.selectionColor,
+    this.dragStartBehavior = DragStartBehavior.start,
+    this.textSelectionControls,
+    this.selectionHeightStyle = ui.BoxHeightStyle.tight,
+    this.selectionWidthStyle = ui.BoxWidthStyle.tight,
+  })  : assert(textSpan != null),
         data = null,
         specialTextSpanBuilder = null,
         super(key: key);
+
+  /// Controls how tall the selection highlight boxes are computed to be.
+  ///
+  /// See [ui.BoxHeightStyle] for details on available styles.
+  final ui.BoxHeightStyle selectionHeightStyle;
+
+  /// Controls how wide the selection highlight boxes are computed to be.
+  ///
+  /// See [ui.BoxWidthStyle] for details on available styles.
+  final ui.BoxWidthStyle selectionWidthStyle;
 
   /// An interface for building the selection UI, to be provided by the
   /// implementor of the toolbar widget or handle widget
@@ -184,6 +202,9 @@ class ExtendedText extends StatelessWidget {
   /// {@macro flutter.dart:ui.text.TextWidthBasis}
   final TextWidthBasis textWidthBasis;
 
+  /// {@macro flutter.dart:ui.textHeightBehavior}
+  final ui.TextHeightBehavior textHeightBehavior;
+
 //  ExtendedRenderEditable get _renderEditable =>
 //      _editableTextKey.currentState.renderEditable;
   @override
@@ -199,12 +220,11 @@ class ExtendedText extends StatelessWidget {
     TextSpan innerTextSpan = specialTextSpanBuilder?.build(data,
         textStyle: effectiveTextStyle, onTap: onSpecialTextTap);
 
-    if (innerTextSpan == null)
-      innerTextSpan = TextSpan(
-        style: effectiveTextStyle,
-        text: data,
-        children: textSpan != null ? <TextSpan>[textSpan] : null,
-      );
+    innerTextSpan ??= TextSpan(
+      style: effectiveTextStyle,
+      text: data,
+      children: textSpan != null ? <InlineSpan>[textSpan] : null,
+    );
 
     //_createImageConfiguration(<InlineSpan>[innerTextSpan], context);
 
@@ -238,6 +258,9 @@ class ExtendedText extends StatelessWidget {
         onTap: onTap,
         data: data ?? textSpanToActualText(innerTextSpan),
         textSelectionControls: textSelectionControls,
+        textHeightBehavior:
+            textHeightBehavior ?? defaultTextStyle.textHeightBehavior,
+        textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
       );
     } else {
       result = ExtendedRichText(
@@ -253,16 +276,20 @@ class ExtendedText extends StatelessWidget {
         maxLines: maxLines ?? defaultTextStyle.maxLines,
         text: innerTextSpan,
         overFlowTextSpan: effectiveOverFlowTextSpan,
+        textHeightBehavior:
+            textHeightBehavior ?? defaultTextStyle.textHeightBehavior,
+        textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
       );
     }
 
     if (semanticsLabel != null) {
       result = Semantics(
-          textDirection: textDirection,
-          label: semanticsLabel,
-          child: ExcludeSemantics(
-            child: result,
-          ));
+        textDirection: textDirection,
+        label: semanticsLabel,
+        child: ExcludeSemantics(
+          child: result,
+        ),
+      );
     }
 
     return result;
@@ -304,6 +331,12 @@ class ExtendedText extends StatelessWidget {
     properties.add(
         DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: null));
     properties.add(IntProperty('maxLines', maxLines, defaultValue: null));
+    properties.add(EnumProperty<TextWidthBasis>(
+        'textWidthBasis', textWidthBasis,
+        defaultValue: null));
+    properties.add(DiagnosticsProperty<ui.TextHeightBehavior>(
+        'textHeightBehavior', textHeightBehavior,
+        defaultValue: null));
     if (semanticsLabel != null) {
       properties.add(StringProperty('semanticsLabel', semanticsLabel));
     }

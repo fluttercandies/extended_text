@@ -10,11 +10,11 @@ import 'extended_text_selection.dart';
 ///help to handle multiple selectionable text on same page.
 ///
 class ExtendedTextSelectionPointerHandler extends StatefulWidget {
-  final Widget child;
-  final TextSelectionPointerHandlerWidgetBuilder builder;
-  ExtendedTextSelectionPointerHandler({this.child, this.builder})
+  const ExtendedTextSelectionPointerHandler({this.child, this.builder})
       : assert(!(child == null && builder == null)),
         assert(!(child != null && builder != null));
+  final Widget child;
+  final TextSelectionPointerHandlerWidgetBuilder builder;
   @override
   ExtendedTextSelectionPointerHandlerState createState() =>
       ExtendedTextSelectionPointerHandlerState();
@@ -22,7 +22,7 @@ class ExtendedTextSelectionPointerHandler extends StatefulWidget {
 
 class ExtendedTextSelectionPointerHandlerState
     extends State<ExtendedTextSelectionPointerHandler> {
-  List<ExtendedTextSelectionState> _selectionStates =
+  final List<ExtendedTextSelectionState> _selectionStates =
       <ExtendedTextSelectionState>[];
   List<ExtendedTextSelectionState> get selectionStates => _selectionStates;
 
@@ -34,17 +34,17 @@ class ExtendedTextSelectionPointerHandlerState
     return Listener(
       child: widget.child,
       behavior: HitTestBehavior.translucent,
-      onPointerDown: (value) {
-        for (var state in _selectionStates) {
+      onPointerDown: (PointerDownEvent value) {
+        for (final ExtendedTextSelectionState state in _selectionStates) {
           if (!state.containsPosition(value.position)) {
             //clear other selection
             state.clearSelection();
           }
         }
       },
-      onPointerMove: (value) {
+      onPointerMove: (PointerMoveEvent value) {
         //clear other selection
-        for (var state in _selectionStates) {
+        for (final ExtendedTextSelectionState state in _selectionStates) {
           state.clearSelection();
         }
       },
