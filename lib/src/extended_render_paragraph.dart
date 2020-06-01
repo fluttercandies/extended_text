@@ -910,7 +910,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 //      rect,
 //    );
 
-    Offset endOffset = getCaretOffset(
+    final Offset endOffset = getCaretOffset(
         TextPosition(
           offset: endTextOffset,
         ),
@@ -1088,7 +1088,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     ///
 
     final Rect visibleRegion = Offset.zero & size;
-
+    //getCaretOffset already has effectiveOffset
     final Offset startOffset = getCaretOffset(
       TextPosition(
         offset: selection.start,
@@ -1106,19 +1106,17 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     // _applyFloatingPointHack. Ideally, the rounding mismatch will be fixed and
     // this can be changed to be a strict check instead of an approximation.
     const double visibleRegionSlop = 0.5;
-    _selectionStartInViewport.value = visibleRegion
-        .inflate(visibleRegionSlop)
-        .contains(startOffset + effectiveOffset);
-
+    _selectionStartInViewport.value =
+        visibleRegion.inflate(visibleRegionSlop).contains(startOffset);
+    //getCaretOffset already has effectiveOffset
     final Offset endOffset = getCaretOffset(
       TextPosition(offset: selection.end, affinity: selection.affinity),
       effectiveOffset: effectiveOffset,
       handleSpecialText: handleSpecialText,
     );
 
-    _selectionEndInViewport.value = visibleRegion
-        .inflate(visibleRegionSlop)
-        .contains(endOffset + effectiveOffset);
+    _selectionEndInViewport.value =
+        visibleRegion.inflate(visibleRegionSlop).contains(endOffset);
   }
 
   bool containsPosition(Offset position) {

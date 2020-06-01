@@ -1,3 +1,7 @@
+## [0.7.2]
+
+Fix wrong calculation about selection handles.
+
 ## [0.7.1]
 
 * Fix error about TargetPlatform.macOS
