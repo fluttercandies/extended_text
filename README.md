@@ -36,23 +36,18 @@ for example, follwing code show how to create @xxxx speical textSpan.
 
 ```dart
 class AtText extends SpecialText {
-  static const String flag = "@";
+  AtText(TextStyle textStyle, SpecialTextGestureTapCallback onTap,
+      {this.showAtBackground = false, this.start})
+      : super(flag, ' ', textStyle, onTap: onTap);
+  static const String flag = '@';
   final int start;
 
   /// whether show background for @somebody
   final bool showAtBackground;
 
-  AtText(TextStyle textStyle, SpecialTextGestureTapCallback onTap,
-      {this.showAtBackground: false, this.start})
-      : super(
-          flag,
-          " ",
-          textStyle,
-        );
-
   @override
   InlineSpan finishText() {
-    TextStyle textStyle =
+    final TextStyle textStyle =
         this.textStyle?.copyWith(color: Colors.blue, fontSize: 16.0);
 
     final String atText = toString();
@@ -69,7 +64,9 @@ class AtText extends SpecialText {
             style: textStyle,
             recognizer: (TapGestureRecognizer()
               ..onTap = () {
-                if (onTap != null) onTap(atText);
+                if (onTap != null) {
+                  onTap(atText);
+                }
               }))
         : SpecialTextSpan(
             text: atText,
@@ -78,11 +75,12 @@ class AtText extends SpecialText {
             style: textStyle,
             recognizer: (TapGestureRecognizer()
               ..onTap = () {
-                if (onTap != null) onTap(atText);
+                if (onTap != null) {
+                  onTap(atText);
+                }
               }));
   }
 }
-
 ```
 
 ### SpecialTextSpanBuilder
@@ -91,34 +89,40 @@ create your SpecialTextSpanBuilder
 
 ```dart
 class MySpecialTextSpanBuilder extends SpecialTextSpanBuilder {
+  MySpecialTextSpanBuilder({this.showAtBackground = false});
+
   /// whether show background for @somebody
   final bool showAtBackground;
-  final BuilderType type;
-  MySpecialTextSpanBuilder(
-      {this.showAtBackground: false, this.type: BuilderType.extendedText});
-
   @override
-  TextSpan build(String data, {TextStyle textStyle, onTap}) {
-    var textSpan = super.build(data, textStyle: textStyle, onTap: onTap);
-    return textSpan;
+  TextSpan build(String data,
+      {TextStyle textStyle, SpecialTextGestureTapCallback onTap}) {
+    if (kIsWeb) {
+      return TextSpan(text: data, style: textStyle);
+    }
+
+    return super.build(data, textStyle: textStyle, onTap: onTap);
   }
 
   @override
   SpecialText createSpecialText(String flag,
       {TextStyle textStyle, SpecialTextGestureTapCallback onTap, int index}) {
-    if (flag == null || flag == "") return null;
+    if (flag == null || flag == '') {
+      return null;
+    }
 
     ///index is end index of start flag, so text start index should be index-(flag.length-1)
     if (isStart(flag, AtText.flag)) {
-      return AtText(textStyle, onTap,
-          start: index - (AtText.flag.length - 1),
-          showAtBackground: showAtBackground,
-          type: type);
+      return AtText(
+        textStyle,
+        onTap,
+        start: index - (AtText.flag.length - 1),
+        showAtBackground: showAtBackground,
+      );
     } else if (isStart(flag, EmojiText.flag)) {
       return EmojiText(textStyle, start: index - (EmojiText.flag.length - 1));
     } else if (isStart(flag, DollarText.flag)) {
       return DollarText(textStyle, onTap,
-          start: index - (DollarText.flag.length - 1), type: type);
+          start: index - (DollarText.flag.length - 1));
     }
     return null;
   }
@@ -136,18 +140,18 @@ class MySpecialTextSpanBuilder extends SpecialTextSpanBuilder {
 show inline image by using ImageSpan.
 
 ```dart
-ImageSpan(
+class ImageSpan extends ExtendedWidgetSpan {
+  ImageSpan(
     ImageProvider image, {
     Key key,
     @required double imageWidth,
     @required double imageHeight,
     EdgeInsets margin,
-    int start: 0,
+    int start = 0,
     ui.PlaceholderAlignment alignment = ui.PlaceholderAlignment.bottom,
     String actualText,
     TextBaseline baseline,
-    TextStyle style,
-    BoxFit fit: BoxFit.scaleDown,
+    BoxFit fit= BoxFit.scaleDown,
     ImageLoadingBuilder loadingBuilder,
     ImageFrameBuilder frameBuilder,
     String semanticLabel,
@@ -160,13 +164,9 @@ ImageSpan(
     bool matchTextDirection = false,
     bool gaplessPlayback = false,
     FilterQuality filterQuality = FilterQuality.low,
+    GestureTapCallback onTap,
+    HitTestBehavior behavior = HitTestBehavior.deferToChild,
   })
-
-ImageSpan(AssetImage("xxx.jpg"),
-        imageWidth: size,
-        imageHeight: size,
-        margin: EdgeInsets.only(left: 2.0, bottom: 0.0, right: 2.0));
-  }
 ```
 
 | parameter   | description                                                                   | default  |
@@ -177,52 +177,6 @@ ImageSpan(AssetImage("xxx.jpg"),
 | margin      | The margin of image                                                           | -        |
 | actualText  | Actual text, take care of it when enable selection,something likes "\[love\]" | '\uFFFC' |
 | start       | Start index of text,take care of it when enable selection.                    | 0        |
-
-### Cache Image
-
-if you want cache the network image, you can use ExtendedNetworkImageProvider and clear them with clearDiskCachedImages
-
-import extended_image_library
-
-```dart
-dependencies:
-  extended_image_library: ^0.1.4
-```
-
-```dart
-ExtendedNetworkImageProvider(
-  this.url, {
-  this.scale = 1.0,
-  this.headers,
-  this.cache: false,
-  this.retries = 3,
-  this.timeLimit,
-  this.timeRetry = const Duration(milliseconds: 100),
-  CancellationToken cancelToken,
-})  : assert(url != null),
-      assert(scale != null),
-      cancelToken = cancelToken ?? CancellationToken();
-```
-
-| parameter   | description                                                                           | default             |
-| ----------- | ------------------------------------------------------------------------------------- | ------------------- |
-| url         | The URL from which the image will be fetched.                                         | required            |
-| scale       | The scale to place in the [ImageInfo] object of the image.                            | 1.0                 |
-| headers     | The HTTP headers that will be used with [HttpClient.get] to fetch image from network. | -                   |
-| cache       | whether cache image to local                                                          | false               |
-| retries     | the time to retry to request                                                          | 3                   |
-| timeLimit   | time limit to request image                                                           | -                   |
-| timeRetry   | the time duration to retry to request                                                 | milliseconds: 100   |
-| cancelToken | token to cancel network request                                                       | CancellationToken() |
-
-```dart
-/// Clear the disk cache directory then return if it succeed.
-///  <param name="duration">timespan to compute whether file has expired or not</param>
-Future<bool> clearDiskCachedImages({Duration duration}) async
-```
-
-[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/pages/custom_image_demo.dart)
-
 
 ## Selection
 
@@ -243,152 +197,21 @@ override buildToolbar or buildHandle to custom your toolbar widget or handle wid
 
 ```dart
 class MyExtendedMaterialTextSelectionControls
-    extends MaterialExtendedTextSelectionControls {
+    extends ExtendedMaterialTextSelectionControls {
   MyExtendedMaterialTextSelectionControls();
   @override
   Widget buildToolbar(
     BuildContext context,
     Rect globalEditableRegion,
     double textLineHeight,
-    Offset position,
+    Offset selectionMidpoint,
     List<TextSelectionPoint> endpoints,
     TextSelectionDelegate delegate,
-  ) {
-    assert(debugCheckHasMediaQuery(context));
-    assert(debugCheckHasMaterialLocalizations(context));
-
-    // The toolbar should appear below the TextField
-    // when there is not enough space above the TextField to show it.
-    final TextSelectionPoint startTextSelectionPoint = endpoints[0];
-    final TextSelectionPoint endTextSelectionPoint =
-        (endpoints.length > 1) ? endpoints[1] : null;
-    final double x = (endTextSelectionPoint == null)
-        ? startTextSelectionPoint.point.dx
-        : (startTextSelectionPoint.point.dx + endTextSelectionPoint.point.dx) /
-            2.0;
-    final double availableHeight = globalEditableRegion.top -
-        MediaQuery.of(context).padding.top -
-        _kToolbarScreenPadding;
-    final double y = (availableHeight < _kToolbarHeight)
-        ? startTextSelectionPoint.point.dy +
-            globalEditableRegion.height +
-            _kToolbarHeight +
-            _kToolbarScreenPadding
-        : startTextSelectionPoint.point.dy - textLineHeight * 2.0;
-    final Offset preciseMidpoint = Offset(x, y);
-
-    return ConstrainedBox(
-      constraints: BoxConstraints.tight(globalEditableRegion.size),
-      child: CustomSingleChildLayout(
-        delegate: MaterialExtendedTextSelectionToolbarLayout(
-          MediaQuery.of(context).size,
-          globalEditableRegion,
-          preciseMidpoint,
-        ),
-        child: _TextSelectionToolbar(
-          handleCut: canCut(delegate) ? () => handleCut(delegate) : null,
-          handleCopy: canCopy(delegate) ? () => handleCopy(delegate) : null,
-          handlePaste: canPaste(delegate) ? () => handlePaste(delegate) : null,
-          handleSelectAll:
-              canSelectAll(delegate) ? () => handleSelectAll(delegate) : null,
-          handleLike: () {
-            //mailto:<email address>?subject=<subject>&body=<body>, e.g.
-            launch(
-                "mailto:zmtzawqlp@live.com?subject=extended_text_share&body=${delegate.textEditingValue.text}");
-            delegate.hideToolbar();
-            //clear selecction
-            delegate.textEditingValue = delegate.textEditingValue.copyWith(
-                selection: TextSelection.collapsed(
-                    offset: delegate.textEditingValue.selection.end));
-          },
-        ),
-      ),
-    );
-  }
-
+  ) {}
+  
   @override
   Widget buildHandle(
       BuildContext context, TextSelectionHandleType type, double textHeight) {
-    final Widget handle = SizedBox(
-      width: _kHandleSize,
-      height: _kHandleSize,
-      child: Image.asset("assets/love.png"),
-    );
-
-    // [handle] is a circle, with a rectangle in the top left quadrant of that
-    // circle (an onion pointing to 10:30). We rotate [handle] to point
-    // straight up or up-right depending on the handle type.
-    switch (type) {
-      case TextSelectionHandleType.left: // points up-right
-        return Transform.rotate(
-          angle: math.pi / 4.0,
-          child: handle,
-        );
-      case TextSelectionHandleType.right: // points up-left
-        return Transform.rotate(
-          angle: -math.pi / 4.0,
-          child: handle,
-        );
-      case TextSelectionHandleType.collapsed: // points up
-        return handle;
-    }
-    assert(type != null);
-    return null;
-  }
-}
-
-/// Manages a copy/paste text selection toolbar.
-class _TextSelectionToolbar extends StatelessWidget {
-  const _TextSelectionToolbar({
-    Key key,
-    this.handleCopy,
-    this.handleSelectAll,
-    this.handleCut,
-    this.handlePaste,
-    this.handleLike,
-  }) : super(key: key);
-
-  final VoidCallback handleCut;
-  final VoidCallback handleCopy;
-  final VoidCallback handlePaste;
-  final VoidCallback handleSelectAll;
-  final VoidCallback handleLike;
-
-  @override
-  Widget build(BuildContext context) {
-    final List<Widget> items = <Widget>[];
-    final MaterialLocalizations localizations =
-        MaterialLocalizations.of(context);
-
-    if (handleCut != null)
-      items.add(FlatButton(
-          child: Text(localizations.cutButtonLabel), onPressed: handleCut));
-    if (handleCopy != null)
-      items.add(FlatButton(
-          child: Text(localizations.copyButtonLabel), onPressed: handleCopy));
-    if (handlePaste != null)
-      items.add(FlatButton(
-        child: Text(localizations.pasteButtonLabel),
-        onPressed: handlePaste,
-      ));
-    if (handleSelectAll != null)
-      items.add(FlatButton(
-          child: Text(localizations.selectAllButtonLabel),
-          onPressed: handleSelectAll));
-
-    if (handleLike != null)
-      items.add(FlatButton(child: Icon(Icons.favorite), onPressed: handleLike));
-
-    // If there is no option available, build an empty widget.
-    if (items.isEmpty) {
-      return Container(width: 0.0, height: 0.0);
-    }
-
-    return Material(
-      elevation: 1.0,
-      child: Wrap(children: items),
-      borderRadius: BorderRadius.all(Radius.circular(10.0)),
-    );
   }
 }
 
@@ -472,21 +295,34 @@ refer to issues [24335](https://github.com/flutter/flutter/issues/24335)/[24337]
 
 refer to issue [26748](https://github.com/flutter/flutter/issues/26748)
 
+| parameter   | description                                                  | default             |
+| ----------- | ------------------------------------------------------------ | ------------------- |
+| child       | The widget of TextOverflow.                                  | @required           |
+| maxHeight   | The maxHeight of [TextOverflowWidget], default is preferredLineHeight. | preferredLineHeight |
+| align       | The Align of [TextOverflowWidget], left/right.               | right               |
+| fixedOffset | Fixed offset refer to the Text Overflow Rect and [child].    | -                   |
+
 ```dart
   ExtendedText(...
-      overFlowTextSpan: OverFlowTextSpan(children: <TextSpan>[
-              TextSpan(text: '  \u2026  '),
-              TextSpan(
-                  text: "more detail",
-                  style: TextStyle(
-                    color: Colors.blue,
+            overFlowWidget:
+                TextOverflowWidget(
+                    //maxHeight: double.infinity,
+                    //align: TextOverflowAlign.right,
+                    //fixedOffset: Offset.zero,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        const Text('\u2026 '),
+                        RaisedButton(
+                          child: const Text('more'),
+                          onPressed: () {
+                            launch(
+                                'https://github.com/fluttercandies/extended_text');
+                          },
+                        )
+                      ],
+                    ),
                   ),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () {
-                      launch(
-                          "https://github.com/fluttercandies/extended_text");
-                    })
-            ]),
             ...
           )
 ```

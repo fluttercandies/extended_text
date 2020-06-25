@@ -26,7 +26,7 @@ class BackgroundTextDemo extends StatelessWidget {
                 Text.rich(TextSpan(children: <TextSpan>[
                   TextSpan(
                       text: '24335',
-                      style: const TextStyle(color: Colors.blue),
+                      style: const TextStyle(color: Colors.blue,),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
                           launch(

@@ -5,9 +5,7 @@
 
 import 'package:flutter/widgets.dart';
 
-import 'package:flutter_candies_demo_library/flutter_candies_demo_library_route.dart';
 import 'pages/background_text_demo.dart';
-import 'pages/custom_image_demo.dart';
 import 'pages/custom_text_overflow_demo.dart';
 import 'pages/main_page.dart';
 import 'pages/text_demo.dart';
@@ -22,13 +20,6 @@ RouteResult getRouteResult({String name, Map<String, dynamic> arguments}) {
         widget: BackgroundTextDemo(),
         routeName: 'BackgroundText',
         description: 'workaround for issue 24335/24337 about background',
-      );
-    case 'fluttercandies://CustomImageDemo':
-      return RouteResult(
-        name: name,
-        widget: CustomImageDemo(),
-        routeName: 'CustomImage',
-        description: 'custom inline-image in text',
       );
     case 'fluttercandies://CustomTextOverflowDemo':
       return RouteResult(
@@ -56,18 +47,6 @@ RouteResult getRouteResult({String name, Map<String, dynamic> arguments}) {
         name: name,
         widget: MainPage(),
         routeName: 'MainPage',
-      );
-    case 'fluttercandies://picswiper':
-      return RouteResult(
-        name: name,
-        widget: PicSwiper(
-          index: arguments['index'],
-          pics: arguments['pics'],
-          tuChongItem: arguments['tuChongItem'],
-        ),
-        showStatusBar: false,
-        routeName: 'PicSwiper',
-        pageRouteType: PageRouteType.transparent,
       );
     default:
       return const RouteResult(name: 'flutterCandies://notfound');

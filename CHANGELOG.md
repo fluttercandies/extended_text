@@ -1,3 +1,8 @@
+## [2.0.0]
+
+* Support OverFlowWidget [ExtendedText].
+* Breaking change: remove overFlowTextSpan.
+
 ## [1.0.1]
 
 * Fix wrong calculation about selection handles.
@@ -10,15 +15,15 @@
 ## [0.7.1]
 
 * Fix error about TargetPlatform.macOS
-  
+
 ## [0.7.0]
 
 * Fix issue that Index out of range for overflow WidgetSpan
-  
+
 ## [0.6.9]
 
 * Fix issue that TextPainter was not layout
-  
+
 ## [0.6.8]
 
 * extract method for TextSelection
@@ -58,20 +63,20 @@
 
 ## [0.5.8]
 
-* Breaking change: 
+* Breaking change:
   Remove background parameter of [OverFlowTextSpan]
 
 ## [0.5.7]
 
-* Issue: 
+* Issue:
   Fix textEditingValue and textSelectionControls are not update when didUpdateWidget
 
 ## [0.5.4]
 
-* Feature: 
+* Feature:
   Support text selection
-* Issue: 
-   Fix issue about rect of overFlowTextSpan 
+* Issue:
+   Fix issue about rect of overFlowTextSpan
 
 ## [0.5.3]
 
@@ -142,11 +147,11 @@
 ## [0.2.8]
 
 * Change SpecialTextGestureTapCallback input from string to dynamic
- 
+
 ## [0.2.7]
 
-* Change BeforePaintImage function to BeforePaintTextImage 
-  Change AfterPaintImage function to AfterPaintTextImage 
+* Change BeforePaintImage function to BeforePaintTextImage
+  Change AfterPaintImage function to AfterPaintTextImage
 
 ## [0.2.5]
 
@@ -155,7 +160,7 @@
 ## [0.2.4]
 
 * Add TextPainter wholeTextPainter for BackgroundTextSpan's paintBackground call back,so that you can get info for
-  whole text painter. 
+  whole text painter.
 
 ## [0.2.2]
 
