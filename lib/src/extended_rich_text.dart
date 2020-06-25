@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:extended_text/src/extended_render_paragraph.dart';
-import 'package:extended_text/src/over_flow_text_span.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:extended_text_library/extended_text_library.dart';
+import 'text_overflow_widget.dart';
 
 ///  * [TextStyle], which discusses how to style text.
 ///  * [TextSpan], which is used to describe the text in a paragraph.
@@ -30,7 +30,6 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
     this.textScaleFactor = 1.0,
     this.maxLines,
     this.locale,
-    this.overFlowTextSpan,
     this.onSelectionChanged,
     this.strutStyle,
     this.textWidthBasis = TextWidthBasis.parent,
@@ -41,6 +40,7 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
     this.textHeightBehavior,
     this.selectionHeightStyle = BoxHeightStyle.tight,
     this.selectionWidthStyle = BoxWidthStyle.tight,
+    this.overFlowWidget,
   })  : assert(text != null),
         assert(textAlign != null),
         assert(softWrap != null),
@@ -48,11 +48,11 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
         assert(textScaleFactor != null),
         assert(maxLines == null || maxLines > 0),
         assert(textWidthBasis != null),
-        super(key: key, children: _extractChildren(text));
+        super(key: key, children: _extractChildren(text, overFlowWidget));
 
   // Traverses the InlineSpan tree and depth-first collects the list of
   // child widgets that are created in WidgetSpans.
-  static List<Widget> _extractChildren(InlineSpan span) {
+  static List<Widget> _extractChildren(InlineSpan span, TextOverflowWidget overFlowWidget) {
     final List<Widget> result = <Widget>[];
     span.visitChildren((InlineSpan span) {
       if (span is WidgetSpan) {
@@ -60,6 +60,9 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       }
       return true;
     });
+    if (overFlowWidget != null) {
+      result.add(overFlowWidget);
+    }
     return result;
   }
 
@@ -72,9 +75,6 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
   final Color selectionColor;
 
   final TextSelectionChangedHandler onSelectionChanged;
-
-  /// the custom text over flow TextSpan
-  final OverFlowTextSpan overFlowTextSpan;
 
   /// The text to display in this widget.
   final InlineSpan text;
@@ -140,6 +140,8 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
   final LayerLink startHandleLayerLink;
   final LayerLink endHandleLayerLink;
 
+  final TextOverflowWidget overFlowWidget;
+
   @override
   ExtendedRenderParagraph createRenderObject(BuildContext context) {
     assert(textDirection != null || debugCheckHasDirectionality(context));
@@ -158,7 +160,6 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
             context,
             nullOk: true,
           ),
-      overFlowTextSpan: overFlowTextSpan,
       selection: selection,
       onSelectionChanged: onSelectionChanged,
       selectionColor: selectionColor,
@@ -167,6 +168,7 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       textHeightBehavior: textHeightBehavior,
       selectionWidthStyle: selectionWidthStyle,
       selectionHeightStyle: selectionHeightStyle,
+      overFlowWidget:overFlowWidget,
     );
   }
 
@@ -185,7 +187,6 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       ..strutStyle = strutStyle
       ..textWidthBasis = textWidthBasis
       ..locale = locale ?? Localizations.localeOf(context, nullOk: true)
-      ..overFlowTextSpan = overFlowTextSpan
       ..selection = selection
       ..selectionColor = selectionColor
       ..onSelectionChanged = onSelectionChanged
@@ -193,7 +194,8 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       ..endHandleLayerLink = endHandleLayerLink
       ..textHeightBehavior = textHeightBehavior
       ..selectionWidthStyle = selectionWidthStyle
-      ..selectionHeightStyle = selectionHeightStyle;
+      ..selectionHeightStyle = selectionHeightStyle
+      ..overFlowWidget =overFlowWidget;
   }
 
   @override

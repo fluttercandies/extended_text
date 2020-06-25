@@ -7,8 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../extended_render_paragraph.dart';
 import '../extended_rich_text.dart';
-import '../over_flow_text_span.dart';
+import '../text_overflow_widget.dart';
 import 'extended_text_selection_pointer_handler.dart';
+
 
 ///
 ///  create by zmtzawqlp on 2019/6/5
@@ -25,7 +26,6 @@ class ExtendedTextSelection extends StatefulWidget {
       this.textScaleFactor,
       this.overflow,
       this.text,
-      this.overFlowTextSpan,
       this.selectionColor,
       this.dragStartBehavior,
       this.data,
@@ -34,10 +34,12 @@ class ExtendedTextSelection extends StatefulWidget {
       this.textHeightBehavior,
       this.selectionHeightStyle = BoxHeightStyle.tight,
       this.selectionWidthStyle = BoxWidthStyle.tight,
+      this.overFlowWidget,
       Key key})
       : assert(selectionHeightStyle != null),
         assert(selectionWidthStyle != null),
         super(key: key);
+  final TextOverflowWidget overFlowWidget;
 
   /// Controls how tall the selection highlight boxes are computed to be.
   ///
@@ -116,9 +118,6 @@ class ExtendedTextSelection extends StatefulWidget {
   final TextSpan text;
 
   final Color selectionColor;
-
-  /// the custom text over flow TextSpan
-  final OverFlowTextSpan overFlowTextSpan;
 
   final DragStartBehavior dragStartBehavior;
 
@@ -234,7 +233,6 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
                 textScaleFactor: widget.textScaleFactor,
                 maxLines: widget.maxLines,
                 text: widget.text,
-                overFlowTextSpan: widget.overFlowTextSpan,
                 key: _renderParagraphKey,
                 selectionColor: widget.selectionColor,
                 selection: textEditingValue.selection,
@@ -244,6 +242,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
                 textWidthBasis: widget.textWidthBasis,
                 selectionWidthStyle: widget.selectionWidthStyle,
                 selectionHeightStyle: widget.selectionHeightStyle,
+                overFlowWidget: widget.overFlowWidget,
               ),
             )));
 

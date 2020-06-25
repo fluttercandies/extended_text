@@ -63,7 +63,7 @@ packages:
       path: "E:\\Flutter\\FlutterCandies\\dev\\extended_text_library"
       relative: false
     source: path
-    version: "0.5.4"
+    version: "2.0.0"
   flutter:
     dependency: "direct main"
     description: flutter

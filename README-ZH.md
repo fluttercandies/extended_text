@@ -47,23 +47,18 @@ extended_text 帮助将字符串文本快速转换为特殊的TextSpan
 
 ```dart
 class AtText extends SpecialText {
-  static const String flag = "@";
+  AtText(TextStyle textStyle, SpecialTextGestureTapCallback onTap,
+      {this.showAtBackground = false, this.start})
+      : super(flag, ' ', textStyle, onTap: onTap);
+  static const String flag = '@';
   final int start;
 
   /// whether show background for @somebody
   final bool showAtBackground;
 
-  AtText(TextStyle textStyle, SpecialTextGestureTapCallback onTap,
-      {this.showAtBackground: false, this.start})
-      : super(
-          flag,
-          " ",
-          textStyle,
-        );
-
   @override
   InlineSpan finishText() {
-    TextStyle textStyle =
+    final TextStyle textStyle =
         this.textStyle?.copyWith(color: Colors.blue, fontSize: 16.0);
 
     final String atText = toString();
@@ -80,7 +75,9 @@ class AtText extends SpecialText {
             style: textStyle,
             recognizer: (TapGestureRecognizer()
               ..onTap = () {
-                if (onTap != null) onTap(atText);
+                if (onTap != null) {
+                  onTap(atText);
+                }
               }))
         : SpecialTextSpan(
             text: atText,
@@ -89,7 +86,9 @@ class AtText extends SpecialText {
             style: textStyle,
             recognizer: (TapGestureRecognizer()
               ..onTap = () {
-                if (onTap != null) onTap(atText);
+                if (onTap != null) {
+                  onTap(atText);
+                }
               }));
   }
 }
@@ -105,34 +104,40 @@ class AtText extends SpecialText {
 
 ```dart
 class MySpecialTextSpanBuilder extends SpecialTextSpanBuilder {
+  MySpecialTextSpanBuilder({this.showAtBackground = false});
+
   /// whether show background for @somebody
   final bool showAtBackground;
-  final BuilderType type;
-  MySpecialTextSpanBuilder(
-      {this.showAtBackground: false, this.type: BuilderType.extendedText});
-
   @override
-  TextSpan build(String data, {TextStyle textStyle, onTap}) {
-    var textSpan = super.build(data, textStyle: textStyle, onTap: onTap);
-    return textSpan;
+  TextSpan build(String data,
+      {TextStyle textStyle, SpecialTextGestureTapCallback onTap}) {
+    if (kIsWeb) {
+      return TextSpan(text: data, style: textStyle);
+    }
+
+    return super.build(data, textStyle: textStyle, onTap: onTap);
   }
 
   @override
   SpecialText createSpecialText(String flag,
       {TextStyle textStyle, SpecialTextGestureTapCallback onTap, int index}) {
-    if (flag == null || flag == "") return null;
+    if (flag == null || flag == '') {
+      return null;
+    }
 
     ///index is end index of start flag, so text start index should be index-(flag.length-1)
     if (isStart(flag, AtText.flag)) {
-      return AtText(textStyle, onTap,
-          start: index - (AtText.flag.length - 1),
-          showAtBackground: showAtBackground,
-          type: type);
+      return AtText(
+        textStyle,
+        onTap,
+        start: index - (AtText.flag.length - 1),
+        showAtBackground: showAtBackground,
+      );
     } else if (isStart(flag, EmojiText.flag)) {
       return EmojiText(textStyle, start: index - (EmojiText.flag.length - 1));
     } else if (isStart(flag, DollarText.flag)) {
       return DollarText(textStyle, onTap,
-          start: index - (DollarText.flag.length - 1), type: type);
+          start: index - (DollarText.flag.length - 1));
     }
     return null;
   }
@@ -195,52 +200,6 @@ ImageSpan(AssetImage("xxx.jpg"),
 | actualText  | 真实的文本,当你开启文本选择功能的时候，必须设置,比如图片"\[love\] | 空占位符'\uFFFC' |
 | start       | 在文本字符串中的开始位置,当你开启文本选择功能的时候，必须设置     | 0                |
 
-### 缓存图片
-
-你可以用ExtendedNetworkImageProvider来缓存文本中的图片，使用clearDiskCachedImages方法来清掉本地缓存
-
-引入 extended_image_library
-
-```dart
-dependencies:
-  extended_image_library: ^0.1.4
-```
-
-```dart
-ExtendedNetworkImageProvider(
-  this.url, {
-  this.scale = 1.0,
-  this.headers,
-  this.cache: false,
-  this.retries = 3,
-  this.timeLimit,
-  this.timeRetry = const Duration(milliseconds: 100),
-  CancellationToken cancelToken,
-})  : assert(url != null),
-      assert(scale != null),
-      cancelToken = cancelToken ?? CancellationToken();
-```
-
-| 参数        | 描述                | 默认                |
-| ----------- | ------------------- | ------------------- |
-| url         | 网络请求地址        | required            |
-| scale       | ImageInfo中的scale  | 1.0                 |
-| headers     | HttpClient的headers | -                   |
-| cache       | 是否缓存到本地      | false               |
-| retries     | 请求尝试次数        | 3                   |
-| timeLimit   | 请求超时            | -                   |
-| timeRetry   | 请求重试间隔        | milliseconds: 100   |
-| cancelToken | 用于取消请求的Token | CancellationToken() |
-
-```dart
-/// Clear the disk cache directory then return if it succeed.
-///  <param name="duration">timespan to compute whether file has expired or not</param>
-Future<bool> clearDiskCachedImages({Duration duration}) async
-```
-
-[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/pages/custom_image_demo.dart)
-
-
 ## 文本选择
 
 ![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/selection.gif)
@@ -260,152 +219,21 @@ extended_text提供了默认的控制器MaterialExtendedTextSelectionControls/Cu
 
 ```dart
 class MyExtendedMaterialTextSelectionControls
-    extends MaterialExtendedTextSelectionControls {
+    extends ExtendedMaterialTextSelectionControls {
   MyExtendedMaterialTextSelectionControls();
   @override
   Widget buildToolbar(
     BuildContext context,
     Rect globalEditableRegion,
     double textLineHeight,
-    Offset position,
+    Offset selectionMidpoint,
     List<TextSelectionPoint> endpoints,
     TextSelectionDelegate delegate,
-  ) {
-    assert(debugCheckHasMediaQuery(context));
-    assert(debugCheckHasMaterialLocalizations(context));
-
-    // The toolbar should appear below the TextField
-    // when there is not enough space above the TextField to show it.
-    final TextSelectionPoint startTextSelectionPoint = endpoints[0];
-    final TextSelectionPoint endTextSelectionPoint =
-        (endpoints.length > 1) ? endpoints[1] : null;
-    final double x = (endTextSelectionPoint == null)
-        ? startTextSelectionPoint.point.dx
-        : (startTextSelectionPoint.point.dx + endTextSelectionPoint.point.dx) /
-            2.0;
-    final double availableHeight = globalEditableRegion.top -
-        MediaQuery.of(context).padding.top -
-        _kToolbarScreenPadding;
-    final double y = (availableHeight < _kToolbarHeight)
-        ? startTextSelectionPoint.point.dy +
-            globalEditableRegion.height +
-            _kToolbarHeight +
-            _kToolbarScreenPadding
-        : startTextSelectionPoint.point.dy - textLineHeight * 2.0;
-    final Offset preciseMidpoint = Offset(x, y);
-
-    return ConstrainedBox(
-      constraints: BoxConstraints.tight(globalEditableRegion.size),
-      child: CustomSingleChildLayout(
-        delegate: MaterialExtendedTextSelectionToolbarLayout(
-          MediaQuery.of(context).size,
-          globalEditableRegion,
-          preciseMidpoint,
-        ),
-        child: _TextSelectionToolbar(
-          handleCut: canCut(delegate) ? () => handleCut(delegate) : null,
-          handleCopy: canCopy(delegate) ? () => handleCopy(delegate) : null,
-          handlePaste: canPaste(delegate) ? () => handlePaste(delegate) : null,
-          handleSelectAll:
-              canSelectAll(delegate) ? () => handleSelectAll(delegate) : null,
-          handleLike: () {
-            //mailto:<email address>?subject=<subject>&body=<body>, e.g.
-            launch(
-                "mailto:zmtzawqlp@live.com?subject=extended_text_share&body=${delegate.textEditingValue.text}");
-            delegate.hideToolbar();
-            //clear selecction
-            delegate.textEditingValue = delegate.textEditingValue.copyWith(
-                selection: TextSelection.collapsed(
-                    offset: delegate.textEditingValue.selection.end));
-          },
-        ),
-      ),
-    );
-  }
-
+  ) {}
+  
   @override
   Widget buildHandle(
       BuildContext context, TextSelectionHandleType type, double textHeight) {
-    final Widget handle = SizedBox(
-      width: _kHandleSize,
-      height: _kHandleSize,
-      child: Image.asset("assets/love.png"),
-    );
-
-    // [handle] is a circle, with a rectangle in the top left quadrant of that
-    // circle (an onion pointing to 10:30). We rotate [handle] to point
-    // straight up or up-right depending on the handle type.
-    switch (type) {
-      case TextSelectionHandleType.left: // points up-right
-        return Transform.rotate(
-          angle: math.pi / 4.0,
-          child: handle,
-        );
-      case TextSelectionHandleType.right: // points up-left
-        return Transform.rotate(
-          angle: -math.pi / 4.0,
-          child: handle,
-        );
-      case TextSelectionHandleType.collapsed: // points up
-        return handle;
-    }
-    assert(type != null);
-    return null;
-  }
-}
-
-/// Manages a copy/paste text selection toolbar.
-class _TextSelectionToolbar extends StatelessWidget {
-  const _TextSelectionToolbar({
-    Key key,
-    this.handleCopy,
-    this.handleSelectAll,
-    this.handleCut,
-    this.handlePaste,
-    this.handleLike,
-  }) : super(key: key);
-
-  final VoidCallback handleCut;
-  final VoidCallback handleCopy;
-  final VoidCallback handlePaste;
-  final VoidCallback handleSelectAll;
-  final VoidCallback handleLike;
-
-  @override
-  Widget build(BuildContext context) {
-    final List<Widget> items = <Widget>[];
-    final MaterialLocalizations localizations =
-        MaterialLocalizations.of(context);
-
-    if (handleCut != null)
-      items.add(FlatButton(
-          child: Text(localizations.cutButtonLabel), onPressed: handleCut));
-    if (handleCopy != null)
-      items.add(FlatButton(
-          child: Text(localizations.copyButtonLabel), onPressed: handleCopy));
-    if (handlePaste != null)
-      items.add(FlatButton(
-        child: Text(localizations.pasteButtonLabel),
-        onPressed: handlePaste,
-      ));
-    if (handleSelectAll != null)
-      items.add(FlatButton(
-          child: Text(localizations.selectAllButtonLabel),
-          onPressed: handleSelectAll));
-
-    if (handleLike != null)
-      items.add(FlatButton(child: Icon(Icons.favorite), onPressed: handleLike));
-
-    // If there is no option available, build an empty widget.
-    if (items.isEmpty) {
-      return Container(width: 0.0, height: 0.0);
-    }
-
-    return Material(
-      elevation: 1.0,
-      child: Wrap(children: items),
-      borderRadius: BorderRadius.all(Radius.circular(10.0)),
-    );
   }
 }
 
@@ -489,21 +317,34 @@ Text背景相关的issue[24335](https://github.com/flutter/flutter/issues/24335)
 
 文本溢出相关issue [26748](https://github.com/flutter/flutter/issues/26748)
 
+| parameter   | description                                                  | default             |
+| ----------- | ------------------------------------------------------------ | ------------------- |
+| child       | The widget of TextOverflow.                                  | @required           |
+| maxHeight   | Widget的最大高度，默认为 TextPaint计算出来的行高 preferredLineHeight. | preferredLineHeight |
+| align       | left，靠近最后裁剪文本；right，靠近文本的右下角              | right               |
+| fixedOffset | 调整Widget的位置                                             | -                   |
+
 ```dart
   ExtendedText(...
-      overFlowTextSpan: OverFlowTextSpan(children: <TextSpan>[
-              TextSpan(text: '  \u2026  '),
-              TextSpan(
-                  text: "more detail",
-                  style: TextStyle(
-                    color: Colors.blue,
+            overFlowWidget:
+                TextOverflowWidget(
+                    //maxHeight: double.infinity,
+                    //align: TextOverflowAlign.right,
+                    //fixedOffset: Offset.zero,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        const Text('\u2026 '),
+                        RaisedButton(
+                          child: const Text('more'),
+                          onPressed: () {
+                            launch(
+                                'https://github.com/fluttercandies/extended_text');
+                          },
+                        )
+                      ],
+                    ),
                   ),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () {
-                      launch(
-                          "https://github.com/fluttercandies/extended_text");
-                    })
-            ]),
             ...
           )
 ```

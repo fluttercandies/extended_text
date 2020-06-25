@@ -1,7 +1,6 @@
 import 'dart:ui' as ui show TextHeightBehavior, BoxWidthStyle, BoxHeightStyle;
 import 'package:extended_text/extended_text.dart';
 import 'package:extended_text/src/extended_rich_text.dart';
-import 'package:extended_text/src/over_flow_text_span.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +27,6 @@ class ExtendedText extends StatelessWidget {
     this.textHeightBehavior,
     this.specialTextSpanBuilder,
     this.onSpecialTextTap,
-    this.overFlowTextSpan,
     this.selectionEnabled = false,
     this.onTap,
     this.selectionColor,
@@ -36,8 +34,9 @@ class ExtendedText extends StatelessWidget {
     this.textSelectionControls,
     this.selectionHeightStyle = ui.BoxHeightStyle.tight,
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
+    this.overFlowWidget,
   })  : assert(data != null),
-       
+
         textSpan = null,
         super(key: key);
 
@@ -58,7 +57,6 @@ class ExtendedText extends StatelessWidget {
     this.textWidthBasis,
     this.textHeightBehavior,
     this.onSpecialTextTap,
-    this.overFlowTextSpan,
     this.selectionEnabled = false,
     this.onTap,
     this.selectionColor,
@@ -66,10 +64,15 @@ class ExtendedText extends StatelessWidget {
     this.textSelectionControls,
     this.selectionHeightStyle = ui.BoxHeightStyle.tight,
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
+    this.overFlowWidget,
   })  : assert(textSpan != null),
         data = null,
         specialTextSpanBuilder = null,
         super(key: key);
+
+  /// maxheight is equal to textPainter.preferredLineHeight
+  /// maxWidth is equal to textPainter.width
+  final TextOverflowWidget overFlowWidget;
 
   /// Controls how tall the selection highlight boxes are computed to be.
   ///
@@ -96,9 +99,6 @@ class ExtendedText extends StatelessWidget {
 
   ///whether enable selection
   final bool selectionEnabled;
-
-  /// the custom text over flow TextSpan
-  final OverFlowTextSpan overFlowTextSpan;
 
   /// The text to display.
   ///
@@ -228,16 +228,6 @@ class ExtendedText extends StatelessWidget {
 
     //_createImageConfiguration(<InlineSpan>[innerTextSpan], context);
 
-    OverFlowTextSpan effectiveOverFlowTextSpan;
-    if (overFlowTextSpan != null) {
-      effectiveOverFlowTextSpan = OverFlowTextSpan(
-        recognizer: overFlowTextSpan.recognizer,
-        text: overFlowTextSpan.text,
-        style: overFlowTextSpan.style ?? effectiveTextStyle,
-        children: overFlowTextSpan.children,
-      );
-    }
-
     Widget result;
     if (selectionEnabled) {
       result = ExtendedTextSelection(
@@ -252,7 +242,6 @@ class ExtendedText extends StatelessWidget {
             textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
         maxLines: maxLines ?? defaultTextStyle.maxLines,
         text: innerTextSpan,
-        overFlowTextSpan: effectiveOverFlowTextSpan,
         selectionColor: selectionColor ?? Theme.of(context).textSelectionColor,
         dragStartBehavior: dragStartBehavior,
         onTap: onTap,
@@ -261,6 +250,7 @@ class ExtendedText extends StatelessWidget {
         textHeightBehavior:
             textHeightBehavior ?? defaultTextStyle.textHeightBehavior,
         textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
+        overFlowWidget: overFlowWidget,
       );
     } else {
       result = ExtendedRichText(
@@ -275,10 +265,10 @@ class ExtendedText extends StatelessWidget {
             textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
         maxLines: maxLines ?? defaultTextStyle.maxLines,
         text: innerTextSpan,
-        overFlowTextSpan: effectiveOverFlowTextSpan,
         textHeightBehavior:
             textHeightBehavior ?? defaultTextStyle.textHeightBehavior,
         textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
+        overFlowWidget: overFlowWidget,
       );
     }
 

@@ -4,83 +4,58 @@
 // **************************************************************************
 const List<String> routeNames = <String>[
   'fluttercandies://BackgroundTextDemo',
-  'fluttercandies://CustomImageDemo',
   'fluttercandies://CustomTextOverflowDemo',
   'fluttercandies://TextDemo',
   'fluttercandies://TextSelectionDemo',
   'fluttercandies://mainpage',
-  'fluttercandies://picswiper'
 ];
 
 class Routes {
   const Routes._();
 
-  /// "workaround for issue 24335/24337 about background"
+  /// 'workaround for issue 24335/24337 about background'
   ///
-  /// [name] : fluttercandies://BackgroundTextDemo
+  /// [name] : 'fluttercandies://BackgroundTextDemo'
   ///
-  /// [routeName] : BackgroundText
+  /// [routeName] : 'BackgroundText'
   ///
-  /// [description] : "workaround for issue 24335/24337 about background"
+  /// [description] : 'workaround for issue 24335/24337 about background'
   static const String fluttercandiesBackgroundTextDemo =
       'fluttercandies://BackgroundTextDemo';
 
-  /// "custom inline-image in text"
+  /// 'workaround for issue 26748. how to custom text overflow'
   ///
-  /// [name] : fluttercandies://CustomImageDemo
+  /// [name] : 'fluttercandies://CustomTextOverflowDemo'
   ///
-  /// [routeName] : CustomImage
+  /// [routeName] : 'CustomTextOverflow'
   ///
-  /// [description] : "custom inline-image in text"
-  static const String fluttercandiesCustomImageDemo =
-      'fluttercandies://CustomImageDemo';
-
-  /// "workaround for issue 26748. how to custom text overflow"
-  ///
-  /// [name] : fluttercandies://CustomTextOverflowDemo
-  ///
-  /// [routeName] : CustomTextOverflow
-  ///
-  /// [description] : "workaround for issue 26748. how to custom text overflow"
+  /// [description] : 'workaround for issue 26748. how to custom text overflow'
   static const String fluttercandiesCustomTextOverflowDemo =
       'fluttercandies://CustomTextOverflowDemo';
 
-  /// "quickly build special text"
+  /// 'quickly build special text'
   ///
-  /// [name] : fluttercandies://TextDemo
+  /// [name] : 'fluttercandies://TextDemo'
   ///
-  /// [routeName] : Text
+  /// [routeName] : 'Text'
   ///
-  /// [description] : "quickly build special text"
+  /// [description] : 'quickly build special text'
   static const String fluttercandiesTextDemo = 'fluttercandies://TextDemo';
 
-  /// "text selection support"
+  /// 'text selection support'
   ///
-  /// [name] : fluttercandies://TextSelectionDemo
+  /// [name] : 'fluttercandies://TextSelectionDemo'
   ///
-  /// [routeName] : TextSelection
+  /// [routeName] : 'TextSelection'
   ///
-  /// [description] : "text selection support"
+  /// [description] : 'text selection support'
   static const String fluttercandiesTextSelectionDemo =
       'fluttercandies://TextSelectionDemo';
 
-  /// MainPage
+  /// 'MainPage'
   ///
-  /// [name] : fluttercandies://mainpage
+  /// [name] : 'fluttercandies://mainpage'
   ///
-  /// [routeName] : MainPage
+  /// [routeName] : 'MainPage'
   static const String fluttercandiesMainpage = 'fluttercandies://mainpage';
-
-  /// PicSwiper
-  ///
-  /// [name] : fluttercandies://picswiper
-  ///
-  /// [routeName] : PicSwiper
-  ///
-  /// [arguments] : [index, pics, tuChongItem]
-  ///
-  /// [showStatusBar] : false
-  ///
-  /// [pageRouteType] : PageRouteType.transparent
-  static const String fluttercandiesPicswiper = 'fluttercandies://picswiper';
 }
