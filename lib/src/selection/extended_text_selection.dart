@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../extended_render_paragraph.dart';
 import '../extended_rich_text.dart';
-import '../over_flow_text_span.dart';
+import '../text_overflow_widget.dart';
 import 'extended_text_selection_pointer_handler.dart';
 
 ///
@@ -15,6 +15,29 @@ import 'extended_text_selection_pointer_handler.dart';
 ///
 
 class ExtendedTextSelection extends StatefulWidget {
+  const ExtendedTextSelection(
+      {this.onTap,
+      this.softWrap,
+      this.locale,
+      this.textDirection,
+      this.textAlign,
+      this.maxLines,
+      this.textScaleFactor,
+      this.overflow,
+      this.text,
+      this.selectionColor,
+      this.dragStartBehavior,
+      this.data,
+      this.textSelectionControls,
+      this.textWidthBasis,
+      this.overFlowWidget,
+      Key key})
+      : super(key: key);
+  final TextOverflowWidget overFlowWidget;
+
+
+  final TextWidthBasis textWidthBasis;
+
   final GestureTapCallback onTap;
 
   /// How the text should be aligned horizontally.
@@ -79,32 +102,11 @@ class ExtendedTextSelection extends StatefulWidget {
 
   final Color selectionColor;
 
-  /// the custom text over flow TextSpan
-  final OverFlowTextSpan overFlowTextSpan;
-
   final DragStartBehavior dragStartBehavior;
 
   final String data;
 
   final TextSelectionControls textSelectionControls;
-
-  ExtendedTextSelection(
-      {this.onTap,
-      this.softWrap,
-      this.locale,
-      this.textDirection,
-      this.textAlign,
-      this.maxLines,
-      this.textScaleFactor,
-      this.overflow,
-      this.text,
-      this.overFlowTextSpan,
-      this.selectionColor,
-      this.dragStartBehavior,
-      this.data,
-      this.textSelectionControls,
-      Key key})
-      : super(key: key);
 
   @override
   ExtendedTextSelectionState createState() => ExtendedTextSelectionState();
@@ -212,13 +214,14 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
                 textScaleFactor: widget.textScaleFactor,
                 maxLines: widget.maxLines,
                 text: widget.text,
-                overFlowTextSpan: widget.overFlowTextSpan,
                 key: _renderParagraphKey,
                 selectionColor: widget.selectionColor,
                 selection: textEditingValue.selection,
                 onSelectionChanged: _handleSelectionChanged,
                 startHandleLayerLink: _startHandleLayerLink,
                 endHandleLayerLink: _endHandleLayerLink,
+                textWidthBasis: widget.textWidthBasis,
+                overFlowWidget: widget.overFlowWidget,
               ),
             )));
 

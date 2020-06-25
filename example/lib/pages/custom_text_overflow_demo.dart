@@ -1,8 +1,7 @@
-
+import 'package:example/text/my_special_text_span_builder.dart';
 import 'package:extended_text/extended_text.dart';
-import 'package:flutter/gestures.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_candies_demo_library/flutter_candies_demo_library.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:ff_annotation_route/ff_annotation_route.dart';
@@ -39,19 +38,27 @@ class CustomTextOverflowDemo extends StatelessWidget {
               }
             },
             specialTextSpanBuilder: MySpecialTextSpanBuilder(),
-            //overflow: TextOverflow.ellipsis,
-            overFlowTextSpan: OverFlowTextSpan(children: <TextSpan>[
-              TextSpan(text: '  \u2026  '),
-              TextSpan(
-                  text: "more detail",
-                  style: TextStyle(
-                    color: Colors.blue,
+            selectionEnabled: true,
+            overFlowWidget: kIsWeb
+                ? null
+                : TextOverflowWidget(
+                    //maxHeight: double.infinity,
+                    //align: TextOverflowAlign.right,
+                    //fixedOffset: Offset.zero,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        const Text('\u2026 '),
+                        RaisedButton(
+                          child: const Text('more'),
+                          onPressed: () {
+                            launch(
+                                'https://github.com/fluttercandies/extended_text');
+                          },
+                        )
+                      ],
+                    ),
                   ),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () {
-                      launch("https://github.com/fluttercandies/extended_text");
-                    })
-            ]),
             maxLines: 10,
           ),
         ));

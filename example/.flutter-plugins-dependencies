@@ -1,1 +1,1 @@
-{"_info":"// This is a generated file; do not edit or check into version control.","dependencyGraph":[{"name":"image_picker_saver","dependencies":[]},{"name":"path_provider","dependencies":["path_provider_macos"]},{"name":"path_provider_macos","dependencies":[]},{"name":"url_launcher","dependencies":["url_launcher_web"]},{"name":"url_launcher_web","dependencies":[]}]}
+{"_info":"// This is a generated file; do not edit or check into version control.","dependencyGraph":[{"name":"url_launcher","dependencies":["url_launcher_web"]},{"name":"url_launcher_web","dependencies":[]}]}

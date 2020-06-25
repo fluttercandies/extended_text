@@ -60,10 +60,12 @@ packages:
   extended_text_library:
     dependency: "direct main"
     description:
-      name: extended_text_library
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.5.3"
+      path: "."
+      ref: "v1.12.13"
+      resolved-ref: "2ac9262cc4d790d6007cea8debecd866148d7bfa"
+      url: "https://github.com/fluttercandies/extended_text_library.git"
+    source: git
+    version: "2.0.0"
   flutter:
     dependency: "direct main"
     description: flutter
