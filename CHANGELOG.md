@@ -1,7 +1,11 @@
+## [3.0.0]
+
+* Breaking change: fix typos [OverflowWidget].
+
 ## [2.0.0]
 
-* Support OverFlowWidget [ExtendedText].
-* Breaking change: remove overFlowTextSpan.
+* Support OverflowWidget [ExtendedText].
+* Breaking change: remove overflowTextSpan.
 
 ## [1.0.1]
 

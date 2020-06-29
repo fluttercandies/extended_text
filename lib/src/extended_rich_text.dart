@@ -40,7 +40,7 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
     this.textHeightBehavior,
     this.selectionHeightStyle = BoxHeightStyle.tight,
     this.selectionWidthStyle = BoxWidthStyle.tight,
-    this.overFlowWidget,
+    this.overflowWidget,
   })  : assert(text != null),
         assert(textAlign != null),
         assert(softWrap != null),
@@ -48,7 +48,7 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
         assert(textScaleFactor != null),
         assert(maxLines == null || maxLines > 0),
         assert(textWidthBasis != null),
-        super(key: key, children: _extractChildren(text, overFlowWidget));
+        super(key: key, children: _extractChildren(text, overflowWidget));
 
   // Traverses the InlineSpan tree and depth-first collects the list of
   // child widgets that are created in WidgetSpans.
@@ -140,7 +140,7 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
   final LayerLink startHandleLayerLink;
   final LayerLink endHandleLayerLink;
 
-  final TextOverflowWidget overFlowWidget;
+  final TextOverflowWidget overflowWidget;
 
   @override
   ExtendedRenderParagraph createRenderObject(BuildContext context) {
@@ -168,7 +168,7 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       textHeightBehavior: textHeightBehavior,
       selectionWidthStyle: selectionWidthStyle,
       selectionHeightStyle: selectionHeightStyle,
-      overFlowWidget:overFlowWidget,
+      overflowWidget:overflowWidget,
     );
   }
 
@@ -195,7 +195,7 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       ..textHeightBehavior = textHeightBehavior
       ..selectionWidthStyle = selectionWidthStyle
       ..selectionHeightStyle = selectionHeightStyle
-      ..overFlowWidget =overFlowWidget;
+      ..overflowWidget =overflowWidget;
   }
 
   @override

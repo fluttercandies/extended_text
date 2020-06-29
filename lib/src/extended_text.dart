@@ -34,7 +34,7 @@ class ExtendedText extends StatelessWidget {
     this.textSelectionControls,
     this.selectionHeightStyle = ui.BoxHeightStyle.tight,
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
-    this.overFlowWidget,
+    this.overflowWidget,
   })  : assert(data != null),
 
         textSpan = null,
@@ -64,7 +64,7 @@ class ExtendedText extends StatelessWidget {
     this.textSelectionControls,
     this.selectionHeightStyle = ui.BoxHeightStyle.tight,
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
-    this.overFlowWidget,
+    this.overflowWidget,
   })  : assert(textSpan != null),
         data = null,
         specialTextSpanBuilder = null,
@@ -72,7 +72,7 @@ class ExtendedText extends StatelessWidget {
 
   /// maxheight is equal to textPainter.preferredLineHeight
   /// maxWidth is equal to textPainter.width
-  final TextOverflowWidget overFlowWidget;
+  final TextOverflowWidget overflowWidget;
 
   /// Controls how tall the selection highlight boxes are computed to be.
   ///
@@ -250,7 +250,7 @@ class ExtendedText extends StatelessWidget {
         textHeightBehavior:
             textHeightBehavior ?? defaultTextStyle.textHeightBehavior,
         textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
-        overFlowWidget: overFlowWidget,
+        overFlowWidget: overflowWidget,
       );
     } else {
       result = ExtendedRichText(
@@ -268,7 +268,7 @@ class ExtendedText extends StatelessWidget {
         textHeightBehavior:
             textHeightBehavior ?? defaultTextStyle.textHeightBehavior,
         textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
-        overFlowWidget: overFlowWidget,
+        overflowWidget: overflowWidget,
       );
     }
 
