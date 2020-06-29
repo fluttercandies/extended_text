@@ -242,7 +242,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
                 textWidthBasis: widget.textWidthBasis,
                 selectionWidthStyle: widget.selectionWidthStyle,
                 selectionHeightStyle: widget.selectionHeightStyle,
-                overFlowWidget: widget.overFlowWidget,
+                overflowWidget: widget.overFlowWidget,
               ),
             )));
 

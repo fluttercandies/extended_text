@@ -46,7 +46,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     ui.TextHeightBehavior textHeightBehavior,
     ui.BoxHeightStyle selectionHeightStyle = ui.BoxHeightStyle.tight,
     ui.BoxWidthStyle selectionWidthStyle = ui.BoxWidthStyle.tight,
-    TextOverflowWidget overFlowWidget,
+    TextOverflowWidget overflowWidget,
   })  : assert(text != null),
         assert(text.debugAssertIsValid()),
         assert(textAlign != null),
@@ -58,7 +58,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         assert(textWidthBasis != null),
         _handleSpecialText = hasSpecialText(text),
         _softWrap = softWrap,
-        _overflow = overFlowWidget != null ? TextOverflow.clip : overflow,
+        _overflow = overflowWidget != null ? TextOverflow.clip : overflow,
         _oldOverflow = overflow,
         _startHandleLayerLink = startHandleLayerLink,
         _endHandleLayerLink = endHandleLayerLink,
@@ -69,7 +69,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
           textScaleFactor: textScaleFactor,
           maxLines: maxLines,
           ellipsis:
-              (overFlowWidget == null && overflow == TextOverflow.ellipsis)
+              (overflowWidget == null && overflow == TextOverflow.ellipsis)
                   ? _kEllipsis
                   : null,
           locale: locale,
@@ -81,7 +81,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         _selection = selection,
         _selectionHeightStyle = selectionHeightStyle,
         _selectionWidthStyle = selectionWidthStyle,
-        _overFlowWidget = overFlowWidget {
+        _overflowWidget = overflowWidget {
     addAll(children);
     extractPlaceholderSpans(text);
   }
@@ -247,7 +247,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   set overflow(TextOverflow value) {
     assert(value != null);
     final TextOverflow temp =
-        overFlowWidget != null ? TextOverflow.clip : value;
+        overflowWidget != null ? TextOverflow.clip : value;
     if (_overflow == temp) {
       return;
     }
@@ -423,12 +423,12 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         minWidth: constraints.minWidth,
         maxWidth: constraints.maxWidth,
         forceLayout: true);
-    if (overFlowWidget != null) {
+    if (overflowWidget != null) {
       lastChild.layout(
           BoxConstraints(
             maxWidth: constraints.maxWidth,
             maxHeight:
-                overFlowWidget.maxHeight ?? textPainter.preferredLineHeight,
+                overflowWidget.maxHeight ?? textPainter.preferredLineHeight,
           ),
           parentUsesSize: true);
     }
@@ -930,7 +930,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 
   @override
   bool hitTestChildren(BoxHitTestResult result, {Offset position}) {
-    if (overFlowWidget != null) {
+    if (overflowWidget != null) {
       final bool isHit = hitTestChild(result, lastChild, position: position);
       if (isHit) {
         return true;
@@ -942,7 +942,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   Rect _overFlowRect;
   Path _paintTextOverflow(PaintingContext context, Offset offset) {
     _overFlowRect = null;
-    if (_hasVisualOverflow && overFlowWidget != null) {
+    if (_hasVisualOverflow && overflowWidget != null) {
       assert(textPainter.width >= lastChild.size.width);
 
       final Rect rect = const Offset(0.0, 0.0) & size;
@@ -964,16 +964,16 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
           lastChild.parentData as TextParentData;
 
       //_textPainter.preferredLineHeight
-      final double x = overFlowWidget.align == TextOverflowAlign.left
+      final double x = overflowWidget.align == TextOverflowAlign.left
           ? finalOverFlowOffset.dx
           : rect.right - overFlowWidgetSize.width;
       textParentData.offset = Offset(
-          x + overFlowWidget.fixedOffset.dx,
+          x + overflowWidget.fixedOffset.dx,
           rect.bottom -
               overFlowWidgetSize.height +
               (overFlowWidgetSize.height - _textPainter.preferredLineHeight) /
                   2.0 +
-              overFlowWidget.fixedOffset.dy);
+              overflowWidget.fixedOffset.dy);
       textParentData.scale = 1.0;
       final double scale = textParentData.scale;
       context.pushTransform(
@@ -1137,7 +1137,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
       }
 
       if (_hasVisualOverflow &&
-          overFlowWidget != null &&
+          overflowWidget != null &&
           _overFlowRect != null) {
         for (final ui.TextBox box in boxes.toList()) {
           if (_overFlowRect.overlaps(box.toRect())) {
@@ -1209,7 +1209,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         _textPainter.getPositionForOffset(globalToLocal(globalPosition));
 
     ///never drag over the over flow text span
-    if (_hasVisualOverflow && overFlowWidget != null) {
+    if (_hasVisualOverflow && overflowWidget != null) {
       final TextParentData textParentData =
           lastChild.parentData as TextParentData;
       final TextPosition position =
@@ -1303,11 +1303,11 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   Offset get effectiveOffset => Offset.zero;
 
   @override
-  TextOverflowWidget get overFlowWidget => _overFlowWidget;
+  TextOverflowWidget get overflowWidget => _overflowWidget;
   final TextOverflow _oldOverflow;
-  TextOverflowWidget _overFlowWidget;
-  set overFlowWidget(TextOverflowWidget value) {
-    if (_overFlowWidget == value) {
+  TextOverflowWidget _overflowWidget;
+  set overflowWidget(TextOverflowWidget value) {
+    if (_overflowWidget == value) {
       return;
     }
     if (value != null) {
@@ -1315,7 +1315,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     } else {
       overflow = _oldOverflow;
     }
-    _overFlowWidget = value;
+    _overflowWidget = value;
     markNeedsPaint();
   }
 }
