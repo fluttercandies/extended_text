@@ -59,7 +59,7 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                     //overflow: ExtendedTextOverflow.ellipsis,
                     style: TextStyle(fontSize: 14, color: Colors.grey),
                     maxLines: 4,
-                    overFlowWidget: kIsWeb
+                    overflowWidget: kIsWeb
                         ? null
                         : TextOverflowWidget(
                             child: Row(

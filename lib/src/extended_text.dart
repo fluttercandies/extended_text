@@ -32,7 +32,7 @@ class ExtendedText extends StatelessWidget {
     this.selectionColor,
     this.dragStartBehavior = DragStartBehavior.start,
     this.textSelectionControls,
-    this.overFlowWidget,
+    this.overflowWidget,
   })  : assert(data != null),
 
         textSpan = null,
@@ -59,7 +59,7 @@ class ExtendedText extends StatelessWidget {
     this.selectionColor,
     this.dragStartBehavior = DragStartBehavior.start,
     this.textSelectionControls,
-    this.overFlowWidget,
+    this.overflowWidget,
   })  : assert(textSpan != null),
         data = null,
         specialTextSpanBuilder = null,
@@ -67,7 +67,7 @@ class ExtendedText extends StatelessWidget {
 
   /// maxheight is equal to textPainter.preferredLineHeight
   /// maxWidth is equal to textPainter.width
-  final TextOverflowWidget overFlowWidget;
+  final TextOverflowWidget overflowWidget;
 
   /// An interface for building the selection UI, to be provided by the
   /// implementor of the toolbar widget or handle widget
@@ -231,7 +231,7 @@ class ExtendedText extends StatelessWidget {
         data: data ?? textSpanToActualText(innerTextSpan),
         textSelectionControls: textSelectionControls,
         textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
-        overFlowWidget: overFlowWidget,
+        overFlowWidget: overflowWidget,
       );
     } else {
       result = ExtendedRichText(
@@ -247,7 +247,7 @@ class ExtendedText extends StatelessWidget {
         maxLines: maxLines ?? defaultTextStyle.maxLines,
         text: innerTextSpan,
         textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
-        overFlowWidget: overFlowWidget,
+        overflowWidget: overflowWidget,
       );
     }
 

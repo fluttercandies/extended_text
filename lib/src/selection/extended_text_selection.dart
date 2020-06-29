@@ -221,7 +221,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
                 startHandleLayerLink: _startHandleLayerLink,
                 endHandleLayerLink: _endHandleLayerLink,
                 textWidthBasis: widget.textWidthBasis,
-                overFlowWidget: widget.overFlowWidget,
+                overflowWidget: widget.overFlowWidget,
               ),
             )));
 

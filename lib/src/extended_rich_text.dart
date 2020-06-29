@@ -37,7 +37,7 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
     this.selectionColor,
     this.startHandleLayerLink,
     this.endHandleLayerLink,
-    this.overFlowWidget,
+    this.overflowWidget,
   })  : assert(text != null),
         assert(textAlign != null),
         assert(softWrap != null),
@@ -45,11 +45,11 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
         assert(textScaleFactor != null),
         assert(maxLines == null || maxLines > 0),
         assert(textWidthBasis != null),
-        super(key: key, children: _extractChildren(text, overFlowWidget));
+        super(key: key, children: _extractChildren(text, overflowWidget));
 
   // Traverses the InlineSpan tree and depth-first collects the list of
   // child widgets that are created in WidgetSpans.
-  static List<Widget> _extractChildren(InlineSpan span, TextOverflowWidget overFlowWidget) {
+  static List<Widget> _extractChildren(InlineSpan span, TextOverflowWidget overflowWidget) {
     final List<Widget> result = <Widget>[];
     span.visitChildren((InlineSpan span) {
       if (span is WidgetSpan) {
@@ -57,8 +57,8 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       }
       return true;
     });
-    if (overFlowWidget != null) {
-      result.add(overFlowWidget);
+    if (overflowWidget != null) {
+      result.add(overflowWidget);
     }
     return result;
   }
@@ -132,7 +132,7 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
   final LayerLink startHandleLayerLink;
   final LayerLink endHandleLayerLink;
 
-  final TextOverflowWidget overFlowWidget;
+  final TextOverflowWidget overflowWidget;
 
   @override
   ExtendedRenderParagraph createRenderObject(BuildContext context) {
@@ -157,7 +157,7 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       selectionColor: selectionColor,
       startHandleLayerLink: startHandleLayerLink,
       endHandleLayerLink: endHandleLayerLink,
-      overFlowWidget:overFlowWidget,
+      overflowWidget:overflowWidget,
     );
   }
 
@@ -181,7 +181,7 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       ..onSelectionChanged = onSelectionChanged
       ..startHandleLayerLink = startHandleLayerLink
       ..endHandleLayerLink = endHandleLayerLink
-      ..overFlowWidget =overFlowWidget;
+      ..overflowWidget =overflowWidget;
   }
 
   @override

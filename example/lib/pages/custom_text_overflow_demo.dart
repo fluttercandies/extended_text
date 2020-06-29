@@ -39,7 +39,7 @@ class CustomTextOverflowDemo extends StatelessWidget {
             },
             specialTextSpanBuilder: MySpecialTextSpanBuilder(),
             selectionEnabled: true,
-            overFlowWidget: kIsWeb
+            overflowWidget: kIsWeb
                 ? null
                 : TextOverflowWidget(
                     //maxHeight: double.infinity,
