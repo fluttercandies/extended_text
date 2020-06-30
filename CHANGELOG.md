@@ -1,3 +1,7 @@
+## [3.0.1]
+
+* Fix throw exception when set [OverflowWidget] and has no visual overflow.
+
 ## [3.0.0]
 
 * Breaking change: fix typos [OverflowWidget].

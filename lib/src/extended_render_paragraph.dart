@@ -801,7 +801,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 
   @override
   bool hitTestChildren(BoxHitTestResult result, {Offset position}) {
-    if (overflowWidget != null) {
+    if (_hasVisualOverflow && overflowWidget != null) {
       final bool isHit = hitTestChild(result, lastChild, position: position);
       if (isHit) {
         return true;
