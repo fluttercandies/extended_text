@@ -930,7 +930,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 
   @override
   bool hitTestChildren(BoxHitTestResult result, {Offset position}) {
-    if (overflowWidget != null && _textPainter.didExceedMaxLines) {
+    if (overflowWidget != null && _hasVisualOverflow) {
       final bool isHit = hitTestChild(result, lastChild, position: position);
       if (isHit) {
         return true;
