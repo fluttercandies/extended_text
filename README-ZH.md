@@ -350,3 +350,7 @@ Text背景相关的issue[24335](https://github.com/flutter/flutter/issues/24335)
 ```
 
 [more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/pages/custom_text_overflow_demo.dart)
+
+## ☕️Buy me a coffee
+
+![img](http://zmtzawqlp.gitee.io/my_images/images/qrcode.png)
