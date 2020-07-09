@@ -328,3 +328,7 @@ refer to issue [26748](https://github.com/flutter/flutter/issues/26748)
 ```
 
 [more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/pages/custom_text_overflow_demo.dart)
+
+## ☕️Buy me a coffee
+
+![img](http://zmtzawqlp.gitee.io/my_images/images/qrcode.png)
