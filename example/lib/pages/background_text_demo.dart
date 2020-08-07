@@ -26,7 +26,9 @@ class BackgroundTextDemo extends StatelessWidget {
                 Text.rich(TextSpan(children: <TextSpan>[
                   TextSpan(
                       text: '24335',
-                      style: const TextStyle(color: Colors.blue,),
+                      style: const TextStyle(
+                        color: Colors.blue,
+                      ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
                           launch(
@@ -78,8 +80,9 @@ class BackgroundTextDemo extends StatelessWidget {
                     BackgroundTextSpan(
                         text: '错误演示 12345',
                         background: Paint()..color = Colors.blue,
-                        style: TextStyle(color: Colors.white)),
-                    const TextSpan(text: ' extended text with nice background '),
+                        style: const TextStyle(color: Colors.white)),
+                    const TextSpan(
+                        text: ' extended text with nice background '),
                     BackgroundTextSpan(
                       text:
                           '错误演示 12345  错误演示 12345  错误演示 12345  错误演示 12345  错误演示 12345  错误演示 12345',
@@ -90,7 +93,7 @@ class BackgroundTextDemo extends StatelessWidget {
                             '  extended text with nice background,only problem is that we can get offset of ellipsis,so can\'t paint background at end of ellipsis. please let me know if any way to get offset of ellipsis.'),
                     BackgroundTextSpan(
                       text: 'paint background end of line 错误演示12345',
-                      style: TextStyle(color: Colors.red),
+                      style: const TextStyle(color: Colors.red),
                       background: Paint()..color = Colors.red.withOpacity(0.1),
                     ),
                   ]),
@@ -105,7 +108,8 @@ class BackgroundTextDemo extends StatelessWidget {
                       text:
                           'This text has nice background with borderradius,no mattter how many line,it likes nice',
                       background: Paint()..color = Colors.indigo,
-                      clipBorderRadius: const BorderRadius.all(Radius.circular(3.0))),
+                      clipBorderRadius:
+                          const BorderRadius.all(Radius.circular(3.0))),
                 ])),
                 Container(
                   height: 20.0,
@@ -115,7 +119,8 @@ class BackgroundTextDemo extends StatelessWidget {
                       text:
                           'if you don\'t like default background, you can use paintBackground call back to draw your background',
                       background: Paint()..color = Colors.teal,
-                      clipBorderRadius: const BorderRadius.all(Radius.circular(3.0)),
+                      clipBorderRadius:
+                          const BorderRadius.all(Radius.circular(3.0)),
                       paintBackground: (BackgroundTextSpan backgroundTextSpan,
                           Canvas canvas,
                           Offset offset,

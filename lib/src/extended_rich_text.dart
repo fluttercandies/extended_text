@@ -52,7 +52,8 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
 
   // Traverses the InlineSpan tree and depth-first collects the list of
   // child widgets that are created in WidgetSpans.
-  static List<Widget> _extractChildren(InlineSpan span, TextOverflowWidget overFlowWidget) {
+  static List<Widget> _extractChildren(
+      InlineSpan span, TextOverflowWidget overFlowWidget) {
     final List<Widget> result = <Widget>[];
     span.visitChildren((InlineSpan span) {
       if (span is WidgetSpan) {
@@ -168,7 +169,7 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       textHeightBehavior: textHeightBehavior,
       selectionWidthStyle: selectionWidthStyle,
       selectionHeightStyle: selectionHeightStyle,
-      overflowWidget:overflowWidget,
+      overflowWidget: overflowWidget,
     );
   }
 
@@ -195,7 +196,7 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       ..textHeightBehavior = textHeightBehavior
       ..selectionWidthStyle = selectionWidthStyle
       ..selectionHeightStyle = selectionHeightStyle
-      ..overflowWidget =overflowWidget;
+      ..overflowWidget = overflowWidget;
   }
 
   @override

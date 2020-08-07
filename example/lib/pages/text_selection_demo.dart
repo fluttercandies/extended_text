@@ -58,7 +58,7 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                     },
                     specialTextSpanBuilder: MySpecialTextSpanBuilder(),
                     //overflow: ExtendedTextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
                     maxLines: 4,
                     overflowWidget: kIsWeb
                         ? null

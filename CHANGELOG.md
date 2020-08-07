@@ -1,3 +1,7 @@
+## [4.0.0]
+
+* Merge from Flutter v1.20
+
 ## [3.0.1]
 
 * Fix throw exception when set [OverflowWidget] and has no visual overflow.

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
 // Minimal padding from all edges of the selection toolbar to all edges of the
 // viewport.
 const double _kHandleSize = 22.0;
@@ -13,6 +12,7 @@ const double _kToolbarHeight = 44.0;
 // Padding when positioning toolbar below selection.
 const double _kToolbarContentDistanceBelow = _kHandleSize - 2.0;
 const double _kToolbarContentDistance = 8.0;
+
 ///
 ///  create by zmtzawqlp on 2019/8/3
 ///
@@ -28,6 +28,7 @@ class MyExtendedMaterialTextSelectionControls
     Offset selectionMidpoint,
     List<TextSelectionPoint> endpoints,
     TextSelectionDelegate delegate,
+    ClipboardStatusNotifier clipboardStatus,
   ) {
     assert(debugCheckHasMediaQuery(context));
     assert(debugCheckHasMaterialLocalizations(context));
@@ -35,23 +36,26 @@ class MyExtendedMaterialTextSelectionControls
     // The toolbar should appear below the TextField when there is not enough
     // space above the TextField to show it.
     final TextSelectionPoint startTextSelectionPoint = endpoints[0];
-    final TextSelectionPoint endTextSelectionPoint = endpoints.length > 1
-      ? endpoints[1]
-      : endpoints[0];
-    const double closedToolbarHeightNeeded = _kToolbarScreenPadding
-      + _kToolbarHeight
-      + _kToolbarContentDistance;
+    final TextSelectionPoint endTextSelectionPoint =
+        endpoints.length > 1 ? endpoints[1] : endpoints[0];
+    const double closedToolbarHeightNeeded =
+        _kToolbarScreenPadding + _kToolbarHeight + _kToolbarContentDistance;
     final double paddingTop = MediaQuery.of(context).padding.top;
-    final double availableHeight = globalEditableRegion.top
-      + startTextSelectionPoint.point.dy
-      - textLineHeight
-      - paddingTop;
+    final double availableHeight = globalEditableRegion.top +
+        startTextSelectionPoint.point.dy -
+        textLineHeight -
+        paddingTop;
     final bool fitsAbove = closedToolbarHeightNeeded <= availableHeight;
     final Offset anchor = Offset(
       globalEditableRegion.left + selectionMidpoint.dx,
       fitsAbove
-        ? globalEditableRegion.top + startTextSelectionPoint.point.dy - textLineHeight - _kToolbarContentDistance
-        : globalEditableRegion.top + endTextSelectionPoint.point.dy + _kToolbarContentDistanceBelow,
+          ? globalEditableRegion.top +
+              startTextSelectionPoint.point.dy -
+              textLineHeight -
+              _kToolbarContentDistance
+          : globalEditableRegion.top +
+              endTextSelectionPoint.point.dy +
+              _kToolbarContentDistanceBelow,
     );
 
     return Stack(
@@ -63,22 +67,25 @@ class MyExtendedMaterialTextSelectionControls
             fitsAbove,
           ),
           child: _TextSelectionToolbar(
-          handleCut: canCut(delegate) ? () => handleCut(delegate) : null,
-          handleCopy: canCopy(delegate) ? () => handleCopy(delegate) : null,
-          handlePaste: canPaste(delegate) ? () => handlePaste(delegate) : null,
-          handleSelectAll:
-              canSelectAll(delegate) ? () => handleSelectAll(delegate) : null,
-          handleLike: () {
-            //mailto:<email address>?subject=<subject>&body=<body>, e.g.
-            launch(
-                'mailto:zmtzawqlp@live.com?subject=extended_text_share&body=${delegate.textEditingValue.text}');
-            delegate.hideToolbar();
-            //clear selecction
-            delegate.textEditingValue = delegate.textEditingValue.copyWith(
-                selection: TextSelection.collapsed(
-                    offset: delegate.textEditingValue.selection.end));
-          },
-    ),
+            handleCut: canCut(delegate) ? () => handleCut(delegate) : null,
+            handleCopy: canCopy(delegate)
+                ? () => handleCopy(delegate, clipboardStatus)
+                : null,
+            handlePaste:
+                canPaste(delegate) ? () => handlePaste(delegate) : null,
+            handleSelectAll:
+                canSelectAll(delegate) ? () => handleSelectAll(delegate) : null,
+            handleLike: () {
+              //mailto:<email address>?subject=<subject>&body=<body>, e.g.
+              launch(
+                  'mailto:zmtzawqlp@live.com?subject=extended_text_share&body=${delegate.textEditingValue.text}');
+              delegate.hideToolbar();
+              //clear selecction
+              delegate.textEditingValue = delegate.textEditingValue.copyWith(
+                  selection: TextSelection.collapsed(
+                      offset: delegate.textEditingValue.selection.end));
+            },
+          ),
         ),
       ],
     );
@@ -137,7 +144,8 @@ class _TextSelectionToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Widget> items = <Widget>[];
-    final MaterialLocalizations localizations = MaterialLocalizations.of(context);
+    final MaterialLocalizations localizations =
+        MaterialLocalizations.of(context);
 
     if (handleCut != null) {
       items.add(FlatButton(
@@ -160,7 +168,8 @@ class _TextSelectionToolbar extends StatelessWidget {
     }
 
     if (handleLike != null) {
-      items.add(FlatButton(child: Icon(Icons.favorite), onPressed: handleLike));
+      items.add(
+          FlatButton(child: const Icon(Icons.favorite), onPressed: handleLike));
     }
 
     // If there is no option available, build an empty widget.

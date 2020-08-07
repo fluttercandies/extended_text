@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,7 +10,6 @@ import '../extended_render_paragraph.dart';
 import '../extended_rich_text.dart';
 import '../text_overflow_widget.dart';
 import 'extended_text_selection_pointer_handler.dart';
-
 
 ///
 ///  create by zmtzawqlp on 2019/6/5
@@ -144,9 +144,12 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   final LayerLink _endHandleLayerLink = LayerLink();
   ExtendedTextSelectionPointerHandlerState _pointerHandlerState;
   CommonTextSelectionGestureDetectorBuilder _selectionGestureDetectorBuilder;
+  final ClipboardStatusNotifier _clipboardStatus =
+      kIsWeb ? null : ClipboardStatusNotifier();
   @override
   void initState() {
     _textSelectionControls = widget.textSelectionControls;
+    _clipboardStatus?.addListener(_onChangedClipboardStatus);
     _selectionGestureDetectorBuilder =
         CommonTextSelectionGestureDetectorBuilder(
       delegate: this,
@@ -183,14 +186,24 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
           text: widget.data,
           selection: const TextSelection.collapsed(offset: 0));
     }
-
+    if (pasteEnabled && widget.textSelectionControls?.canPaste(this) == true) {
+      _clipboardStatus?.update();
+    }
     super.didUpdateWidget(oldWidget);
   }
 
   @override
   void dispose() {
     _pointerHandlerState?.selectionStates?.remove(this);
+    _clipboardStatus?.removeListener(_onChangedClipboardStatus);
+    _clipboardStatus?.dispose();
     super.dispose();
+  }
+
+  void _onChangedClipboardStatus() {
+    setState(() {
+      // Inform the widget that the value of clipboardStatus has changed.
+    });
   }
 
   @override
@@ -255,7 +268,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
 
   VoidCallback _semanticsOnCopy(TextSelectionControls controls) {
     return controls?.canCopy(this) == true
-        ? () => controls.handleCopy(this)
+        ? () => controls.handleCopy(this, _clipboardStatus)
         : null;
   }
 
@@ -266,6 +279,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     //todo
 //    if (widget.selectionControls != null) {
     _selectionOverlay = ExtendedTextSelectionOverlay(
+        clipboardStatus: _clipboardStatus,
         context: context,
         debugRequiredFor: widget,
         toolbarLayerLink: _toolbarLayerLink,

@@ -36,7 +36,6 @@ class ExtendedText extends StatelessWidget {
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
     this.overflowWidget,
   })  : assert(data != null),
-
         textSpan = null,
         super(key: key);
 

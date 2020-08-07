@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:ff_annotation_route/ff_annotation_route.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -32,7 +31,7 @@ class MainPage extends StatelessWidget {
             minWidth: 0.0,
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: FlatButton(
-              child: Text(
+              child: const Text(
                 'Github',
                 style: TextStyle(
                   decorationStyle: TextDecorationStyle.solid,
@@ -74,7 +73,7 @@ class MainPage extends StatelessWidget {
                     ),
                     Text(
                       page.description,
-                      style: TextStyle(color: Colors.grey),
+                      style: const TextStyle(color: Colors.grey),
                     )
                   ],
                 ),
