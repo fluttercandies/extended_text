@@ -7,14 +7,13 @@ Language: [English](README.md) | [中文简体](README-ZH.md)
 Extended official text to build special text like inline image or @somebody quickly,it also support custom background,custom over flow and custom selection toolbar and handles.
 
 ## Table of contents
-- [extended_text](#extendedtext)
+- [extended_text](#extended_text)
   - [Table of contents](#table-of-contents)
   - [Speical Text](#speical-text)
     - [Create Speical Text](#create-speical-text)
     - [SpecialTextSpanBuilder](#specialtextspanbuilder)
   - [Image](#image)
     - [ImageSpan](#imagespan)
-    - [Cache Image](#cache-image)
   - [Selection](#selection)
     - [TextSelectionControls](#textselectioncontrols)
     - [Control ToolBar Handle](#control-toolbar-handle)
@@ -208,7 +207,7 @@ class MyExtendedMaterialTextSelectionControls
     List<TextSelectionPoint> endpoints,
     TextSelectionDelegate delegate,
   ) {}
-  
+
   @override
   Widget buildHandle(
       BuildContext context, TextSelectionHandleType type, double textHeight) {
@@ -329,6 +328,3 @@ refer to issue [26748](https://github.com/flutter/flutter/issues/26748)
 
 [more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/pages/custom_text_overflow_demo.dart)
 
-## ☕️Buy me a coffee
-
-![img](http://zmtzawqlp.gitee.io/my_images/images/qrcode.png)
