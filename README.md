@@ -128,8 +128,6 @@ class MySpecialTextSpanBuilder extends SpecialTextSpanBuilder {
 }
 ```
 
-[more detail](https://github.com/fluttercandies/extended_text/tree/master/example/lib/special_text)
-
 ## Image
 
 ![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/custom_image.gif)
@@ -265,7 +263,6 @@ get selectionStates(ExtendedTextSelectionState) by builder call back, and handle
       },
     );
 ```
-[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/pages/text_selection_demo.dart)
 
 ## Custom Background
 
@@ -286,7 +283,6 @@ refer to issues [24335](https://github.com/flutter/flutter/issues/24335)/[24337]
 | clipBorderRadius | Clip BorderRadius                                            | -       |
 | paintBackground  | Paint background call back, you can paint background by self | -       |
 
-[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/pages/background_text_demo.dart)
 
 ## Custom Overflow
 
@@ -326,5 +322,5 @@ refer to issue [26748](https://github.com/flutter/flutter/issues/26748)
           )
 ```
 
-[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/pages/custom_text_overflow_demo.dart)
+
 
