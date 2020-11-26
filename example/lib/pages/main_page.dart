@@ -19,6 +19,7 @@ class MainPage extends StatelessWidget {
         .map<RouteResult>((String name) => getRouteResult(name: name)));
   }
   final List<RouteResult> routes = <RouteResult>[];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

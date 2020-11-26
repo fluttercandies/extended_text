@@ -56,7 +56,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         assert(textScaleFactor != null),
         assert(maxLines == null || maxLines > 0),
         assert(textWidthBasis != null),
-        _handleSpecialText = hasSpecialText(text),
         _softWrap = softWrap,
         _overflow = overflowWidget != null ? TextOverflow.clip : overflow,
         _oldOverflow = overflow,
@@ -94,10 +93,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 
   @override
   double get preferredLineHeight => _textPainter.preferredLineHeight;
-
-  bool _handleSpecialText = false;
-  @override
-  bool get handleSpecialText => _handleSpecialText;
 
   List<ui.TextBox> _selectionRects;
 
@@ -164,7 +159,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   InlineSpan get text => _textPainter.text;
   set text(InlineSpan value) {
     assert(value != null);
-    _handleSpecialText = hasSpecialText(value);
     switch (_textPainter.text.compareTo(value)) {
       case RenderComparison.identical:
       case RenderComparison.metadata:
@@ -1023,7 +1017,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         TextPosition(
           offset: endTextOffset,
         ),
-        handleSpecialText: handleSpecialText,
         effectiveOffset: effectiveOffset);
 
     if (endOffset == Offset.zero && endTextOffset > 0) {
@@ -1070,7 +1063,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     bool showSelection = false;
 
     ///zmt
-    final TextSelection actualSelection = handleSpecialText
+    final TextSelection actualSelection = hasSpecialInlineSpanBase
         ? convertTextInputSelectionToTextPainterSelection(text, _selection)
         : _selection;
 
@@ -1121,7 +1114,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     if (!selection.isCollapsed) {
       layoutTextWithConstraints(constraints);
       TextSelection textPainterSelection = selection;
-      if (handleSpecialText) {
+      if (hasSpecialInlineSpanBase) {
         textPainterSelection =
             convertTextInputSelectionToTextPainterSelection(text, selection);
       }
@@ -1238,7 +1231,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         affinity: selection.affinity,
       ),
       effectiveOffset: effectiveOffset,
-      handleSpecialText: handleSpecialText,
     );
 
     // (justinmc): https://github.com/flutter/flutter/issues/31495
@@ -1255,7 +1247,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     final Offset endOffset = getCaretOffset(
       TextPosition(offset: selection.end, affinity: selection.affinity),
       effectiveOffset: effectiveOffset,
-      handleSpecialText: handleSpecialText,
     );
 
     _selectionEndInViewport.value =

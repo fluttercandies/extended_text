@@ -3,7 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:ff_annotation_route/ff_annotation_route.dart';
+import 'package:ff_annotation_route/ff_annotation_route.dart' hide Path;
 
 @FFRoute(
     name: 'fluttercandies://BackgroundTextDemo',

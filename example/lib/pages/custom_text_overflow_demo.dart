@@ -59,7 +59,7 @@ class CustomTextOverflowDemo extends StatelessWidget {
                       ],
                     ),
                   ),
-            maxLines: 10,
+            maxLines: 5,
           ),
         ));
   }
