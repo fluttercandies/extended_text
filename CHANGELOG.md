@@ -1,3 +1,8 @@
+## 4.1.0
+
+* Support keyboard copy on web/desktop
+* Fix wrong position of caret
+  
 ## 4.0.1
 
 * Change handleSpecialText to hasSpecialInlineSpanBase(extended_text_library)

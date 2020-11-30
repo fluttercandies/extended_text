@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import '../extended_render_paragraph.dart';
 import '../extended_rich_text.dart';
@@ -132,7 +133,8 @@ class ExtendedTextSelection extends StatefulWidget {
 class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     implements
         ExtendedTextSelectionGestureDetectorBuilderDelegate,
-        TextSelectionDelegate {
+        TextSelectionDelegate,
+        TextInputClient {
   final GlobalKey _renderParagraphKey = GlobalKey();
   ExtendedRenderParagraph get _renderParagraph =>
       _renderParagraphKey.currentContext.findRenderObject()
@@ -146,10 +148,17 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   CommonTextSelectionGestureDetectorBuilder _selectionGestureDetectorBuilder;
   final ClipboardStatusNotifier _clipboardStatus =
       kIsWeb ? null : ClipboardStatusNotifier();
+
+  FocusNode _focusNode;
+  FocusAttachment _focusAttachment;
+  FocusNode get _effectiveFocusNode => _focusNode ??= FocusNode();
+  bool get _hasFocus => _effectiveFocusNode.hasFocus;
   @override
   void initState() {
     _textSelectionControls = widget.textSelectionControls;
     _clipboardStatus?.addListener(_onChangedClipboardStatus);
+    _focusAttachment = _effectiveFocusNode.attach(context);
+    _effectiveFocusNode.addListener(_handleFocusChanged);
     _selectionGestureDetectorBuilder =
         CommonTextSelectionGestureDetectorBuilder(
       delegate: this,
@@ -157,10 +166,11 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
       showToolbar: showToolbar,
       onTap: widget.onTap,
       context: context,
-      requestKeyboard: null,
+      requestKeyboard: requestKeyboard,
     );
     textEditingValue = TextEditingValue(
         text: widget.data, selection: const TextSelection.collapsed(offset: 0));
+
     super.initState();
   }
 
@@ -197,6 +207,9 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     _pointerHandlerState?.selectionStates?.remove(this);
     _clipboardStatus?.removeListener(_onChangedClipboardStatus);
     _clipboardStatus?.dispose();
+    _focusNode?.dispose();
+    _focusAttachment?.detach();
+    _closeInputConnectionIfNeeded();
     super.dispose();
   }
 
@@ -206,8 +219,24 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     });
   }
 
+  /// Express interest in interacting with the keyboard.
+  ///
+  /// If this control is already attached to the keyboard, this function will
+  /// request that the keyboard become visible. Otherwise, this function will
+  /// ask the focus system that it become focused. If successful in acquiring
+  /// focus, the control will then attach to the keyboard and request that the
+  /// keyboard become visible.
+  void requestKeyboard() {
+    if (_hasFocus) {
+      _openInputConnection();
+    } else {
+      _effectiveFocusNode.requestFocus();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    _focusAttachment?.reparent();
     final ThemeData themeData = Theme.of(context);
     _pointerHandlerState = context
         .findAncestorStateOfType<ExtendedTextSelectionPointerHandlerState>();
@@ -256,12 +285,18 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
                 selectionWidthStyle: widget.selectionWidthStyle,
                 selectionHeightStyle: widget.selectionHeightStyle,
                 overflowWidget: widget.overFlowWidget,
+                hasFocus: _effectiveFocusNode.hasFocus,
+                textSelectionDelegate: this,
               ),
             )));
 
     result = _selectionGestureDetectorBuilder.buildGestureDetector(
       behavior: HitTestBehavior.translucent,
       child: result,
+    );
+    result = MouseRegion(
+      child: result,
+      cursor: SystemMouseCursors.text,
     );
     return result;
   }
@@ -276,8 +311,9 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
       TextSelection selection, SelectionChangedCause cause) {
     textEditingValue = textEditingValue?.copyWith(selection: selection);
     _hideSelectionOverlayIfNeeded();
+    requestKeyboard();
     //todo
-//    if (widget.selectionControls != null) {
+    //    if (widget.selectionControls != null) {
     _selectionOverlay = ExtendedTextSelectionOverlay(
         clipboardStatus: _clipboardStatus,
         context: context,
@@ -296,8 +332,8 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     if (cause != SelectionChangedCause.keyboard &&
         (widget.text.toPlainText().isNotEmpty || longPress))
       _selectionOverlay.showHandles();
-//      if (widget.onSelectionChanged != null)
-//        widget.onSelectionChanged(selection, cause);
+    //      if (widget.onSelectionChanged != null)
+    //        widget.onSelectionChanged(selection, cause);
   }
 
   TextEditingValue _value;
@@ -307,7 +343,9 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   @override
   set textEditingValue(TextEditingValue value) {
     //value = _handleSpecialTextSpan(value);
+
     _selectionOverlay?.update(value);
+    _textInputConnection?.setEditingState(value);
     if (mounted) {
       setState(() {
         _value = value;
@@ -335,8 +373,8 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   @override
   void bringIntoView(TextPosition position) {
     //do nothing
-//    _scrollController.jumpTo(_getScrollOffsetForCaret(
-//        renderEditable.getLocalRectForCaret(position)));
+    //    _scrollController.jumpTo(_getScrollOffsetForCaret(
+    //        renderEditable.getLocalRectForCaret(position)));
   }
 
   /// Shows the selection toolbar at the location of the current cursor.
@@ -400,4 +438,146 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
 
   @override
   bool get selectionEnabled => true;
+
+  /// Whether to create an input connection with the platform for text editing
+  /// or not.
+  ///
+  /// Read-only input fields do not need a connection with the platform since
+  /// there's no need for text editing capabilities (e.g. virtual keyboard).
+  ///
+  /// On the web, we always need a connection because we want some browser
+  /// functionalities to continue to work on read-only input fields like:
+  ///
+  /// - Relevant context menu.
+  /// - cmd/ctrl+c shortcut to copy.
+  /// - cmd/ctrl+a to select all.
+  /// - Changing the selection using a physical keyboard.
+  bool get _shouldCreateInputConnection => kIsWeb;
+  bool get _hasInputConnection =>
+      _textInputConnection != null && _textInputConnection.attached;
+
+  TextInputConnection _textInputConnection;
+
+  void _openInputConnection() {
+    if (!_shouldCreateInputConnection) {
+      return;
+    }
+    if (!_hasInputConnection) {
+      final TextEditingValue localValue = _value;
+
+      // When _needsAutofill == true && currentAutofillScope == null, autofill
+      // is allowed but saving the user input from the text field is
+      // discouraged.
+      //
+      // In case the autofillScope changes from a non-null value to null, or
+      // _needsAutofill changes to false from true, the platform needs to be
+      // notified to exclude this field from the autofill context. So we need to
+      // provide the autofillId.
+      _textInputConnection = TextInput.attach(this, textInputConfiguration);
+
+      _textInputConnection.show();
+
+      final TextStyle style = widget.text.style;
+      _textInputConnection
+        ..setStyle(
+          fontFamily: style.fontFamily,
+          fontSize: style.fontSize,
+          fontWeight: style.fontWeight,
+          textDirection: widget.textDirection,
+          textAlign: widget.textAlign,
+        )
+        ..setEditingState(localValue);
+    } else {
+      _textInputConnection.show();
+    }
+  }
+
+  void _closeInputConnectionIfNeeded() {
+    if (_hasInputConnection) {
+      _textInputConnection.close();
+      _textInputConnection = null;
+    }
+  }
+
+  @override
+  void connectionClosed() {
+    if (_hasInputConnection) {
+      _textInputConnection.connectionClosedReceived();
+      _textInputConnection = null;
+    }
+  }
+
+  @override
+  AutofillScope get currentAutofillScope => null;
+
+  @override
+  TextEditingValue get currentTextEditingValue => _value;
+
+  @override
+  void performAction(TextInputAction action) {}
+
+  @override
+  void performPrivateCommand(String action, Map<String, dynamic> data) {}
+
+  @override
+  void showAutocorrectionPromptRect(int start, int end) {}
+
+  @override
+  void updateEditingValue(TextEditingValue value) {
+    // This method handles text editing state updates from the platform text
+    // input plugin. The [EditableText] may not have the focus or an open input
+    // connection, as autofill can update a disconnected [EditableText].
+
+    // Since we still have to support keyboard select, this is the best place
+    // to disable text updating.
+    if (!_shouldCreateInputConnection) {
+      return;
+    }
+
+    // // In the read-only case, we only care about selection changes, and reject
+    // // everything else.
+    if (_value != null) {
+      value = _value.copyWith(selection: value.selection);
+    }
+
+    if (value == _value) {
+      // This is possible, for example, when the numeric keyboard is input,
+      // the engine will notify twice for the same value.
+      // Track at https://github.com/flutter/flutter/issues/65811
+      return;
+    }
+
+    if (_value != null &&
+        value.text == _value.text &&
+        value.composing == _value.composing) {
+      // `selection` is the only change.
+      _handleSelectionChanged(value.selection, SelectionChangedCause.keyboard);
+    } else {
+      //hideToolbar();
+      textEditingValue = value;
+    }
+  }
+
+  @override
+  void updateFloatingCursor(RawFloatingCursorPoint point) {}
+
+  void _handleFocusChanged() {
+    _openOrCloseInputConnectionIfNeeded();
+    setState(() {});
+  }
+
+  void _openOrCloseInputConnectionIfNeeded() {
+    if (_hasFocus && _focusNode.consumeKeyboardToken()) {
+      _openInputConnection();
+    } else if (!_hasFocus) {
+      _closeInputConnectionIfNeeded();
+      //widget.controller.clearComposing();
+    }
+  }
+
+  TextInputConfiguration get textInputConfiguration =>
+      const TextInputConfiguration(
+        inputAction: TextInputAction.newline,
+        inputType: TextInputType.multiline,
+      );
 }

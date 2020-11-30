@@ -45,6 +45,8 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
           Expanded(
             child: ListView.builder(
               itemBuilder: (BuildContext context, int index) {
+                //return SelectableText(_attachContent);
+
                 return Padding(
                   padding: const EdgeInsets.all(20),
                   child: ExtendedText(
@@ -64,18 +66,19 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                         ? null
                         : TextOverflowWidget(
                             child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              const Text('\u2026 '),
-                              RaisedButton(
-                                child: const Text('more'),
-                                onPressed: () {
-                                  launch(
-                                      'https://github.com/fluttercandies/extended_text');
-                                },
-                              )
-                            ],
-                          )),
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                const Text('\u2026 '),
+                                RaisedButton(
+                                  child: const Text('more'),
+                                  onPressed: () {
+                                    launch(
+                                        'https://github.com/fluttercandies/extended_text');
+                                  },
+                                )
+                              ],
+                            ),
+                          ),
                     selectionEnabled: true,
                     textSelectionControls:
                         _myExtendedMaterialTextSelectionControls,

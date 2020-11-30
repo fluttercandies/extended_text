@@ -47,6 +47,8 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     ui.BoxHeightStyle selectionHeightStyle = ui.BoxHeightStyle.tight,
     ui.BoxWidthStyle selectionWidthStyle = ui.BoxWidthStyle.tight,
     TextOverflowWidget overflowWidget,
+    this.textSelectionDelegate,
+    bool hasFocus,
   })  : assert(text != null),
         assert(text.debugAssertIsValid()),
         assert(textAlign != null),
@@ -81,6 +83,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         _selectionHeightStyle = selectionHeightStyle,
         _selectionWidthStyle = selectionWidthStyle,
         _overflowWidget = overflowWidget {
+    this.hasFocus = hasFocus ?? false;
     addAll(children);
     extractPlaceholderSpans(text);
   }
@@ -1309,4 +1312,11 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     _overflowWidget = value;
     markNeedsPaint();
   }
+
+  @override
+  Rect get caretPrototype =>
+      Rect.fromLTWH(0, 0, 1, textPainter.preferredLineHeight);
+
+  @override
+  TextSelectionDelegate textSelectionDelegate;
 }

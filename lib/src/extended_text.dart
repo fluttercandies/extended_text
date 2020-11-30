@@ -231,8 +231,9 @@ class ExtendedText extends StatelessWidget {
     if (selectionEnabled) {
       result = ExtendedTextSelection(
         textAlign: textAlign ?? defaultTextStyle.textAlign ?? TextAlign.start,
-        textDirection:
-            textDirection, // RichText uses Directionality.of to obtain a default if this is null.
+        textDirection: textDirection ??
+            Directionality.of(
+                context), // RichText uses Directionality.of to obtain a default if this is null.
         locale:
             locale, // RichText uses Localizations.localeOf to obtain a default if this is null
         softWrap: softWrap ?? defaultTextStyle.softWrap,
@@ -254,8 +255,9 @@ class ExtendedText extends StatelessWidget {
     } else {
       result = ExtendedRichText(
         textAlign: textAlign ?? defaultTextStyle.textAlign ?? TextAlign.start,
-        textDirection:
-            textDirection, // RichText uses Directionality.of to obtain a default if this is null.
+        textDirection: textDirection ??
+            Directionality.of(
+                context), // RichText uses Directionality.of to obtain a default if this is null.
         locale:
             locale, // RichText uses Localizations.localeOf to obtain a default if this is null
         softWrap: softWrap ?? defaultTextStyle.softWrap,
@@ -268,6 +270,7 @@ class ExtendedText extends StatelessWidget {
             textHeightBehavior ?? defaultTextStyle.textHeightBehavior,
         textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
         overflowWidget: overflowWidget,
+        hasFocus: false,
       );
     }
 

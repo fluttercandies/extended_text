@@ -41,6 +41,8 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
     this.selectionHeightStyle = BoxHeightStyle.tight,
     this.selectionWidthStyle = BoxWidthStyle.tight,
     this.overflowWidget,
+    this.textSelectionDelegate,
+    this.hasFocus,
   })  : assert(text != null),
         assert(textAlign != null),
         assert(softWrap != null),
@@ -142,6 +144,8 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
   final LayerLink endHandleLayerLink;
 
   final TextOverflowWidget overflowWidget;
+  final TextSelectionDelegate textSelectionDelegate;
+  final bool hasFocus;
 
   @override
   ExtendedRenderParagraph createRenderObject(BuildContext context) {
@@ -170,6 +174,8 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       selectionWidthStyle: selectionWidthStyle,
       selectionHeightStyle: selectionHeightStyle,
       overflowWidget: overflowWidget,
+      textSelectionDelegate: textSelectionDelegate,
+      hasFocus: hasFocus,
     );
   }
 
@@ -196,7 +202,9 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       ..textHeightBehavior = textHeightBehavior
       ..selectionWidthStyle = selectionWidthStyle
       ..selectionHeightStyle = selectionHeightStyle
-      ..overflowWidget = overflowWidget;
+      ..overflowWidget = overflowWidget
+      ..textSelectionDelegate = textSelectionDelegate
+      ..hasFocus = hasFocus;
   }
 
   @override
