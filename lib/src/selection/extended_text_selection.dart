@@ -36,6 +36,7 @@ class ExtendedTextSelection extends StatefulWidget {
       this.selectionHeightStyle = BoxHeightStyle.tight,
       this.selectionWidthStyle = BoxWidthStyle.tight,
       this.overFlowWidget,
+      this.strutStyle,
       Key key})
       : assert(selectionHeightStyle != null),
         assert(selectionWidthStyle != null),
@@ -92,6 +93,9 @@ class ExtendedTextSelection extends StatefulWidget {
 
   /// How visual overflow should be handled.
   final TextOverflow overflow;
+
+  /// {@macro flutter.painting.textPainter.strutStyle}
+  final StrutStyle strutStyle;
 
   /// The number of font pixels for each logical pixel.
   ///
@@ -287,6 +291,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
                 overflowWidget: widget.overFlowWidget,
                 hasFocus: _effectiveFocusNode.hasFocus,
                 textSelectionDelegate: this,
+                strutStyle: widget.strutStyle,
               ),
             )));
 
