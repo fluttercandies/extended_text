@@ -242,7 +242,8 @@ class ExtendedText extends StatelessWidget {
             textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
         maxLines: maxLines ?? defaultTextStyle.maxLines,
         text: innerTextSpan,
-        selectionColor: selectionColor ?? Theme.of(context).textSelectionColor,
+        selectionColor: selectionColor ??
+            Theme.of(context).textSelectionTheme.selectionColor,
         dragStartBehavior: dragStartBehavior,
         onTap: onTap,
         data: data ?? textSpanToActualText(innerTextSpan),

@@ -308,7 +308,7 @@ refer to issue [26748](https://github.com/flutter/flutter/issues/26748)
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         const Text('\u2026 '),
-                        RaisedButton(
+                        ElevatedButton(
                           child: const Text('more'),
                           onPressed: () {
                             launch(

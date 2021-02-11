@@ -22,14 +22,14 @@ class MyExtendedMaterialTextSelectionControls
   MyExtendedMaterialTextSelectionControls();
   @override
   Widget buildToolbar(
-    BuildContext context,
-    Rect globalEditableRegion,
-    double textLineHeight,
-    Offset selectionMidpoint,
-    List<TextSelectionPoint> endpoints,
-    TextSelectionDelegate delegate,
-    ClipboardStatusNotifier clipboardStatus,
-  ) {
+      BuildContext context,
+      Rect globalEditableRegion,
+      double textLineHeight,
+      Offset selectionMidpoint,
+      List<TextSelectionPoint> endpoints,
+      TextSelectionDelegate delegate,
+      ClipboardStatusNotifier clipboardStatus,
+      Offset _) {
     assert(debugCheckHasMediaQuery(context));
     assert(debugCheckHasMaterialLocalizations(context));
 
@@ -148,28 +148,28 @@ class _TextSelectionToolbar extends StatelessWidget {
         MaterialLocalizations.of(context);
 
     if (handleCut != null) {
-      items.add(FlatButton(
+      items.add(TextButton(
           child: Text(localizations.cutButtonLabel), onPressed: handleCut));
     }
     if (handleCopy != null) {
-      items.add(FlatButton(
+      items.add(TextButton(
           child: Text(localizations.copyButtonLabel), onPressed: handleCopy));
     }
     if (handlePaste != null) {
-      items.add(FlatButton(
+      items.add(TextButton(
         child: Text(localizations.pasteButtonLabel),
         onPressed: handlePaste,
       ));
     }
     if (handleSelectAll != null) {
-      items.add(FlatButton(
+      items.add(TextButton(
           child: Text(localizations.selectAllButtonLabel),
           onPressed: handleSelectAll));
     }
 
     if (handleLike != null) {
       items.add(
-          FlatButton(child: const Icon(Icons.favorite), onPressed: handleLike));
+          TextButton(child: const Icon(Icons.favorite), onPressed: handleLike));
     }
 
     // If there is no option available, build an empty widget.

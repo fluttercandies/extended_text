@@ -49,7 +49,7 @@ class CustomTextOverflowDemo extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         const Text('\u2026 '),
-                        RaisedButton(
+                        ElevatedButton(
                           child: const Text('more'),
                           onPressed: () {
                             launch(

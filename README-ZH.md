@@ -331,7 +331,7 @@ Text背景相关的issue[24335](https://github.com/flutter/flutter/issues/24335)
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         const Text('\u2026 '),
-                        RaisedButton(
+                        ElevatedButton(
                           child: const Text('more'),
                           onPressed: () {
                             launch(
