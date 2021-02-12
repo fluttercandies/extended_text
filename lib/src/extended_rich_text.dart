@@ -160,11 +160,7 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       maxLines: maxLines,
       strutStyle: strutStyle,
       textWidthBasis: textWidthBasis,
-      locale: locale ??
-          Localizations.localeOf(
-            context,
-            nullOk: true,
-          ),
+      locale: locale ?? Localizations.maybeLocaleOf(context),
       selection: selection,
       onSelectionChanged: onSelectionChanged,
       selectionColor: selectionColor,
@@ -193,7 +189,7 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       ..maxLines = maxLines
       ..strutStyle = strutStyle
       ..textWidthBasis = textWidthBasis
-      ..locale = locale ?? Localizations.localeOf(context, nullOk: true)
+      ..locale = locale ?? Localizations.maybeLocaleOf(context)
       ..selection = selection
       ..selectionColor = selectionColor
       ..onSelectionChanged = onSelectionChanged
