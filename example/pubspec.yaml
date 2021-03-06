@@ -18,8 +18,9 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
-  url_launcher: 5.3.0
-  oktoast: ^2.1.4
+  url_launcher: any
+  oktoast: any
+  ff_annotation_route_library: ^2.0.1-non-null-safety  
 dependency_overrides:
   extended_text:
     path: ../
@@ -27,7 +28,6 @@ dependency_overrides:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  ff_annotation_route: any
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec

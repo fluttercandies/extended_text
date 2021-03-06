@@ -6,12 +6,11 @@
 import 'package:example/text/my_extended_text_selection_controls.dart';
 import 'package:example/text/my_special_text_span_builder.dart';
 import 'package:extended_text/extended_text.dart';
+import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide CircularProgressIndicator;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/foundation.dart';
-
-import 'package:ff_annotation_route/ff_annotation_route.dart';
 
 @FFRoute(
     name: 'fluttercandies://TextSelectionDemo',
@@ -23,14 +22,12 @@ class TextSelectionDemo extends StatefulWidget {
 }
 
 class _TextSelectionDemoState extends State<TextSelectionDemo> {
-  MyExtendedMaterialTextSelectionControls
-      _myExtendedMaterialTextSelectionControls;
+  TextSelectionControls _myExtendedMaterialTextSelectionControls;
   final String _attachContent =
       '[love]Extended text help you to build rich text quickly. any special text you will have with extended text.It\'s my pleasure to invite you to join \$FlutterCandies\$ if you want to improve flutter .[love] if you meet any problem, please let me konw @zmtzawqlp .[sun_glasses]';
   @override
   void initState() {
-    _myExtendedMaterialTextSelectionControls =
-        MyExtendedMaterialTextSelectionControls();
+    _myExtendedMaterialTextSelectionControls = MyTextSelectionControls();
     super.initState();
   }
 
@@ -69,9 +66,9 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
                                 const Text('\u2026 '),
-                                RaisedButton(
+                                InkWell(
                                   child: const Text('more'),
-                                  onPressed: () {
+                                  onTap: () {
                                     launch(
                                         'https://github.com/fluttercandies/extended_text');
                                   },
