@@ -1,6 +1,6 @@
 name: extended_text
 description: Extended official text to build special text like inline image or @somebody quickly,it also support custom background,custom over flow and custom selection toolbar and handles.
-version: 4.1.0
+version: 5.0.0-non-null-safety
 homepage: https://github.com/fluttercandies/extended_text
 
 environment:
@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  extended_text_library: ^4.0.3
+  extended_text_library: ^5.0.0-non-null-safety
 
 dev_dependencies:
   flutter_test:

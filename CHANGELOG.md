@@ -1,3 +1,6 @@
+## 5.0.0-non-null-safety
+
+* non-null-safety
 ## 4.1.0
 
 * Support keyboard copy on web/desktop
