@@ -31,7 +31,7 @@ class ExtendedText extends StatelessWidget {
     this.onTap,
     this.selectionColor,
     this.dragStartBehavior = DragStartBehavior.start,
-    this.textSelectionControls,
+    this.selectionControls,
     this.selectionHeightStyle = ui.BoxHeightStyle.tight,
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
     this.overflowWidget,
@@ -59,7 +59,7 @@ class ExtendedText extends StatelessWidget {
     this.onTap,
     this.selectionColor,
     this.dragStartBehavior = DragStartBehavior.start,
-    this.textSelectionControls,
+    this.selectionControls,
     this.selectionHeightStyle = ui.BoxHeightStyle.tight,
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
     this.overflowWidget,
@@ -83,7 +83,7 @@ class ExtendedText extends StatelessWidget {
 
   /// An interface for building the selection UI, to be provided by the
   /// implementor of the toolbar widget or handle widget
-  final TextSelectionControls? textSelectionControls;
+  final TextSelectionControls? selectionControls;
 
   ///DragStartBehavior for text selection
   final DragStartBehavior dragStartBehavior;
@@ -245,7 +245,7 @@ class ExtendedText extends StatelessWidget {
         dragStartBehavior: dragStartBehavior,
         onTap: onTap,
         data: data ?? textSpanToActualText(innerTextSpan),
-        textSelectionControls: textSelectionControls,
+        textSelectionControls: selectionControls,
         textHeightBehavior:
             textHeightBehavior ?? defaultTextStyle.textHeightBehavior,
         textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,

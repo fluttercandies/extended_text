@@ -200,7 +200,7 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       ..selectionWidthStyle = selectionWidthStyle
       ..selectionHeightStyle = selectionHeightStyle
       ..overflowWidget = overflowWidget
-      ..textSelectionDelegate = textSelectionDelegate!
+      ..textSelectionDelegate = textSelectionDelegate
       ..hasFocus = hasFocus!;
   }
 
