@@ -1,6 +1,8 @@
 ## 5.0.1
 
 * Add add SemanticsInformation for overflowWidget
+* Improve performance for overflowWidget
+* Do not paint Selection in the region of overFlowWidget
 
 ## 5.0.0
 

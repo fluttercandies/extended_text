@@ -407,16 +407,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         minWidth: constraints.minWidth,
         maxWidth: constraints.maxWidth,
         forceLayout: true);
-    if (overflowWidget != null) {
-      lastChild!.layout(
-        BoxConstraints(
-          maxWidth: constraints.maxWidth,
-          maxHeight:
-              overflowWidget!.maxHeight ?? textPainter.preferredLineHeight,
-        ),
-        parentUsesSize: true,
-      );
-    }
+
     setParentData();
 
     // We grab _textPainter.size and _textPainter.didExceedMaxLines here because
@@ -487,6 +478,57 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     } else {
       _needsClipping = false;
       _overflowShader = null;
+    }
+    _overFlowRect = null;
+    if (_hasVisualOverflow && overflowWidget != null) {
+      lastChild!.layout(
+        BoxConstraints(
+          maxWidth: constraints.maxWidth,
+          maxHeight:
+              overflowWidget!.maxHeight ?? textPainter.preferredLineHeight,
+        ),
+        parentUsesSize: true,
+      );
+
+      assert(textPainter.width >= lastChild!.size.width);
+
+      final TextParentData textParentData =
+          lastChild!.parentData as TextParentData;
+      textParentData.scale = 1.0;
+
+      final Rect rect = const Offset(0.0, 0.0) & size;
+      final Size overFlowWidgetSize = lastChild!.size;
+
+      // find TextPosition near bottomRight
+      final TextPosition lastOnePosition =
+          _textPainter.getPositionForOffset(rect.bottomRight);
+
+      // find overflow TextPosition that not clip the original text
+      final Offset finalOverFlowOffset = _findFinalOverflowOffset(
+        rect: rect,
+        x: rect.width -
+            overFlowWidgetSize.width +
+            overflowWidget!.fixedOffset.dx,
+        endTextOffset: lastOnePosition.offset,
+        y: rect.bottom,
+        effectiveOffset: Offset.zero,
+      );
+
+      final double x = overflowWidget!.align == TextOverflowAlign.left
+          ? finalOverFlowOffset.dx
+          : rect.right - overFlowWidgetSize.width;
+
+      textParentData.offset = Offset(
+          x + overflowWidget!.fixedOffset.dx,
+          rect.bottom -
+              overFlowWidgetSize.height +
+              (overFlowWidgetSize.height - _textPainter.preferredLineHeight) /
+                  2.0 +
+              overflowWidget!.fixedOffset.dy);
+      final Rect textRect = Offset.zero & size;
+      // _paintTextOverflow
+      _overFlowRect =
+          Rect.fromPoints(finalOverFlowOffset, textRect.bottomRight);
     }
   }
 
@@ -686,7 +728,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     _semanticsInfo = text.getSemanticsInformation();
 
     // add SemanticsInformation for overflowWidget
-    if (overflowWidget != null) {
+    if (_hasVisualOverflow && overflowWidget != null) {
       _semanticsInfo!
           .addAll(WidgetSpan(child: overflowWidget!).getSemanticsInformation());
     }
@@ -949,40 +991,12 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 
   Rect? _overFlowRect;
   Path? _paintTextOverflow(PaintingContext context, Offset offset) {
-    _overFlowRect = null;
-    if (_hasVisualOverflow && overflowWidget != null) {
+    if (_hasVisualOverflow && overflowWidget != null && _overFlowRect != null) {
       assert(textPainter.width >= lastChild!.size.width);
-
-      final Rect rect = const Offset(0.0, 0.0) & size;
-      final Size overFlowWidgetSize = lastChild!.size;
-
-      ///find TextPosition near bottomRight
-      final TextPosition lastOnePosition =
-          _textPainter.getPositionForOffset(rect.bottomRight);
-
-      ///find overflow TextPosition that not clip the original text
-      final Offset finalOverFlowOffset = _findFinalOverflowOffset(
-          rect: rect,
-          x: rect.width - overFlowWidgetSize.width,
-          endTextOffset: lastOnePosition.offset,
-          y: rect.bottom,
-          effectiveOffset: Offset.zero);
 
       final TextParentData textParentData =
           lastChild!.parentData as TextParentData;
 
-      //_textPainter.preferredLineHeight
-      final double x = overflowWidget!.align == TextOverflowAlign.left
-          ? finalOverFlowOffset.dx
-          : rect.right - overFlowWidgetSize.width;
-      textParentData.offset = Offset(
-          x + overflowWidget!.fixedOffset.dx,
-          rect.bottom -
-              overFlowWidgetSize.height +
-              (overFlowWidgetSize.height - _textPainter.preferredLineHeight) /
-                  2.0 +
-              overflowWidget!.fixedOffset.dy);
-      textParentData.scale = 1.0;
       final double scale = textParentData.scale!;
       context.pushTransform(
         needsCompositing,
@@ -997,59 +1011,41 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
       );
 
       final Rect textRect = offset & size;
-      _overFlowRect =
-          Rect.fromPoints(offset + finalOverFlowOffset, textRect.bottomRight);
       final double visibleRegionSlop = _textPainter.preferredLineHeight / 2.0;
-
+      final Rect overFlowRect = _overFlowRect!.shift(offset);
       return Path()
-        ..addPolygon(<Offset>[
-          textRect.topLeft,
-          textRect.topRight,
-          _overFlowRect!.topRight,
-          _overFlowRect!.topLeft,
-          _overFlowRect!.bottomLeft.translate(0.0, visibleRegionSlop),
-          textRect.bottomLeft.translate(0.0, visibleRegionSlop),
-        ], true);
+        ..addPolygon(
+          <Offset>[
+            textRect.topLeft,
+            textRect.topRight,
+            overFlowRect.topRight,
+            overFlowRect.topLeft,
+            overFlowRect.bottomLeft.translate(0.0, visibleRegionSlop),
+            textRect.bottomLeft.translate(0.0, visibleRegionSlop),
+          ],
+          true,
+        );
     }
     return null;
   }
 
   /// y find min y, so that over flow text will be covered
   Offset _findFinalOverflowOffset({
-    Rect? rect,
-    double? x,
+    required Rect rect,
+    required double x,
     required int endTextOffset,
-    double? y,
+    required double y,
     Offset? effectiveOffset,
   }) {
-//    Offset endOffset = getOffsetForCaret(
-//      TextPosition(offset: endTextOffset),
-//      rect,
-//    );
-
     final Offset endOffset = getCaretOffset(
-        TextPosition(
-          offset: endTextOffset,
-        ),
-        effectiveOffset: effectiveOffset);
+      TextPosition(
+        offset: endTextOffset,
+      ),
+      effectiveOffset: effectiveOffset,
+    );
 
-    if (endOffset == Offset.zero && endTextOffset > 0) {
-      return _findFinalOverflowOffset(
-          rect: rect,
-          x: x,
-          endTextOffset: endTextOffset - 1,
-          y: y,
-          effectiveOffset: effectiveOffset);
-    }
-
-    //final TextPosition position = getPositionForOffset(endOffset);
-
-    ///handle image span
-//    final InlineSpan textSpan = _textPainter.text.getSpanForPosition(position);
-//    if (textSpan is ExtendedWidgetSpan) {
-//      endOffset = Offset(endOffset.dx - textSpan.size.width, endOffset.dy);
-//    }
-    //overflow
+    // overflow
+    //
     if (endTextOffset != 0 && endOffset == Offset.zero) {
       return _findFinalOverflowOffset(
           rect: rect,
@@ -1059,13 +1055,14 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
           effectiveOffset: effectiveOffset);
     }
 
-    if (endOffset.dx > x!) {
+    if (endOffset.dx > x) {
       return _findFinalOverflowOffset(
-          rect: rect,
-          x: x,
-          endTextOffset: endTextOffset - 1,
-          y: math.min(y!, endOffset.dy),
-          effectiveOffset: effectiveOffset);
+        rect: rect,
+        x: x,
+        endTextOffset: endTextOffset - 1,
+        y: math.min(y, endOffset.dy),
+        effectiveOffset: effectiveOffset,
+      );
     }
     return Offset(endOffset.dx, math.min(y!, endOffset.dy));
   }
@@ -1076,7 +1073,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     }
     bool showSelection = false;
 
-    ///zmt
+    // zmt
     final TextSelection actualSelection = hasSpecialInlineSpanBase
         ? convertTextInputSelectionToTextPainterSelection(text, _selection!)
         : _selection!;
@@ -1088,6 +1085,25 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 
     if (showSelection) {
       _selectionRects ??= _textPainter.getBoxesForSelection(actualSelection);
+
+      // do not paint Selection in the region of _overFlowRect
+      if (_hasVisualOverflow &&
+          overflowWidget != null &&
+          _overFlowRect != null) {
+        final Rect overFlowRect = _overFlowRect!.shift(_offset);
+        for (final ui.TextBox box in _selectionRects!) {
+          if (overFlowRect.overlaps(box.toRect())) {
+            _selectionRects![_selectionRects!.indexOf(box)] =
+                ui.TextBox.fromLTRBD(
+              math.min(overFlowRect.left, box.left),
+              box.top,
+              math.min(overFlowRect.left, box.right),
+              box.bottom,
+              box.direction,
+            );
+          }
+        }
+      }
 
       assert(_selectionRects != null);
       paintSelection(context.canvas, effectiveOffset);
@@ -1145,12 +1161,13 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
       if (_hasVisualOverflow &&
           overflowWidget != null &&
           _overFlowRect != null) {
+        final Rect overFlowRect = _overFlowRect!.shift(_offset);
         for (final ui.TextBox box in boxes.toList()) {
-          if (_overFlowRect!.overlaps(box.toRect())) {
+          if (overFlowRect.overlaps(box.toRect())) {
             boxes[boxes.indexOf(box)] = ui.TextBox.fromLTRBD(
-              math.min(_overFlowRect!.left, box.left),
+              math.min(overFlowRect.left, box.left),
               box.top,
-              math.min(_overFlowRect!.left, box.right),
+              math.min(overFlowRect.left, box.right),
               box.bottom,
               box.direction,
             );
