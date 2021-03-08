@@ -409,12 +409,13 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         forceLayout: true);
     if (overflowWidget != null) {
       lastChild!.layout(
-          BoxConstraints(
-            maxWidth: constraints.maxWidth,
-            maxHeight:
-                overflowWidget!.maxHeight ?? textPainter.preferredLineHeight,
-          ),
-          parentUsesSize: true);
+        BoxConstraints(
+          maxWidth: constraints.maxWidth,
+          maxHeight:
+              overflowWidget!.maxHeight ?? textPainter.preferredLineHeight,
+        ),
+        parentUsesSize: true,
+      );
     }
     setParentData();
 
@@ -675,6 +676,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
       workingText,
       semanticsLabel: workingLabel,
     ));
+
     return combined;
   }
 
@@ -682,6 +684,12 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   void describeSemanticsConfiguration(SemanticsConfiguration config) {
     super.describeSemanticsConfiguration(config);
     _semanticsInfo = text.getSemanticsInformation();
+
+    // add SemanticsInformation for overflowWidget
+    if (overflowWidget != null) {
+      _semanticsInfo!
+          .addAll(WidgetSpan(child: overflowWidget!).getSemanticsInformation());
+    }
 
     if (_semanticsInfo!.any(
         (InlineSpanSemanticsInformation info) => info.recognizer != null)) {
@@ -733,11 +741,12 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
           final SemanticsNode childNode = children.elementAt(childIndex);
           final TextParentData parentData =
               child!.parentData! as TextParentData;
+
           childNode.rect = Rect.fromLTWH(
             childNode.rect.left,
             childNode.rect.top,
-            childNode.rect.width * parentData.scale!,
-            childNode.rect.height * parentData.scale!,
+            childNode.rect.width * (parentData.scale ?? 1.0),
+            childNode.rect.height * (parentData.scale ?? 1.0),
           );
           newChildren.add(childNode);
           childIndex += 1;

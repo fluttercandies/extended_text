@@ -1,6 +1,10 @@
+## 5.0.1
+
+* Add add SemanticsInformation for overflowWidget
+
 ## 5.0.0
 
-* support null-safety
+* Support null-safety
 
 ## 4.1.0
 
