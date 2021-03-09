@@ -1064,7 +1064,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         effectiveOffset: effectiveOffset,
       );
     }
-    return Offset(endOffset.dx, math.min(y!, endOffset.dy));
+    return Offset(endOffset.dx, math.min(y, endOffset.dy));
   }
 
   void _paintSelection(PaintingContext context, Offset effectiveOffset) {
