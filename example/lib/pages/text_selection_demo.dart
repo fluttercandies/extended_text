@@ -77,8 +77,7 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                             ),
                           ),
                     selectionEnabled: true,
-                    selectionControls:
-                        _myExtendedMaterialTextSelectionControls,
+                    selectionControls: _myExtendedMaterialTextSelectionControls,
                   ),
                 );
               },

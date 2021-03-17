@@ -1,3 +1,7 @@
+## 5.0.3
+
+* Fix null-safety error #96
+
 ## 5.0.2
 
 * Fix null-safety error

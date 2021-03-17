@@ -220,8 +220,7 @@ class ExtendedText extends StatelessWidget {
     innerTextSpan ??= TextSpan(
       style: effectiveTextStyle,
       text: data,
-      children: (textSpan != null ? <InlineSpan?>[textSpan] : null)
-          as List<InlineSpan>?,
+      children: textSpan != null ? <InlineSpan>[textSpan!] : null,
     );
 
     //_createImageConfiguration(<InlineSpan>[innerTextSpan], context);
