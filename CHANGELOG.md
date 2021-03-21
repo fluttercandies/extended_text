@@ -1,3 +1,7 @@
+## 5.0.4
+
+* Fix issue that the overflowWidget is not layout #97
+  
 ## 5.0.3
 
 * Fix null-safety error #96

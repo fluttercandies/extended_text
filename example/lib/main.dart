@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      builder: (BuildContext c, Widget w) {
+      builder: (BuildContext c, Widget? w) {
         // ScreenUtil.instance =
         //     ScreenUtil(width: 750, height: 1334, allowFontScaling: true)
         //       ..init(c);
@@ -27,10 +27,10 @@ class MyApp extends StatelessWidget {
           final MediaQueryData data = MediaQuery.of(c);
           return MediaQuery(
             data: data.copyWith(textScaleFactor: 1.0),
-            child: w,
+            child: w!,
           );
         }
-        return w;
+        return w!;
       },
       initialRoute: Routes.fluttercandiesMainpage,
       onGenerateRoute: (RouteSettings settings) {
@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-List<String> _imageTestUrls;
+List<String>? _imageTestUrls;
 List<String> get imageTestUrls =>
     _imageTestUrls ??
     <String>['https://photo.tuchong.com/4870004/f/298584322.jpg'];

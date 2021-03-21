@@ -71,17 +71,17 @@ class MainPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      (index + 1).toString() + '.' + page.routeName,
+                      (index + 1).toString() + '.' + page.routeName!,
                       //style: TextStyle(inherit: false),
                     ),
                     Text(
-                      page.description,
+                      page.description!,
                       style: const TextStyle(color: Colors.grey),
                     )
                   ],
                 ),
                 onTap: () {
-                  Navigator.pushNamed(context, routes[index].name);
+                  Navigator.pushNamed(context, routes[index].name!);
                 },
               ));
         },

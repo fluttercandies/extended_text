@@ -123,11 +123,11 @@ class BackgroundTextDemo extends StatelessWidget {
                       paintBackground: (BackgroundTextSpan backgroundTextSpan,
                           Canvas canvas,
                           Offset offset,
-                          TextPainter painter,
+                          TextPainter? painter,
                           Rect rect,
-                          {Offset endOffset,
-                          TextPainter wholeTextPainter}) {
-                        final Rect textRect = offset & painter.size;
+                          {Offset? endOffset,
+                          TextPainter? wholeTextPainter}) {
+                        final Rect textRect = offset & painter!.size;
 
                         ///top-right
                         if (endOffset != null) {
@@ -137,7 +137,7 @@ class BackgroundTextDemo extends StatelessWidget {
                           if (backgroundTextSpan.clipBorderRadius != null) {
                             canvas.save();
                             canvas.clipPath(Path()
-                              ..addRRect(backgroundTextSpan.clipBorderRadius
+                              ..addRRect(backgroundTextSpan.clipBorderRadius!
                                   .resolve(painter.textDirection)
                                   .toRRect(firstLineRect)));
                           }
@@ -165,7 +165,7 @@ class BackgroundTextDemo extends StatelessWidget {
                               if (backgroundTextSpan.clipBorderRadius != null) {
                                 canvas.save();
                                 canvas.clipPath(Path()
-                                  ..addRRect(backgroundTextSpan.clipBorderRadius
+                                  ..addRRect(backgroundTextSpan.clipBorderRadius!
                                       .resolve(painter.textDirection)
                                       .toRRect(lastLineRect)));
                               }
@@ -184,7 +184,7 @@ class BackgroundTextDemo extends StatelessWidget {
                               if (backgroundTextSpan.clipBorderRadius != null) {
                                 canvas.save();
                                 canvas.clipPath(Path()
-                                  ..addRRect(backgroundTextSpan.clipBorderRadius
+                                  ..addRRect(backgroundTextSpan.clipBorderRadius!
                                       .resolve(painter.textDirection)
                                       .toRRect(fullLineRect)));
                               }
@@ -202,7 +202,7 @@ class BackgroundTextDemo extends StatelessWidget {
                           if (backgroundTextSpan.clipBorderRadius != null) {
                             canvas.save();
                             canvas.clipPath(Path()
-                              ..addRRect(backgroundTextSpan.clipBorderRadius
+                              ..addRRect(backgroundTextSpan.clipBorderRadius!
                                   .resolve(painter.textDirection)
                                   .toRRect(textRect)));
                           }

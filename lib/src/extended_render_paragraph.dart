@@ -480,7 +480,8 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
       _overflowShader = null;
     }
     _overFlowRect = null;
-    if (_hasVisualOverflow && overflowWidget != null) {
+    if (overflowWidget != null) {
+      // #97, the overflowWidget is already added, we must layout it as official.
       lastChild!.layout(
         BoxConstraints(
           maxWidth: constraints.maxWidth,
@@ -489,6 +490,10 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         ),
         parentUsesSize: true,
       );
+
+      if (!_hasVisualOverflow) {
+        return;
+      }
 
       assert(textPainter.width >= lastChild!.size.width);
 

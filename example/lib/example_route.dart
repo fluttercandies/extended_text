@@ -11,10 +11,10 @@ import 'pages/main_page.dart';
 import 'pages/text_demo.dart';
 import 'pages/text_selection_demo.dart';
 
-// ignore_for_file: prefer_const_literals_to_create_immutables,unused_local_variable
+// ignore_for_file: prefer_const_literals_to_create_immutables,unused_local_variable,unused_import
 FFRouteSettings getRouteSettings({
-  @required String name,
-  Map<String, dynamic> arguments,
+  required String name,
+  Map<String, dynamic>? arguments,
 }) {
   final Map<String, dynamic> safeArguments =
       arguments ?? const <String, dynamic>{};
