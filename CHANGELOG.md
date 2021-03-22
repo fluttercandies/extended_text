@@ -1,3 +1,7 @@
+## 5.0.5
+
+* Fix issue that childIndex == children.length assert false in assembleSemanticsNode when use overflowWidget and text is not overflow.
+
 ## 5.0.4
 
 * Fix issue that the overflowWidget is not layout #97

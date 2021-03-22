@@ -733,7 +733,11 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     _semanticsInfo = text.getSemanticsInformation();
 
     // add SemanticsInformation for overflowWidget
-    if (_hasVisualOverflow && overflowWidget != null) {
+    // add into _semanticsInfo even if _hasVisualOverflow is false.
+    // make sure that assert(childIndex == children.length)
+    // is passed in assembleSemanticsNode method.
+    //
+    if (overflowWidget != null) {
       _semanticsInfo!
           .addAll(WidgetSpan(child: overflowWidget!).getSemanticsInformation());
     }
