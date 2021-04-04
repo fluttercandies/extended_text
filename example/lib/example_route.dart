@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'pages/background_text_demo.dart';
 import 'pages/custom_text_overflow_demo.dart';
 import 'pages/main_page.dart';
+import 'pages/middle_text_overflow_demo.dart';
 import 'pages/text_demo.dart';
 import 'pages/text_selection_demo.dart';
 
@@ -34,6 +35,14 @@ FFRouteSettings getRouteSettings({
         widget: CustomTextOverflowDemo(),
         routeName: 'CustomTextOverflow',
         description: 'workaround for issue 26748. how to custom text overflow',
+      );
+    case 'fluttercandies://MiddleTextOverflowDemo':
+      return FFRouteSettings(
+        name: name,
+        arguments: arguments,
+        widget: MiddleTextOverflowDemo(),
+        routeName: 'MiddleTextOverflow',
+        description: 'how to make text overflow in middle.',
       );
     case 'fluttercandies://TextDemo':
       return FFRouteSettings(
