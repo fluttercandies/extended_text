@@ -21,8 +21,8 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
   /// The [textDirection], if null, defaults to the ambient [Directionality],
   /// which in that case must not be null.
   ExtendedRichText({
-    Key key,
-    @required this.text,
+    Key? key,
+    required this.text,
     this.textAlign = TextAlign.start,
     this.textDirection,
     this.softWrap = true,
@@ -41,27 +41,31 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
     this.selectionHeightStyle = BoxHeightStyle.tight,
     this.selectionWidthStyle = BoxWidthStyle.tight,
     this.overflowWidget,
-  })  : assert(text != null),
-        assert(textAlign != null),
-        assert(softWrap != null),
-        assert(overflow != null),
-        assert(textScaleFactor != null),
-        assert(maxLines == null || maxLines > 0),
-        assert(textWidthBasis != null),
+    this.textSelectionDelegate,
+    this.hasFocus,
+  })  : assert(maxLines == null || maxLines > 0),
         super(key: key, children: _extractChildren(text, overflowWidget));
 
   // Traverses the InlineSpan tree and depth-first collects the list of
   // child widgets that are created in WidgetSpans.
-  static List<Widget> _extractChildren(InlineSpan span, TextOverflowWidget overFlowWidget) {
+  static List<Widget> _extractChildren(
+      InlineSpan span, TextOverflowWidget? overFlowWidget) {
+    int index = 0;
     final List<Widget> result = <Widget>[];
     span.visitChildren((InlineSpan span) {
       if (span is WidgetSpan) {
-        result.add(span.child);
+        result.add(Semantics(
+          tagForChildren: PlaceholderSpanIndexSemanticsTag(index++),
+          child: span.child,
+        ));
       }
       return true;
     });
     if (overFlowWidget != null) {
-      result.add(overFlowWidget);
+      result.add(Semantics(
+        tagForChildren: PlaceholderSpanIndexSemanticsTag(index++),
+        child: overFlowWidget,
+      ));
     }
     return result;
   }
@@ -70,11 +74,11 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
   final BoxWidthStyle selectionWidthStyle;
 
   /// The range of text that is currently selected.
-  final TextSelection selection;
+  final TextSelection? selection;
 
-  final Color selectionColor;
+  final Color? selectionColor;
 
-  final TextSelectionChangedHandler onSelectionChanged;
+  final TextSelectionChangedHandler? onSelectionChanged;
 
   /// The text to display in this widget.
   final InlineSpan text;
@@ -96,7 +100,7 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
   ///
   /// Defaults to the ambient [Directionality], if any. If there is no ambient
   /// [Directionality], then this must not be null.
-  final TextDirection textDirection;
+  final TextDirection? textDirection;
 
   /// Whether the text should break at soft line breaks.
   ///
@@ -118,7 +122,7 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
   ///
   /// If this is 1, text will not wrap. Otherwise, text will be wrapped at the
   /// edge of the box.
-  final int maxLines;
+  final int? maxLines;
 
   /// Used to select a font when the same Unicode character can
   /// be rendered differently, depending on the locale.
@@ -127,20 +131,22 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
   /// is inherited from the enclosing app with `Localizations.localeOf(context)`.
   ///
   /// See [RenderParagraph.locale] for more information.
-  final Locale locale;
+  final Locale? locale;
 
   /// {@macro flutter.painting.textPainter.strutStyle}
-  final StrutStyle strutStyle;
+  final StrutStyle? strutStyle;
 
   /// {@macro flutter.widgets.text.DefaultTextStyle.textWidthBasis}
   final TextWidthBasis textWidthBasis;
 
-  final TextHeightBehavior textHeightBehavior;
+  final TextHeightBehavior? textHeightBehavior;
 
-  final LayerLink startHandleLayerLink;
-  final LayerLink endHandleLayerLink;
+  final LayerLink? startHandleLayerLink;
+  final LayerLink? endHandleLayerLink;
 
-  final TextOverflowWidget overflowWidget;
+  final TextOverflowWidget? overflowWidget;
+  final TextSelectionDelegate? textSelectionDelegate;
+  final bool? hasFocus;
 
   @override
   ExtendedRenderParagraph createRenderObject(BuildContext context) {
@@ -155,11 +161,7 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       maxLines: maxLines,
       strutStyle: strutStyle,
       textWidthBasis: textWidthBasis,
-      locale: locale ??
-          Localizations.localeOf(
-            context,
-            nullOk: true,
-          ),
+      locale: locale ?? Localizations.maybeLocaleOf(context),
       selection: selection,
       onSelectionChanged: onSelectionChanged,
       selectionColor: selectionColor,
@@ -168,7 +170,9 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       textHeightBehavior: textHeightBehavior,
       selectionWidthStyle: selectionWidthStyle,
       selectionHeightStyle: selectionHeightStyle,
-      overflowWidget:overflowWidget,
+      overflowWidget: overflowWidget,
+      textSelectionDelegate: textSelectionDelegate,
+      hasFocus: hasFocus,
     );
   }
 
@@ -186,7 +190,7 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       ..maxLines = maxLines
       ..strutStyle = strutStyle
       ..textWidthBasis = textWidthBasis
-      ..locale = locale ?? Localizations.localeOf(context, nullOk: true)
+      ..locale = locale ?? Localizations.maybeLocaleOf(context)
       ..selection = selection
       ..selectionColor = selectionColor
       ..onSelectionChanged = onSelectionChanged
@@ -195,7 +199,9 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       ..textHeightBehavior = textHeightBehavior
       ..selectionWidthStyle = selectionWidthStyle
       ..selectionHeightStyle = selectionHeightStyle
-      ..overflowWidget =overflowWidget;
+      ..overflowWidget = overflowWidget
+      ..textSelectionDelegate = textSelectionDelegate
+      ..hasFocus = hasFocus!;
   }
 
   @override

@@ -10,7 +10,7 @@
 - [Flutter RichText 支持自定义文本溢出效果](https://juejin.im/post/5c8ca608f265da2dd6394001)
 - [Flutter RichText 支持自定义文字背景](https://juejin.im/post/5c8bf9516fb9a049c9669204)
 - [Flutter RichText 支持特殊文字效果](https://juejin.im/post/5c8bf4fce51d451066008fa2)
-- [Flutter RichText支持文本选择](https://juejin.im/post/5cff71d46fb9a07ea6486a0e)  
+- [Flutter RichText支持文本选择](https://juejin.im/post/5cff71d46fb9a07ea6486a0e)
 
 欢迎加入[Flutter Candies](https://github.com/fluttercandies)，一起生产可爱的Flutter小糖果(QQ群181398081)
 
@@ -146,7 +146,6 @@ class MySpecialTextSpanBuilder extends SpecialTextSpanBuilder {
 
 其实你也不是一定要用这套代码将字符串转换为TextSpan，你可以有自己的方法，给最后的TextSpan就可以了。
 
-[more detail](https://github.com/fluttercandies/extended_text/tree/master/example/lib/special_text)
 
 ## 图片
 
@@ -230,7 +229,7 @@ class MyExtendedMaterialTextSelectionControls
     List<TextSelectionPoint> endpoints,
     TextSelectionDelegate delegate,
   ) {}
-  
+
   @override
   Widget buildHandle(
       BuildContext context, TextSelectionHandleType type, double textHeight) {
@@ -288,13 +287,12 @@ class MyExtendedMaterialTextSelectionControls
       },
     );
 ```
-[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/pages/text_selection_demo.dart)
 
 ## 自定义背景
 
 ![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/background.png)
 
-Text背景相关的issue[24335](https://github.com/flutter/flutter/issues/24335)/[24337](https://github.com/flutter/flutter/issues/24337) 
+Text背景相关的issue[24335](https://github.com/flutter/flutter/issues/24335)/[24337](https://github.com/flutter/flutter/issues/24337)
 
 ```dart
   BackgroundTextSpan(
@@ -308,8 +306,6 @@ Text背景相关的issue[24335](https://github.com/flutter/flutter/issues/24335)
 | background       | 背景画刷                                   | -    |
 | clipBorderRadius | 用于裁剪背景                               | -    |
 | paintBackground  | 绘制背景的回调，你可以按照你的想法绘画背景 | -    |
-
-[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/pages/background_text_demo.dart)
 
 ## 自定义文本溢出
 
@@ -349,4 +345,6 @@ Text背景相关的issue[24335](https://github.com/flutter/flutter/issues/24335)
           )
 ```
 
-[more detail](https://github.com/fluttercandies/extended_text/blob/master/example/lib/pages/custom_text_overflow_demo.dart)
+## ☕️Buy me a coffee
+
+![img](http://zmtzawqlp.gitee.io/my_images/images/qrcode.png)

@@ -11,8 +11,8 @@ class ExtendedText extends StatelessWidget {
   /// If the [style] argument is null, the text will use the style from the
   /// closest enclosing [DefaultTextStyle].
   const ExtendedText(
-    this.data, {
-    Key key,
+    String this.data, {
+    Key? key,
     this.style,
     this.strutStyle,
     this.textAlign,
@@ -31,19 +31,17 @@ class ExtendedText extends StatelessWidget {
     this.onTap,
     this.selectionColor,
     this.dragStartBehavior = DragStartBehavior.start,
-    this.textSelectionControls,
+    this.selectionControls,
     this.selectionHeightStyle = ui.BoxHeightStyle.tight,
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
     this.overflowWidget,
-  })  : assert(data != null),
-
-        textSpan = null,
+  })  : textSpan = null,
         super(key: key);
 
   /// Creates a text widget with a [InlineSpan].
   const ExtendedText.rich(
-    this.textSpan, {
-    Key key,
+    InlineSpan this.textSpan, {
+    Key? key,
     this.style,
     this.strutStyle,
     this.textAlign,
@@ -61,18 +59,17 @@ class ExtendedText extends StatelessWidget {
     this.onTap,
     this.selectionColor,
     this.dragStartBehavior = DragStartBehavior.start,
-    this.textSelectionControls,
+    this.selectionControls,
     this.selectionHeightStyle = ui.BoxHeightStyle.tight,
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
     this.overflowWidget,
-  })  : assert(textSpan != null),
-        data = null,
+  })  : data = null,
         specialTextSpanBuilder = null,
         super(key: key);
 
   /// maxheight is equal to textPainter.preferredLineHeight
   /// maxWidth is equal to textPainter.width
-  final TextOverflowWidget overflowWidget;
+  final TextOverflowWidget? overflowWidget;
 
   /// Controls how tall the selection highlight boxes are computed to be.
   ///
@@ -86,16 +83,16 @@ class ExtendedText extends StatelessWidget {
 
   /// An interface for building the selection UI, to be provided by the
   /// implementor of the toolbar widget or handle widget
-  final TextSelectionControls textSelectionControls;
+  final TextSelectionControls? selectionControls;
 
   ///DragStartBehavior for text selection
   final DragStartBehavior dragStartBehavior;
 
   ///Color of selection
-  final Color selectionColor;
+  final Color? selectionColor;
 
   ///Called when the user taps on this text.
-  final GestureTapCallback onTap;
+  final GestureTapCallback? onTap;
 
   ///whether enable selection
   final bool selectionEnabled;
@@ -103,31 +100,31 @@ class ExtendedText extends StatelessWidget {
   /// The text to display.
   ///
   /// This will be null if a [textSpan] is provided instead.
-  final String data;
+  final String? data;
 
   ///build your ccustom text span
-  final SpecialTextSpanBuilder specialTextSpanBuilder;
+  final SpecialTextSpanBuilder? specialTextSpanBuilder;
 
   ///call back of SpecialText tap
-  final SpecialTextGestureTapCallback onSpecialTextTap;
+  final SpecialTextGestureTapCallback? onSpecialTextTap;
 
   /// The text to display as a [InlineSpan].
   ///
   /// This will be null if [data] is provided instead.
-  final InlineSpan textSpan;
+  final InlineSpan? textSpan;
 
   /// If non-null, the style to use for this text.
   ///
   /// If the style's "inherit" property is true, the style will be merged with
   /// the closest enclosing [DefaultTextStyle]. Otherwise, the style will
   /// replace the closest enclosing [DefaultTextStyle].
-  final TextStyle style;
+  final TextStyle? style;
 
   /// {@macro flutter.painting.textPainter.strutStyle}
-  final StrutStyle strutStyle;
+  final StrutStyle? strutStyle;
 
   /// How the text should be aligned horizontally.
-  final TextAlign textAlign;
+  final TextAlign? textAlign;
 
   /// The directionality of the text.
   ///
@@ -142,7 +139,7 @@ class ExtendedText extends StatelessWidget {
   /// its left.
   ///
   /// Defaults to the ambient [Directionality], if any.
-  final TextDirection textDirection;
+  final TextDirection? textDirection;
 
   /// Used to select a font when the same Unicode character can
   /// be rendered differently, depending on the locale.
@@ -151,15 +148,15 @@ class ExtendedText extends StatelessWidget {
   /// is inherited from the enclosing app with `Localizations.localeOf(context)`.
   ///
   /// See [RenderParagraph.locale] for more information.
-  final Locale locale;
+  final Locale? locale;
 
   /// Whether the text should break at soft line breaks.
   ///
   /// If false, the glyphs in the text will be positioned as if there was unlimited horizontal space.
-  final bool softWrap;
+  final bool? softWrap;
 
   /// How visual overflow should be handled.
-  final TextOverflow overflow;
+  final TextOverflow? overflow;
 
   /// The number of font pixels for each logical pixel.
   ///
@@ -169,7 +166,7 @@ class ExtendedText extends StatelessWidget {
   /// The value given to the constructor as textScaleFactor. If null, will
   /// use the [MediaQueryData.textScaleFactor] obtained from the ambient
   /// [MediaQuery], or 1.0 if there is no [MediaQuery] in scope.
-  final double textScaleFactor;
+  final double? textScaleFactor;
 
   /// An optional maximum number of lines for the text to span, wrapping if necessary.
   /// If the text exceeds the given number of lines, it will be truncated according
@@ -182,7 +179,7 @@ class ExtendedText extends StatelessWidget {
   /// an explicit number for its [DefaultTextStyle.maxLines], then the
   /// [DefaultTextStyle] value will take precedence. You can use a [RichText]
   /// widget directly to entirely override the [DefaultTextStyle].
-  final int maxLines;
+  final int? maxLines;
 
   /// An alternative semantics label for this text.
   ///
@@ -197,33 +194,33 @@ class ExtendedText extends StatelessWidget {
   /// Text(r'$$', semanticsLabel: 'Double dollars')
   ///
   /// ```
-  final String semanticsLabel;
+  final String? semanticsLabel;
 
   /// {@macro flutter.dart:ui.text.TextWidthBasis}
-  final TextWidthBasis textWidthBasis;
+  final TextWidthBasis? textWidthBasis;
 
   /// {@macro flutter.dart:ui.textHeightBehavior}
-  final ui.TextHeightBehavior textHeightBehavior;
+  final ui.TextHeightBehavior? textHeightBehavior;
 
 //  ExtendedRenderEditable get _renderEditable =>
 //      _editableTextKey.currentState.renderEditable;
   @override
   Widget build(BuildContext context) {
     final DefaultTextStyle defaultTextStyle = DefaultTextStyle.of(context);
-    TextStyle effectiveTextStyle = style;
-    if (style == null || style.inherit)
+    TextStyle? effectiveTextStyle = style;
+    if (style == null || style!.inherit)
       effectiveTextStyle = defaultTextStyle.style.merge(style);
     if (MediaQuery.boldTextOverride(context))
-      effectiveTextStyle = effectiveTextStyle
+      effectiveTextStyle = effectiveTextStyle!
           .merge(const TextStyle(fontWeight: FontWeight.bold));
 
-    TextSpan innerTextSpan = specialTextSpanBuilder?.build(data,
+    TextSpan? innerTextSpan = specialTextSpanBuilder?.build(data!,
         textStyle: effectiveTextStyle, onTap: onSpecialTextTap);
 
     innerTextSpan ??= TextSpan(
       style: effectiveTextStyle,
       text: data,
-      children: textSpan != null ? <InlineSpan>[textSpan] : null,
+      children: textSpan != null ? <InlineSpan>[textSpan!] : null,
     );
 
     //_createImageConfiguration(<InlineSpan>[innerTextSpan], context);
@@ -232,8 +229,9 @@ class ExtendedText extends StatelessWidget {
     if (selectionEnabled) {
       result = ExtendedTextSelection(
         textAlign: textAlign ?? defaultTextStyle.textAlign ?? TextAlign.start,
-        textDirection:
-            textDirection, // RichText uses Directionality.of to obtain a default if this is null.
+        textDirection: textDirection ??
+            Directionality.of(
+                context), // RichText uses Directionality.of to obtain a default if this is null.
         locale:
             locale, // RichText uses Localizations.localeOf to obtain a default if this is null
         softWrap: softWrap ?? defaultTextStyle.softWrap,
@@ -242,11 +240,11 @@ class ExtendedText extends StatelessWidget {
             textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
         maxLines: maxLines ?? defaultTextStyle.maxLines,
         text: innerTextSpan,
-        selectionColor: selectionColor ?? Theme.of(context).textSelectionColor,
+        selectionColor: selectionColor,
         dragStartBehavior: dragStartBehavior,
         onTap: onTap,
         data: data ?? textSpanToActualText(innerTextSpan),
-        textSelectionControls: textSelectionControls,
+        textSelectionControls: selectionControls,
         textHeightBehavior:
             textHeightBehavior ?? defaultTextStyle.textHeightBehavior,
         textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
@@ -255,8 +253,9 @@ class ExtendedText extends StatelessWidget {
     } else {
       result = ExtendedRichText(
         textAlign: textAlign ?? defaultTextStyle.textAlign ?? TextAlign.start,
-        textDirection:
-            textDirection, // RichText uses Directionality.of to obtain a default if this is null.
+        textDirection: textDirection ??
+            Directionality.of(
+                context), // RichText uses Directionality.of to obtain a default if this is null.
         locale:
             locale, // RichText uses Localizations.localeOf to obtain a default if this is null
         softWrap: softWrap ?? defaultTextStyle.softWrap,
@@ -269,6 +268,7 @@ class ExtendedText extends StatelessWidget {
             textHeightBehavior ?? defaultTextStyle.textHeightBehavior,
         textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
         overflowWidget: overflowWidget,
+        hasFocus: false,
       );
     }
 
@@ -301,7 +301,7 @@ class ExtendedText extends StatelessWidget {
     super.debugFillProperties(properties);
     properties.add(StringProperty('data', data, showName: false));
     if (textSpan != null) {
-      properties.add(textSpan.toDiagnosticsNode(
+      properties.add(textSpan!.toDiagnosticsNode(
           name: 'textSpan', style: DiagnosticsTreeStyle.transition));
     }
     style?.debugFillProperties(properties);

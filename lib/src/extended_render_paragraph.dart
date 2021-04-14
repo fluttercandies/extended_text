@@ -29,34 +29,28 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   ExtendedRenderParagraph(
     InlineSpan text, {
     TextAlign textAlign = TextAlign.start,
-    @required TextDirection textDirection,
+    required TextDirection textDirection,
     bool softWrap = true,
     TextOverflow overflow = TextOverflow.clip,
     double textScaleFactor = 1.0,
-    int maxLines,
+    int? maxLines,
     TextWidthBasis textWidthBasis = TextWidthBasis.parent,
-    Locale locale,
-    @required LayerLink startHandleLayerLink,
-    @required LayerLink endHandleLayerLink,
+    Locale? locale,
+    required LayerLink? startHandleLayerLink,
+    required LayerLink? endHandleLayerLink,
     this.onSelectionChanged,
-    Color selectionColor,
-    TextSelection selection,
-    StrutStyle strutStyle,
-    List<RenderBox> children,
-    ui.TextHeightBehavior textHeightBehavior,
+    Color? selectionColor,
+    TextSelection? selection,
+    StrutStyle? strutStyle,
+    List<RenderBox>? children,
+    ui.TextHeightBehavior? textHeightBehavior,
     ui.BoxHeightStyle selectionHeightStyle = ui.BoxHeightStyle.tight,
     ui.BoxWidthStyle selectionWidthStyle = ui.BoxWidthStyle.tight,
-    TextOverflowWidget overflowWidget,
-  })  : assert(text != null),
-        assert(text.debugAssertIsValid()),
-        assert(textAlign != null),
-        assert(textDirection != null),
-        assert(softWrap != null),
-        assert(overflow != null),
-        assert(textScaleFactor != null),
+    TextOverflowWidget? overflowWidget,
+    this.textSelectionDelegate,
+    bool? hasFocus,
+  })  : assert(text.debugAssertIsValid()),
         assert(maxLines == null || maxLines > 0),
-        assert(textWidthBasis != null),
-        _handleSpecialText = hasSpecialText(text),
         _softWrap = softWrap,
         _overflow = overflowWidget != null ? TextOverflow.clip : overflow,
         _oldOverflow = overflow,
@@ -82,6 +76,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         _selectionHeightStyle = selectionHeightStyle,
         _selectionWidthStyle = selectionWidthStyle,
         _overflowWidget = overflowWidget {
+    this.hasFocus = hasFocus ?? false;
     addAll(children);
     extractPlaceholderSpans(text);
   }
@@ -90,25 +85,22 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 
   /// Called when the selection changes.
   @override
-  TextSelectionChangedHandler onSelectionChanged;
+  TextSelectionChangedHandler? onSelectionChanged;
 
   @override
   double get preferredLineHeight => _textPainter.preferredLineHeight;
 
-  bool _handleSpecialText = false;
-  @override
-  bool get handleSpecialText => _handleSpecialText;
-
-  List<ui.TextBox> _selectionRects;
+  List<ui.TextBox>? _selectionRects;
 
   /// The [LayerLink] of start selection handle.
   ///
   /// [RenderEditable] is responsible for calculating the [Offset] of this
   /// [LayerLink], which will be used as [CompositedTransformTarget] of start handle.
   @override
-  LayerLink get startHandleLayerLink => _startHandleLayerLink;
-  LayerLink _startHandleLayerLink;
-  set startHandleLayerLink(LayerLink value) {
+  LayerLink? get startHandleLayerLink => _startHandleLayerLink;
+  LayerLink? _startHandleLayerLink;
+  @override
+  set startHandleLayerLink(LayerLink? value) {
     if (_startHandleLayerLink == value) {
       return;
     }
@@ -121,9 +113,10 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   /// [RenderEditable] is responsible for calculating the [Offset] of this
   /// [LayerLink], which will be used as [CompositedTransformTarget] of end handle.
   @override
-  LayerLink get endHandleLayerLink => _endHandleLayerLink;
-  LayerLink _endHandleLayerLink;
-  set endHandleLayerLink(LayerLink value) {
+  LayerLink? get endHandleLayerLink => _endHandleLayerLink;
+  LayerLink? _endHandleLayerLink;
+  @override
+  set endHandleLayerLink(LayerLink? value) {
     if (_endHandleLayerLink == value) {
       return;
     }
@@ -133,9 +126,10 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 
   /// The region of text that is selected, if any.
   @override
-  TextSelection get selection => _selection;
-  TextSelection _selection;
-  set selection(TextSelection value) {
+  TextSelection? get selection => _selection;
+  TextSelection? _selection;
+  @override
+  set selection(TextSelection? value) {
     if (_selection == value) {
       return;
     }
@@ -147,9 +141,10 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 
   /// The color to use when painting the selection.
   @override
-  Color get selectionColor => _selectionColor;
-  Color _selectionColor;
-  set selectionColor(Color value) {
+  Color? get selectionColor => _selectionColor;
+  Color? _selectionColor;
+  @override
+  set selectionColor(Color? value) {
     if (_selectionColor == value) {
       return;
     }
@@ -161,11 +156,9 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 
   /// The text to display
   @override
-  InlineSpan get text => _textPainter.text;
+  InlineSpan get text => _textPainter.text!;
   set text(InlineSpan value) {
-    assert(value != null);
-    _handleSpecialText = hasSpecialText(value);
-    switch (_textPainter.text.compareTo(value)) {
+    switch (_textPainter.text!.compareTo(value)) {
       case RenderComparison.identical:
       case RenderComparison.metadata:
         return;
@@ -189,7 +182,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   /// How the text should be aligned horizontally.
   TextAlign get textAlign => _textPainter.textAlign;
   set textAlign(TextAlign value) {
-    assert(value != null);
     if (_textPainter.textAlign == value) {
       return;
     }
@@ -211,9 +203,8 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   ///
   /// This must not be null.
   @override
-  TextDirection get textDirection => _textPainter.textDirection;
+  TextDirection get textDirection => _textPainter.textDirection!;
   set textDirection(TextDirection value) {
-    assert(value != null);
     if (_textPainter.textDirection == value) {
       return;
     }
@@ -232,7 +223,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   bool get softWrap => _softWrap;
   bool _softWrap;
   set softWrap(bool value) {
-    assert(value != null);
     if (_softWrap == value) {
       return;
     }
@@ -245,7 +235,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   TextOverflow get overflow => _overflow;
   TextOverflow _overflow;
   set overflow(TextOverflow value) {
-    assert(value != null);
     final TextOverflow temp =
         overflowWidget != null ? TextOverflow.clip : value;
     if (_overflow == temp) {
@@ -262,7 +251,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   /// the specified font size.
   double get textScaleFactor => _textPainter.textScaleFactor;
   set textScaleFactor(double value) {
-    assert(value != null);
     if (_textPainter.textScaleFactor == value) {
       return;
     }
@@ -274,10 +262,10 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   /// An optional maximum number of lines for the text to span, wrapping if necessary.
   /// If the text exceeds the given number of lines, it will be truncated according
   /// to [overflow] and [softWrap].
-  int get maxLines => _textPainter.maxLines;
+  int? get maxLines => _textPainter.maxLines;
 
   /// The value may be null. If it is not null, then it must be greater than zero.
-  set maxLines(int value) {
+  set maxLines(int? value) {
     assert(value == null || value > 0);
     if (_textPainter.maxLines == value) {
       return;
@@ -294,10 +282,10 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   /// on the locale. For example the '骨' character is rendered differently in
   /// the Chinese and Japanese locales. In these cases the [locale] may be used
   /// to select a locale-specific font.
-  Locale get locale => _textPainter.locale;
+  Locale? get locale => _textPainter.locale;
 
   /// The value may be null.
-  set locale(Locale value) {
+  set locale(Locale? value) {
     if (_textPainter.locale == value) {
       return;
     }
@@ -307,10 +295,10 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   }
 
   /// {@macro flutter.painting.textPainter.strutStyle}
-  StrutStyle get strutStyle => _textPainter.strutStyle;
+  StrutStyle? get strutStyle => _textPainter.strutStyle;
 
   /// The value may be null.
-  set strutStyle(StrutStyle value) {
+  set strutStyle(StrutStyle? value) {
     if (_textPainter.strutStyle == value) {
       return;
     }
@@ -322,7 +310,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   /// {@macro flutter.widgets.basic.TextWidthBasis}
   TextWidthBasis get textWidthBasis => _textPainter.textWidthBasis;
   set textWidthBasis(TextWidthBasis value) {
-    assert(value != null);
     if (_textPainter.textWidthBasis == value) {
       return;
     }
@@ -332,9 +319,9 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   }
 
   /// {@macro flutter.dart:ui.textHeightBehavior}
-  ui.TextHeightBehavior get textHeightBehavior =>
+  ui.TextHeightBehavior? get textHeightBehavior =>
       _textPainter.textHeightBehavior;
-  set textHeightBehavior(ui.TextHeightBehavior value) {
+  set textHeightBehavior(ui.TextHeightBehavior? value) {
     if (_textPainter.textHeightBehavior == value) {
       return;
     }
@@ -349,7 +336,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   ui.BoxHeightStyle get selectionHeightStyle => _selectionHeightStyle;
   ui.BoxHeightStyle _selectionHeightStyle;
   set selectionHeightStyle(ui.BoxHeightStyle value) {
-    assert(value != null);
     if (_selectionHeightStyle == value) {
       return;
     }
@@ -363,7 +349,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   ui.BoxWidthStyle get selectionWidthStyle => _selectionWidthStyle;
   ui.BoxWidthStyle _selectionWidthStyle;
   set selectionWidthStyle(ui.BoxWidthStyle value) {
-    assert(value != null);
     if (_selectionWidthStyle == value) {
       return;
     }
@@ -374,7 +359,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   @override
   double computeDistanceToActualBaseline(TextBaseline baseline) {
     assert(!debugNeedsLayout);
-    assert(constraints != null);
     assert(constraints.debugAssertIsValid());
     layoutTextWithConstraints(constraints);
     // (garyq): Since our metric for ideographic baseline is currently
@@ -399,15 +383,15 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     layoutTextWithConstraints(constraints);
     final Offset offset = entry.localPosition;
     final TextPosition position = _textPainter.getPositionForOffset(offset);
-    final InlineSpan span = _textPainter.text.getSpanForPosition(position);
+    final InlineSpan? span = _textPainter.text!.getSpanForPosition(position);
     if (span != null && span is TextSpan) {
-      span.recognizer?.addPointer(event as PointerDownEvent);
+      span.recognizer?.addPointer(event);
     }
   }
 
   bool _needsClipping = false;
   bool _hasVisualOverflow = false;
-  ui.Shader _overflowShader;
+  ui.Shader? _overflowShader;
 
   /// Whether this paragraph currently has a [dart:ui.Shader] for its overflow
   /// effect.
@@ -423,15 +407,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         minWidth: constraints.minWidth,
         maxWidth: constraints.maxWidth,
         forceLayout: true);
-    if (overflowWidget != null) {
-      lastChild.layout(
-          BoxConstraints(
-            maxWidth: constraints.maxWidth,
-            maxHeight:
-                overflowWidget.maxHeight ?? textPainter.preferredLineHeight,
-          ),
-          parentUsesSize: true);
-    }
+
     setParentData();
 
     // We grab _textPainter.size and _textPainter.didExceedMaxLines here because
@@ -464,10 +440,9 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
           _overflowShader = null;
           break;
         case TextOverflow.fade:
-          assert(textDirection != null);
           _needsClipping = true;
           final TextPainter fadeSizePainter = TextPainter(
-            text: TextSpan(style: _textPainter.text.style, text: '\u2026'),
+            text: TextSpan(style: _textPainter.text!.style, text: '\u2026'),
             textDirection: textDirection,
             textScaleFactor: textScaleFactor,
             locale: locale,
@@ -504,9 +479,65 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
       _needsClipping = false;
       _overflowShader = null;
     }
+    _overFlowRect = null;
+    if (overflowWidget != null) {
+      // #97, the overflowWidget is already added, we must layout it as official.
+      lastChild!.layout(
+        BoxConstraints(
+          maxWidth: constraints.maxWidth,
+          maxHeight:
+              overflowWidget!.maxHeight ?? textPainter.preferredLineHeight,
+        ),
+        parentUsesSize: true,
+      );
+
+      if (!_hasVisualOverflow) {
+        return;
+      }
+
+      assert(textPainter.width >= lastChild!.size.width);
+
+      final TextParentData textParentData =
+          lastChild!.parentData as TextParentData;
+      textParentData.scale = 1.0;
+
+      final Rect rect = const Offset(0.0, 0.0) & size;
+      final Size overFlowWidgetSize = lastChild!.size;
+
+      // find TextPosition near bottomRight
+      final TextPosition lastOnePosition =
+          _textPainter.getPositionForOffset(rect.bottomRight);
+
+      // find overflow TextPosition that not clip the original text
+      final Offset finalOverFlowOffset = _findFinalOverflowOffset(
+        rect: rect,
+        x: rect.width -
+            overFlowWidgetSize.width +
+            overflowWidget!.fixedOffset.dx,
+        endTextOffset: lastOnePosition.offset,
+        y: rect.bottom,
+        effectiveOffset: Offset.zero,
+      );
+
+      final double x = overflowWidget!.align == TextOverflowAlign.left
+          ? finalOverFlowOffset.dx
+          : rect.right - overFlowWidgetSize.width;
+
+      textParentData.offset = Offset(
+          x + overflowWidget!.fixedOffset.dx,
+          rect.bottom -
+              overFlowWidgetSize.height +
+              (overFlowWidgetSize.height - _textPainter.preferredLineHeight) /
+                  2.0 +
+              overflowWidget!.fixedOffset.dy);
+      final Rect textRect = Offset.zero & size;
+      // _paintTextOverflow
+      _overFlowRect =
+          Rect.fromPoints(finalOverFlowOffset, textRect.bottomRight);
+    }
   }
 
-  Offset _offset;
+  late Offset _offset;
   @override
   void paint(PaintingContext context, Offset offset) {
     _offset = offset;
@@ -541,7 +572,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
       context.canvas.clipRect(bounds);
     }
 
-    final Path clip = _paintTextOverflow(context, offset);
+    final Path? clip = _paintTextOverflow(context, offset);
     //clip rect of over flow
     if (clip != null) {
       context.canvas.save();
@@ -567,7 +598,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     }
   }
 
-  void _paint(PaintingContext context, Offset offset, Path clip) {
+  void _paint(PaintingContext context, Offset offset, Path? clip) {
     if (_needsClipping) {
       final Rect bounds = offset & size;
       if (_overflowShader != null) {
@@ -657,7 +688,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 
   /// Collected during [describeSemanticsConfiguration], used by
   /// [assembleSemanticsNode] and [_combineSemanticsInfo].
-  List<InlineSpanSemanticsInformation> _semanticsInfo;
+  List<InlineSpanSemanticsInformation>? _semanticsInfo;
 
   /// Combines _semanticsInfo entries where permissible, determined by
   /// [InlineSpanSemanticsInformation.requiresOwnNode].
@@ -666,36 +697,33 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     final List<InlineSpanSemanticsInformation> combined =
         <InlineSpanSemanticsInformation>[];
     String workingText = '';
-    String workingLabel;
-    for (final InlineSpanSemanticsInformation info in _semanticsInfo) {
+    // TODO(ianh): this algorithm is internally inconsistent. workingText
+    // never becomes null, but we check for it being so below.
+    String? workingLabel;
+    for (final InlineSpanSemanticsInformation info in _semanticsInfo!) {
       if (info.requiresOwnNode) {
-        if (workingText != null) {
-          combined.add(InlineSpanSemanticsInformation(
-            workingText,
-            semanticsLabel: workingLabel ?? workingText,
-          ));
-          workingText = '';
-          workingLabel = null;
-        }
+        combined.add(InlineSpanSemanticsInformation(
+          workingText,
+          semanticsLabel: workingLabel ?? workingText,
+        ));
+        workingText = '';
+        workingLabel = null;
         combined.add(info);
       } else {
         workingText += info.text;
         workingLabel ??= '';
         if (info.semanticsLabel != null) {
-          workingLabel += info.semanticsLabel;
+          workingLabel += info.semanticsLabel!;
         } else {
           workingLabel += info.text;
         }
       }
     }
-    if (workingText != null) {
-      combined.add(InlineSpanSemanticsInformation(
-        workingText,
-        semanticsLabel: workingLabel,
-      ));
-    } else {
-      assert(workingLabel != null);
-    }
+    combined.add(InlineSpanSemanticsInformation(
+      workingText,
+      semanticsLabel: workingLabel,
+    ));
+
     return combined;
   }
 
@@ -704,13 +732,23 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     super.describeSemanticsConfiguration(config);
     _semanticsInfo = text.getSemanticsInformation();
 
-    if (_semanticsInfo.any(
+    // add SemanticsInformation for overflowWidget
+    // add into _semanticsInfo even if _hasVisualOverflow is false.
+    // make sure that assert(childIndex == children.length)
+    // is passed in assembleSemanticsNode method.
+    //
+    if (overflowWidget != null) {
+      _semanticsInfo!
+          .addAll(WidgetSpan(child: overflowWidget!).getSemanticsInformation());
+    }
+
+    if (_semanticsInfo!.any(
         (InlineSpanSemanticsInformation info) => info.recognizer != null)) {
       config.explicitChildNodes = true;
       config.isSemanticBoundary = true;
     } else {
       final StringBuffer buffer = StringBuffer();
-      for (final InlineSpanSemanticsInformation info in _semanticsInfo) {
+      for (final InlineSpanSemanticsInformation info in _semanticsInfo!) {
         buffer.write(info.semanticsLabel ?? info.text);
       }
       config.label = buffer.toString();
@@ -722,87 +760,104 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   // can be re-used when [assembleSemanticsNode] is called again. This ensures
   // stable ids for the [SemanticsNode]s of [TextSpan]s across
   // [assembleSemanticsNode] invocations.
-  Queue<SemanticsNode> _cachedChildNodes;
+  Queue<SemanticsNode>? _cachedChildNodes;
+
   @override
   void assembleSemanticsNode(SemanticsNode node, SemanticsConfiguration config,
       Iterable<SemanticsNode> children) {
-    assert(_semanticsInfo != null && _semanticsInfo.isNotEmpty);
+    assert(_semanticsInfo != null && _semanticsInfo!.isNotEmpty);
     final List<SemanticsNode> newChildren = <SemanticsNode>[];
     TextDirection currentDirection = textDirection;
     Rect currentRect;
     double ordinal = 0.0;
     int start = 0;
     int placeholderIndex = 0;
-    RenderBox child = firstChild;
+    int childIndex = 0;
+    RenderBox? child = firstChild;
     final Queue<SemanticsNode> newChildCache = Queue<SemanticsNode>();
     for (final InlineSpanSemanticsInformation info in _combineSemanticsInfo()) {
-      final TextDirection initialDirection = currentDirection;
       final TextSelection selection = TextSelection(
         baseOffset: start,
         extentOffset: start + info.text.length,
       );
-      final List<ui.TextBox> rects = getBoxesForSelection(selection);
-      if (rects.isEmpty) {
-        continue;
-      }
-      Rect rect = rects.first.toRect();
-      currentDirection = rects.first.direction;
-      for (final ui.TextBox textBox in rects.skip(1)) {
-        rect = rect.expandToInclude(textBox.toRect());
-        currentDirection = textBox.direction;
-      }
-      // Any of the text boxes may have had infinite dimensions.
-      // We shouldn't pass infinite dimensions up to the bridges.
-      rect = Rect.fromLTWH(
-        math.max(0.0, rect.left),
-        math.max(0.0, rect.top),
-        math.min(rect.width, constraints.maxWidth),
-        math.min(rect.height, constraints.maxHeight),
-      );
-      // round the current rectangle to make this API testable and add some
-      // padding so that the accessibility rects do not overlap with the text.
-      currentRect = Rect.fromLTRB(
-        rect.left.floorToDouble() - 4.0,
-        rect.top.floorToDouble() - 4.0,
-        rect.right.ceilToDouble() + 4.0,
-        rect.bottom.ceilToDouble() + 4.0,
-      );
+      start += info.text.length;
 
       if (info.isPlaceholder) {
-        placeholderIndex++;
-        if (placeholderIndex < children.length) {
-          final SemanticsNode childNode = children.elementAt(placeholderIndex);
-          final TextParentData parentData = child.parentData as TextParentData;
+        // A placeholder span may have 0 to multple semantics nodes, we need
+        // to annotate all of the semantics nodes belong to this span.
+        while (children.length > childIndex &&
+            children
+                .elementAt(childIndex)
+                .isTagged(PlaceholderSpanIndexSemanticsTag(placeholderIndex))) {
+          final SemanticsNode childNode = children.elementAt(childIndex);
+          final TextParentData parentData =
+              child!.parentData! as TextParentData;
+
           childNode.rect = Rect.fromLTWH(
             childNode.rect.left,
             childNode.rect.top,
-            childNode.rect.width * parentData.scale,
-            childNode.rect.height * parentData.scale,
+            childNode.rect.width * (parentData.scale ?? 1.0),
+            childNode.rect.height * (parentData.scale ?? 1.0),
           );
           newChildren.add(childNode);
+          childIndex += 1;
         }
-        child = childAfter(child);
+        child = childAfter(child!);
+        placeholderIndex += 1;
       } else {
+        final TextDirection initialDirection = currentDirection;
+        final List<ui.TextBox> rects = getBoxesForSelection(selection);
+        if (rects.isEmpty) {
+          continue;
+        }
+        Rect rect = rects.first.toRect();
+        currentDirection = rects.first.direction;
+        for (final ui.TextBox textBox in rects.skip(1)) {
+          rect = rect.expandToInclude(textBox.toRect());
+          currentDirection = textBox.direction;
+        }
+        // Any of the text boxes may have had infinite dimensions.
+        // We shouldn't pass infinite dimensions up to the bridges.
+        rect = Rect.fromLTWH(
+          math.max(0.0, rect.left),
+          math.max(0.0, rect.top),
+          math.min(rect.width, constraints.maxWidth),
+          math.min(rect.height, constraints.maxHeight),
+        );
+        // round the current rectangle to make this API testable and add some
+        // padding so that the accessibility rects do not overlap with the text.
+        currentRect = Rect.fromLTRB(
+          rect.left.floorToDouble() - 4.0,
+          rect.top.floorToDouble() - 4.0,
+          rect.right.ceilToDouble() + 4.0,
+          rect.bottom.ceilToDouble() + 4.0,
+        );
         final SemanticsConfiguration configuration = SemanticsConfiguration()
           ..sortKey = OrdinalSortKey(ordinal++)
           ..textDirection = initialDirection
           ..label = info.semanticsLabel ?? info.text;
-        if (info.recognizer != null) {
-          if (info.recognizer is TapGestureRecognizer) {
-            final TapGestureRecognizer recognizer =
-                info.recognizer as TapGestureRecognizer;
-            configuration.onTap = recognizer.onTap;
-            configuration.isLink = true;
-          } else if (info.recognizer is LongPressGestureRecognizer) {
-            final LongPressGestureRecognizer recognizer =
-                info.recognizer as LongPressGestureRecognizer;
-            configuration.onLongPress = recognizer.onLongPress;
+        final GestureRecognizer? recognizer = info.recognizer;
+        if (recognizer != null) {
+          if (recognizer is TapGestureRecognizer) {
+            if (recognizer.onTap != null) {
+              configuration.onTap = recognizer.onTap;
+              configuration.isLink = true;
+            }
+          } else if (recognizer is DoubleTapGestureRecognizer) {
+            if (recognizer.onDoubleTap != null) {
+              configuration.onTap = recognizer.onDoubleTap;
+              configuration.isLink = true;
+            }
+          } else if (recognizer is LongPressGestureRecognizer) {
+            if (recognizer.onLongPress != null) {
+              configuration.onLongPress = recognizer.onLongPress;
+            }
           } else {
-            assert(false);
+            assert(false, '${recognizer.runtimeType} is not supported.');
           }
         }
         final SemanticsNode newChild = (_cachedChildNodes?.isNotEmpty == true)
-            ? _cachedChildNodes.removeFirst()
+            ? _cachedChildNodes!.removeFirst()
             : SemanticsNode();
         newChild
           ..updateWith(config: configuration)
@@ -810,8 +865,11 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         newChildCache.addLast(newChild);
         newChildren.add(newChild);
       }
-      start += info.text.length;
     }
+    // Makes sure we annotated all of the semantics children.
+    assert(childIndex == children.length);
+    assert(child == null);
+
     _cachedChildNodes = newChildCache;
     node.updateWith(config: config, childrenInInversePaintOrder: newChildren);
   }
@@ -826,7 +884,9 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   List<DiagnosticsNode> debugDescribeChildren() {
     return <DiagnosticsNode>[
       text.toDiagnosticsNode(
-          name: 'text', style: DiagnosticsTreeStyle.transition)
+        name: 'text',
+        style: DiagnosticsTreeStyle.transition,
+      )
     ];
   }
 
@@ -871,15 +931,14 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         rect,
       );
       //skip invalid or overflow
-      if (topLeftOffset == null ||
-          (textOffset != 0 && topLeftOffset == Offset.zero)) {
+      if (textOffset != 0 && topLeftOffset == Offset.zero) {
         return;
       }
 
       if (ts is BackgroundTextSpan) {
-        final TextPainter painter = ts.layout(_textPainter);
+        final TextPainter painter = ts.layout(_textPainter)!;
         final Rect textRect = topLeftOffset & painter.size;
-        Offset endOffset;
+        Offset? endOffset;
         if (textRect.right > rect.right) {
           final int endTextOffset = textOffset + ts.toPlainText().length;
           endOffset = _findEndOffset(rect, endTextOffset);
@@ -908,7 +967,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
       //   }
       // }
       else if (ts is TextSpan && ts.children != null) {
-        _paintSpecialTextChildren(ts.children, canvas, rect,
+        _paintSpecialTextChildren(ts.children!, canvas, rect,
             textOffset: textOffset);
       }
 
@@ -922,16 +981,16 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
       rect,
     );
     //overflow
-    if (endOffset == null || (endTextOffset != 0 && endOffset == Offset.zero)) {
+    if (endTextOffset != 0 && endOffset == Offset.zero) {
       return _findEndOffset(rect, endTextOffset - 1);
     }
     return endOffset;
   }
 
   @override
-  bool hitTestChildren(BoxHitTestResult result, {Offset position}) {
+  bool hitTestChildren(BoxHitTestResult result, {Offset? position}) {
     if (_hasVisualOverflow && overflowWidget != null) {
-      final bool isHit = hitTestChild(result, lastChild, position: position);
+      final bool isHit = hitTestChild(result, lastChild!, position: position!);
       if (isHit) {
         return true;
       }
@@ -939,111 +998,64 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     return super.hitTestChildren(result, position: position);
   }
 
-  Rect _overFlowRect;
-  Path _paintTextOverflow(PaintingContext context, Offset offset) {
-    _overFlowRect = null;
-    if (_hasVisualOverflow && overflowWidget != null) {
-      assert(textPainter.width >= lastChild.size.width);
-
-      final Rect rect = const Offset(0.0, 0.0) & size;
-      final Size overFlowWidgetSize = lastChild.size;
-
-      ///find TextPosition near bottomRight
-      final TextPosition lastOnePosition =
-          _textPainter.getPositionForOffset(rect.bottomRight);
-
-      ///find overflow TextPosition that not clip the original text
-      final Offset finalOverFlowOffset = _findFinalOverflowOffset(
-          rect: rect,
-          x: rect.width - overFlowWidgetSize.width,
-          endTextOffset: lastOnePosition.offset,
-          y: rect.bottom,
-          effectiveOffset: Offset.zero);
+  Rect? _overFlowRect;
+  Path? _paintTextOverflow(PaintingContext context, Offset offset) {
+    if (_hasVisualOverflow && overflowWidget != null && _overFlowRect != null) {
+      assert(textPainter.width >= lastChild!.size.width);
 
       final TextParentData textParentData =
-          lastChild.parentData as TextParentData;
+          lastChild!.parentData as TextParentData;
 
-      //_textPainter.preferredLineHeight
-      final double x = overflowWidget.align == TextOverflowAlign.left
-          ? finalOverFlowOffset.dx
-          : rect.right - overFlowWidgetSize.width;
-      textParentData.offset = Offset(
-          x + overflowWidget.fixedOffset.dx,
-          rect.bottom -
-              overFlowWidgetSize.height +
-              (overFlowWidgetSize.height - _textPainter.preferredLineHeight) /
-                  2.0 +
-              overflowWidget.fixedOffset.dy);
-      textParentData.scale = 1.0;
-      final double scale = textParentData.scale;
+      final double scale = textParentData.scale!;
       context.pushTransform(
         needsCompositing,
         offset + textParentData.offset,
         Matrix4.diagonal3Values(scale, scale, scale),
         (PaintingContext context, Offset offset) {
           context.paintChild(
-            lastChild,
+            lastChild!,
             offset,
           );
         },
       );
 
       final Rect textRect = offset & size;
-      _overFlowRect =
-          Rect.fromPoints(offset + finalOverFlowOffset, textRect.bottomRight);
       final double visibleRegionSlop = _textPainter.preferredLineHeight / 2.0;
-
+      final Rect overFlowRect = _overFlowRect!.shift(offset);
       return Path()
-        ..addPolygon(<Offset>[
-          textRect.topLeft,
-          textRect.topRight,
-          _overFlowRect.topRight,
-          _overFlowRect.topLeft,
-          _overFlowRect.bottomLeft.translate(0.0, visibleRegionSlop),
-          textRect.bottomLeft.translate(0.0, visibleRegionSlop),
-        ], true);
+        ..addPolygon(
+          <Offset>[
+            textRect.topLeft,
+            textRect.topRight,
+            overFlowRect.topRight,
+            overFlowRect.topLeft,
+            overFlowRect.bottomLeft.translate(0.0, visibleRegionSlop),
+            textRect.bottomLeft.translate(0.0, visibleRegionSlop),
+          ],
+          true,
+        );
     }
     return null;
   }
 
   /// y find min y, so that over flow text will be covered
   Offset _findFinalOverflowOffset({
-    Rect rect,
-    double x,
-    int endTextOffset,
-    double y,
-    Offset effectiveOffset,
+    required Rect rect,
+    required double x,
+    required int endTextOffset,
+    required double y,
+    Offset? effectiveOffset,
   }) {
-//    Offset endOffset = getOffsetForCaret(
-//      TextPosition(offset: endTextOffset),
-//      rect,
-//    );
-
     final Offset endOffset = getCaretOffset(
-        TextPosition(
-          offset: endTextOffset,
-        ),
-        handleSpecialText: handleSpecialText,
-        effectiveOffset: effectiveOffset);
+      TextPosition(
+        offset: endTextOffset,
+      ),
+      effectiveOffset: effectiveOffset,
+    );
 
-    if (endOffset == Offset.zero && endTextOffset > 0) {
-      return _findFinalOverflowOffset(
-          rect: rect,
-          x: x,
-          endTextOffset: endTextOffset - 1,
-          y: y,
-          effectiveOffset: effectiveOffset);
-    }
-
-    //final TextPosition position = getPositionForOffset(endOffset);
-
-    ///handle image span
-//    final InlineSpan textSpan = _textPainter.text.getSpanForPosition(position);
-//    if (textSpan is ExtendedWidgetSpan) {
-//      endOffset = Offset(endOffset.dx - textSpan.size.width, endOffset.dy);
-//    }
-    //overflow
-    if (endOffset == null || (endTextOffset != 0 && endOffset == Offset.zero)) {
+    // overflow
+    //
+    if (endTextOffset != 0 && endOffset == Offset.zero) {
       return _findFinalOverflowOffset(
           rect: rect,
           x: x,
@@ -1054,11 +1066,12 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 
     if (endOffset.dx > x) {
       return _findFinalOverflowOffset(
-          rect: rect,
-          x: x,
-          endTextOffset: endTextOffset - 1,
-          y: math.min(y, endOffset.dy),
-          effectiveOffset: effectiveOffset);
+        rect: rect,
+        x: x,
+        endTextOffset: endTextOffset - 1,
+        y: math.min(y, endOffset.dy),
+        effectiveOffset: effectiveOffset,
+      );
     }
     return Offset(endOffset.dx, math.min(y, endOffset.dy));
   }
@@ -1069,10 +1082,10 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     }
     bool showSelection = false;
 
-    ///zmt
-    final TextSelection actualSelection = handleSpecialText
-        ? convertTextInputSelectionToTextPainterSelection(text, _selection)
-        : _selection;
+    // zmt
+    final TextSelection actualSelection = hasSpecialInlineSpanBase
+        ? convertTextInputSelectionToTextPainterSelection(text, _selection!)
+        : _selection!;
 
     if (!actualSelection.isCollapsed && _selectionColor != null) {
       showSelection = true;
@@ -1081,6 +1094,25 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 
     if (showSelection) {
       _selectionRects ??= _textPainter.getBoxesForSelection(actualSelection);
+
+      // do not paint Selection in the region of _overFlowRect
+      if (_hasVisualOverflow &&
+          overflowWidget != null &&
+          _overFlowRect != null) {
+        final Rect overFlowRect = _overFlowRect!.shift(_offset);
+        for (final ui.TextBox box in _selectionRects!) {
+          if (overFlowRect.overlaps(box.toRect())) {
+            _selectionRects![_selectionRects!.indexOf(box)] =
+                ui.TextBox.fromLTRBD(
+              math.min(overFlowRect.left, box.left),
+              box.top,
+              math.min(overFlowRect.left, box.right),
+              box.bottom,
+              box.direction,
+            );
+          }
+        }
+      }
 
       assert(_selectionRects != null);
       paintSelection(context.canvas, effectiveOffset);
@@ -1100,8 +1132,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   ///  * [getLocalRectForCaret], which is the equivalent but for
   ///    a [TextPosition] rather than a [TextSelection].
   @override
-  List<TextSelectionPoint> getEndpointsForSelection(TextSelection selection) {
-    assert(constraints != null);
+  List<TextSelectionPoint>? getEndpointsForSelection(TextSelection selection) {
 //    if (temp.isCollapsed && toolbar) {
 //      // (mpcomplete): This doesn't work well at an RTL/LTR boundary.
 ////      final Offset caretOffset =
@@ -1121,7 +1152,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     if (!selection.isCollapsed) {
       layoutTextWithConstraints(constraints);
       TextSelection textPainterSelection = selection;
-      if (handleSpecialText) {
+      if (hasSpecialInlineSpanBase) {
         textPainterSelection =
             convertTextInputSelectionToTextPainterSelection(text, selection);
       }
@@ -1139,12 +1170,13 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
       if (_hasVisualOverflow &&
           overflowWidget != null &&
           _overFlowRect != null) {
+        final Rect overFlowRect = _overFlowRect!.shift(_offset);
         for (final ui.TextBox box in boxes.toList()) {
-          if (_overFlowRect.overlaps(box.toRect())) {
+          if (overFlowRect.overlaps(box.toRect())) {
             boxes[boxes.indexOf(box)] = ui.TextBox.fromLTRBD(
-              math.min(_overFlowRect.left, box.left),
+              math.min(overFlowRect.left, box.left),
               box.top,
-              math.min(_overFlowRect.left, box.right),
+              math.min(overFlowRect.left, box.right),
               box.bottom,
               box.direction,
             );
@@ -1203,15 +1235,15 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   final ValueNotifier<bool> _selectionEndInViewport = ValueNotifier<bool>(true);
 
   @override
-  TextPosition getPositionForPoint(Offset globalPosition) {
+  TextPosition getPositionForPoint(Offset? globalPosition) {
     layoutTextWithConstraints(constraints);
     final TextPosition result =
-        _textPainter.getPositionForOffset(globalToLocal(globalPosition));
+        _textPainter.getPositionForOffset(globalToLocal(globalPosition!));
 
     ///never drag over the over flow text span
     if (_hasVisualOverflow && overflowWidget != null) {
       final TextParentData textParentData =
-          lastChild.parentData as TextParentData;
+          lastChild!.parentData as TextParentData;
       final TextPosition position =
           getPositionForOffset(textParentData.offset + _offset);
       if (result.offset > position.offset) {
@@ -1238,7 +1270,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         affinity: selection.affinity,
       ),
       effectiveOffset: effectiveOffset,
-      handleSpecialText: handleSpecialText,
     );
 
     // (justinmc): https://github.com/flutter/flutter/issues/31495
@@ -1255,7 +1286,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     final Offset endOffset = getCaretOffset(
       TextPosition(offset: selection.end, affinity: selection.affinity),
       effectiveOffset: effectiveOffset,
-      handleSpecialText: handleSpecialText,
     );
 
     _selectionEndInViewport.value =
@@ -1289,24 +1319,24 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   Offset get paintOffset => Offset.zero;
 
   // Retuns a cached plain text version of the text in the painter.
-  String _cachedPlainText;
+  String? _cachedPlainText;
   @override
   String get plainText {
-    _cachedPlainText ??= textSpanToActualText(_textPainter.text);
-    return _cachedPlainText;
+    _cachedPlainText ??= textSpanToActualText(_textPainter.text!);
+    return _cachedPlainText!;
   }
 
   @override
-  List<TextBox> get selectionRects => _selectionRects;
+  List<TextBox>? get selectionRects => _selectionRects;
 
   @override
   Offset get effectiveOffset => Offset.zero;
 
   @override
-  TextOverflowWidget get overflowWidget => _overflowWidget;
+  TextOverflowWidget? get overflowWidget => _overflowWidget;
   final TextOverflow _oldOverflow;
-  TextOverflowWidget _overflowWidget;
-  set overflowWidget(TextOverflowWidget value) {
+  TextOverflowWidget? _overflowWidget;
+  set overflowWidget(TextOverflowWidget? value) {
     if (_overflowWidget == value) {
       return;
     }
@@ -1318,4 +1348,17 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     _overflowWidget = value;
     markNeedsPaint();
   }
+
+  @override
+  Rect get caretPrototype =>
+      Rect.fromLTWH(0, 0, 1, textPainter.preferredLineHeight);
+
+  @override
+  TextSelectionDelegate? textSelectionDelegate;
+
+  @override
+  bool get ignorePointer => false;
+
+  @override
+  bool get readOnly => true;
 }

@@ -6,12 +6,11 @@
 import 'package:example/text/my_extended_text_selection_controls.dart';
 import 'package:example/text/my_special_text_span_builder.dart';
 import 'package:extended_text/extended_text.dart';
+import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide CircularProgressIndicator;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/foundation.dart';
-
-import 'package:ff_annotation_route/ff_annotation_route.dart';
 
 @FFRoute(
     name: 'fluttercandies://TextSelectionDemo',
@@ -23,15 +22,13 @@ class TextSelectionDemo extends StatefulWidget {
 }
 
 class _TextSelectionDemoState extends State<TextSelectionDemo> {
-  MyExtendedMaterialTextSelectionControls
-      _myExtendedMaterialTextSelectionControls;
+  late TextSelectionControls _myExtendedMaterialTextSelectionControls;
   final String _attachContent =
       '[love]Extended text help you to build rich text quickly. any special text you will have with extended text.It\'s my pleasure to invite you to join \$FlutterCandies\$ if you want to improve flutter .[love] if you meet any problem, please let me konw @zmtzawqlp .[sun_glasses]';
   @override
   void initState() {
-    _myExtendedMaterialTextSelectionControls =
-        MyExtendedMaterialTextSelectionControls();
     super.initState();
+    _myExtendedMaterialTextSelectionControls = MyTextSelectionControls();
   }
 
   @override
@@ -45,6 +42,8 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
           Expanded(
             child: ListView.builder(
               itemBuilder: (BuildContext context, int index) {
+                //return SelectableText(_attachContent);
+
                 return Padding(
                   padding: const EdgeInsets.all(20),
                   child: ExtendedText(
@@ -58,27 +57,27 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                     },
                     specialTextSpanBuilder: MySpecialTextSpanBuilder(),
                     //overflow: ExtendedTextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
                     maxLines: 4,
                     overflowWidget: kIsWeb
                         ? null
                         : TextOverflowWidget(
                             child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              const Text('\u2026 '),
-                              RaisedButton(
-                                child: const Text('more'),
-                                onPressed: () {
-                                  launch(
-                                      'https://github.com/fluttercandies/extended_text');
-                                },
-                              )
-                            ],
-                          )),
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                const Text('\u2026 '),
+                                InkWell(
+                                  child: const Text('more'),
+                                  onTap: () {
+                                    launch(
+                                        'https://github.com/fluttercandies/extended_text');
+                                  },
+                                )
+                              ],
+                            ),
+                          ),
                     selectionEnabled: true,
-                    textSelectionControls:
-                        _myExtendedMaterialTextSelectionControls,
+                    selectionControls: _myExtendedMaterialTextSelectionControls,
                   ),
                 );
               },

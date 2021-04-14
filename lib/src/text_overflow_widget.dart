@@ -1,7 +1,7 @@
 /*
  * @Author: zmtzawqlp
  * @Date: 2020-06-25 01:29:01
- * @Last Modified by: zhoumaotuo
+ * @Last Modified by: zmtzawqlp
  * @Last Modified time: 2020-06-25 02:13:14
  */
 import 'package:flutter/widgets.dart';
@@ -16,11 +16,11 @@ enum TextOverflowAlign {
 
 class TextOverflowWidget extends StatelessWidget {
   const TextOverflowWidget({
-    @required this.child,
+    required this.child,
     this.align = TextOverflowAlign.right,
     this.maxHeight,
     this.fixedOffset = Offset.zero,
-  }) : assert(fixedOffset != null);
+  });
 
   /// The widget of TextOverflow.
   final Widget child;
@@ -29,7 +29,7 @@ class TextOverflowWidget extends StatelessWidget {
   final TextOverflowAlign align;
 
   /// The maxHeight of [TextOverflowWidget], default is preferredLineHeight.
-  final double maxHeight;
+  final double? maxHeight;
 
   /// Fixed offset refer to the Text Overflow Rect and [child].
   final Offset fixedOffset;

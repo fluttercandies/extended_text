@@ -5,6 +5,7 @@
 const List<String> routeNames = <String>[
   'fluttercandies://BackgroundTextDemo',
   'fluttercandies://CustomTextOverflowDemo',
+  'fluttercandies://MiddleTextOverflowDemo',
   'fluttercandies://TextDemo',
   'fluttercandies://TextSelectionDemo',
   'fluttercandies://mainpage',
@@ -33,6 +34,16 @@ class Routes {
   static const String fluttercandiesCustomTextOverflowDemo =
       'fluttercandies://CustomTextOverflowDemo';
 
+  /// 'how to make text overflow in middle.'
+  ///
+  /// [name] : 'fluttercandies://MiddleTextOverflowDemo'
+  ///
+  /// [routeName] : 'MiddleTextOverflow'
+  ///
+  /// [description] : 'how to make text overflow in middle.'
+  static const String fluttercandiesMiddleTextOverflowDemo =
+      'fluttercandies://MiddleTextOverflowDemo';
+
   /// 'quickly build special text'
   ///
   /// [name] : 'fluttercandies://TextDemo'
@@ -57,5 +68,9 @@ class Routes {
   /// [name] : 'fluttercandies://mainpage'
   ///
   /// [routeName] : 'MainPage'
+  ///
+  /// [constructors] :
+  ///
+  /// MainPage : []
   static const String fluttercandiesMainpage = 'fluttercandies://mainpage';
 }

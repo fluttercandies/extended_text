@@ -1,10 +1,8 @@
 import 'package:example/text/my_special_text_span_builder.dart';
 import 'package:extended_text/extended_text.dart';
-import 'package:flutter/foundation.dart';
+import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import 'package:ff_annotation_route/ff_annotation_route.dart';
 
 @FFRoute(
     name: 'fluttercandies://CustomTextOverflowDemo',
@@ -39,27 +37,26 @@ class CustomTextOverflowDemo extends StatelessWidget {
             },
             specialTextSpanBuilder: MySpecialTextSpanBuilder(),
             selectionEnabled: true,
-            overflowWidget: kIsWeb
-                ? null
-                : TextOverflowWidget(
-                    //maxHeight: double.infinity,
-                    //align: TextOverflowAlign.right,
-                    //fixedOffset: Offset.zero,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        const Text('\u2026 '),
-                        RaisedButton(
-                          child: const Text('more'),
-                          onPressed: () {
-                            launch(
-                                'https://github.com/fluttercandies/extended_text');
-                          },
-                        )
-                      ],
+            overflowWidget: TextOverflowWidget(
+              //maxHeight: double.infinity,
+              //align: TextOverflowAlign.right,
+              //fixedOffset: Offset.zero,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const Text('\u2026 '),
+                  InkWell(
+                    child: const Text(
+                      'more',
                     ),
-                  ),
-            maxLines: 10,
+                    onTap: () {
+                      launch('https://github.com/fluttercandies/extended_text');
+                    },
+                  )
+                ],
+              ),
+            ),
+            maxLines: 5,
           ),
         ));
   }

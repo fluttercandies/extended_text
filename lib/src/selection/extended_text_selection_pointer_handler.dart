@@ -13,8 +13,8 @@ class ExtendedTextSelectionPointerHandler extends StatefulWidget {
   const ExtendedTextSelectionPointerHandler({this.child, this.builder})
       : assert(!(child == null && builder == null)),
         assert(!(child != null && builder != null));
-  final Widget child;
-  final TextSelectionPointerHandlerWidgetBuilder builder;
+  final Widget? child;
+  final TextSelectionPointerHandlerWidgetBuilder? builder;
   @override
   ExtendedTextSelectionPointerHandlerState createState() =>
       ExtendedTextSelectionPointerHandlerState();
@@ -29,7 +29,7 @@ class ExtendedTextSelectionPointerHandlerState
   @override
   Widget build(BuildContext context) {
     if (widget.builder != null) {
-      return widget.builder(_selectionStates);
+      return widget.builder!(_selectionStates);
     }
     return Listener(
       child: widget.child,

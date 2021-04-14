@@ -10,16 +10,15 @@ description: A new Flutter application.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.6.0 <3.0.0"
-
+  sdk: '>=2.12.0 <3.0.0'
+  flutter: ">=2.0.0"
 dependencies:
+  cupertino_icons: ^1.0.2 
+  ff_annotation_route_library: ^2.0.0 
   flutter:
-    sdk: flutter
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^0.1.2
-  url_launcher: 5.3.0
-  oktoast: ^2.1.4
+    sdk: flutter  
+  oktoast: any
+  url_launcher: any
 dependency_overrides:
   extended_text:
     path: ../
@@ -27,7 +26,6 @@ dependency_overrides:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  ff_annotation_route: any
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
