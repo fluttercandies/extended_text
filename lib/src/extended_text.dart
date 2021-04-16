@@ -35,8 +35,8 @@ class ExtendedText extends StatelessWidget {
     this.selectionHeightStyle = ui.BoxHeightStyle.tight,
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
     this.overflowWidget,
-  })  : assert(data != null),
-        textSpan = null,
+    this.perfectLineBreakingAndOverflowStyle = false,
+  })  : textSpan = null,
         super(key: key);
 
   /// Creates a text widget with a [InlineSpan].
@@ -64,8 +64,8 @@ class ExtendedText extends StatelessWidget {
     this.selectionHeightStyle = ui.BoxHeightStyle.tight,
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
     this.overflowWidget,
-  })  : assert(textSpan != null),
-        data = null,
+    this.perfectLineBreakingAndOverflowStyle = false,
+  })  : data = null,
         specialTextSpanBuilder = null,
         super(key: key);
 
@@ -204,6 +204,13 @@ class ExtendedText extends StatelessWidget {
   /// {@macro flutter.dart:ui.textHeightBehavior}
   final ui.TextHeightBehavior textHeightBehavior;
 
+  /// Whether join '\u{200B}' into text
+  /// https://github.com/flutter/flutter/issues/18761#issuecomment-812390920
+  ///
+  /// Characters(text).join('\u{200B}')
+  ///
+  final bool perfectLineBreakingAndOverflowStyle;
+
 //  ExtendedRenderEditable get _renderEditable =>
 //      _editableTextKey.currentState.renderEditable;
   @override
@@ -216,14 +223,21 @@ class ExtendedText extends StatelessWidget {
       effectiveTextStyle = effectiveTextStyle
           .merge(const TextStyle(fontWeight: FontWeight.bold));
 
-    TextSpan innerTextSpan = specialTextSpanBuilder?.build(data,
-        textStyle: effectiveTextStyle, onTap: onSpecialTextTap);
+    InlineSpan innerTextSpan = specialTextSpanBuilder?.build(
+      data,
+      textStyle: effectiveTextStyle,
+      onTap: onSpecialTextTap,
+    );
 
     innerTextSpan ??= TextSpan(
       style: effectiveTextStyle,
       text: data,
       children: textSpan != null ? <InlineSpan>[textSpan] : null,
     );
+
+    if (perfectLineBreakingAndOverflowStyle) {
+      innerTextSpan = joinChar(innerTextSpan, Accumulator(), '\u{200B}');
+    }
 
     //_createImageConfiguration(<InlineSpan>[innerTextSpan], context);
 

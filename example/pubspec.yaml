@@ -18,9 +18,9 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
-  #url_launcher: any
+  url_launcher: any
   oktoast: ^2.1.4
-  
+
 dependency_overrides:
   extended_text:
     path: ../

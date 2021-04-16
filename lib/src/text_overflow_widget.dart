@@ -12,6 +12,15 @@ enum TextOverflowAlign {
 
   /// Align the [TextOverflowWidget] on the right edge of the Text Overflow Rect.
   right,
+
+  /// Align the [TextOverflowWidget] on the center of the Text Overflow Rect.
+  center,
+}
+
+enum TextOverflowPosition {
+  end,
+  middle,
+  start,
 }
 
 class TextOverflowWidget extends StatelessWidget {
@@ -20,7 +29,9 @@ class TextOverflowWidget extends StatelessWidget {
     this.align = TextOverflowAlign.right,
     this.maxHeight,
     this.fixedOffset = Offset.zero,
-  }) : assert(fixedOffset != null);
+    this.position = TextOverflowPosition.end,
+    this.debugOverflowRectColor,
+  });
 
   /// The widget of TextOverflow.
   final Widget child;
@@ -33,6 +44,12 @@ class TextOverflowWidget extends StatelessWidget {
 
   /// Fixed offset refer to the Text Overflow Rect and [child].
   final Offset fixedOffset;
+
+  /// The position which TextOverflowWidget should be shown
+  final TextOverflowPosition position;
+
+  /// Whether paint overflow rect, just for debug
+  final Color debugOverflowRectColor;
 
   @override
   Widget build(BuildContext context) {

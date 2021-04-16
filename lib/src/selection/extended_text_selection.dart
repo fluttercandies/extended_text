@@ -117,7 +117,7 @@ class ExtendedTextSelection extends StatefulWidget {
   /// widget directly to entirely override the [DefaultTextStyle].
   final int maxLines;
 
-  final TextSpan text;
+  final InlineSpan text;
 
   final Color selectionColor;
 
