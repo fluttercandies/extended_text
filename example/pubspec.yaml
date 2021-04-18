@@ -13,10 +13,10 @@ environment:
   sdk: '>=2.12.0 <3.0.0'
   flutter: ">=2.0.0"
 dependencies:
-  cupertino_icons: ^1.0.2 
-  ff_annotation_route_library: ^2.0.0 
+  cupertino_icons: ^1.0.2
+  ff_annotation_route_library: ^2.0.0
   flutter:
-    sdk: flutter  
+    sdk: flutter
   oktoast: any
   url_launcher: any
 dependency_overrides:
