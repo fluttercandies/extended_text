@@ -6,6 +6,7 @@
 import 'package:flutter/widgets.dart';
 import 'pages/background_text_demo.dart';
 import 'pages/custom_text_overflow_demo.dart';
+import 'pages/line_breaking_overflow_style.dart';
 import 'pages/main_page.dart';
 import 'pages/text_demo.dart';
 import 'pages/text_selection_demo.dart';
@@ -26,6 +27,14 @@ RouteResult getRouteResult({String name, Map<String, dynamic> arguments}) {
         widget: CustomTextOverflowDemo(),
         routeName: 'CustomTextOverflow',
         description: 'workaround for issue 26748. how to custom text overflow',
+      );
+    case 'fluttercandies://LineBreakingOverflowStyle':
+      return FFRouteSettings(
+        name: name,
+        arguments: arguments,
+        widget: LineBreakingOverflowStyleDemo(),
+        routeName: 'LineBreakingOverflowStyle',
+        description: 'workaround for issue 18761. LineBreakingOverflowStyle',
       );
     case 'fluttercandies://TextDemo':
       return RouteResult(

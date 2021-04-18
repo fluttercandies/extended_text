@@ -5,6 +5,7 @@
 const List<String> routeNames = <String>[
   'fluttercandies://BackgroundTextDemo',
   'fluttercandies://CustomTextOverflowDemo',
+  'fluttercandies://LineBreakingOverflowStyle',
   'fluttercandies://TextDemo',
   'fluttercandies://TextSelectionDemo',
   'fluttercandies://mainpage',
@@ -32,6 +33,16 @@ class Routes {
   /// [description] : 'workaround for issue 26748. how to custom text overflow'
   static const String fluttercandiesCustomTextOverflowDemo =
       'fluttercandies://CustomTextOverflowDemo';
+
+  /// 'workaround for issue 18761. LineBreakingOverflowStyle'
+  ///
+  /// [name] : 'fluttercandies://LineBreakingOverflowStyle'
+  ///
+  /// [routeName] : 'LineBreakingOverflowStyle'
+  ///
+  /// [description] : 'workaround for issue 18761. LineBreakingOverflowStyle'
+  static const String fluttercandiesLineBreakingOverflowStyle =
+      'fluttercandies://LineBreakingOverflowStyle';
 
   /// 'quickly build special text'
   ///

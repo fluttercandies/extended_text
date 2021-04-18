@@ -20,32 +20,32 @@ class CustomTextOverflowDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('custom text over flow'),
+      appBar: AppBar(
+        title: const Text('custom text over flow'),
+      ),
+      body: Container(
+        padding: const EdgeInsets.all(20.0),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              _buildText(
+                maxLines: null,
+                title: 'Full Text',
+              ),
+              _buildText(position: TextOverflowPosition.end),
+              _buildText(position: TextOverflowPosition.start),
+              _buildText(position: TextOverflowPosition.middle),
+              _buildText(
+                position: TextOverflowPosition.middle,
+                maxLines: 3,
+              ),
+            ],
+          ),
         ),
-        body: Container(
-            padding: const EdgeInsets.all(20.0),
-            child: SingleChildScrollView(
-              child: Builder(builder: (BuildContext context) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    _buildText(
-                      maxLines: null,
-                      title: 'Full Text',
-                    ),
-                    _buildText(position: TextOverflowPosition.end),
-                    _buildText(position: TextOverflowPosition.start),
-                    _buildText(position: TextOverflowPosition.middle),
-                    _buildText(
-                      position: TextOverflowPosition.middle,
-                      maxLines: 3,
-                    ),
-                  ],
-                );
-              }),
-            )));
+      ),
+    );
   }
 
   Widget _buildText({
@@ -77,7 +77,7 @@ class CustomTextOverflowDemo extends StatelessWidget {
                 onSpecialTextTap: onSpecialTextTap,
                 specialTextSpanBuilder: builder,
                 selectionEnabled: true,
-                //perfectLineBreakingAndOverflowStyle: true,
+                perfectLineBreakingAndOverflowStyle: true,
                 overflowWidget: TextOverflowWidget(
                   position: position,
                   align: TextOverflowAlign.center,
