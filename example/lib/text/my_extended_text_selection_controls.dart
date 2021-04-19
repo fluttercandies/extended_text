@@ -2,7 +2,7 @@ import 'dart:math' as math;
 import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:url_launcher/url_launcher.dart';
+//import 'package:url_launcher/url_launcher.dart';
 
 // Minimal padding from all edges of the selection toolbar to all edges of the
 // viewport.
@@ -77,8 +77,8 @@ class MyExtendedMaterialTextSelectionControls
                 canSelectAll(delegate) ? () => handleSelectAll(delegate) : null,
             handleLike: () {
               //mailto:<email address>?subject=<subject>&body=<body>, e.g.
-              launch(
-                  'mailto:zmtzawqlp@live.com?subject=extended_text_share&body=${delegate.textEditingValue.text}');
+              // launch(
+              //     'mailto:zmtzawqlp@live.com?subject=extended_text_share&body=${delegate.textEditingValue.text}');
               delegate.hideToolbar();
               //clear selecction
               delegate.textEditingValue = delegate.textEditingValue.copyWith(

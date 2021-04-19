@@ -8,15 +8,13 @@ import 'package:example/text/my_special_text_span_builder.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide CircularProgressIndicator;
-import 'package:url_launcher/url_launcher.dart';
+//import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/foundation.dart';
 
-import 'package:ff_annotation_route/ff_annotation_route.dart';
-
-@FFRoute(
-    name: 'fluttercandies://TextSelectionDemo',
-    routeName: 'TextSelection',
-    description: 'text selection support')
+// @FFRoute(
+//     name: 'fluttercandies://TextSelectionDemo',
+//     routeName: 'TextSelection',
+//     description: 'text selection support')
 class TextSelectionDemo extends StatefulWidget {
   @override
   _TextSelectionDemoState createState() => _TextSelectionDemoState();
@@ -52,11 +50,11 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                   child: ExtendedText(
                     _attachContent,
                     onSpecialTextTap: (dynamic parameter) {
-                      if (parameter.toString().startsWith('\$')) {
-                        launch('https://github.com/fluttercandies');
-                      } else if (parameter.toString().startsWith('@')) {
-                        launch('mailto:zmtzawqlp@live.com');
-                      }
+                      // if (parameter.toString().startsWith('\$')) {
+                      //   launch('https://github.com/fluttercandies');
+                      // } else if (parameter.toString().startsWith('@')) {
+                      //   launch('mailto:zmtzawqlp@live.com');
+                      // }
                     },
                     specialTextSpanBuilder: MySpecialTextSpanBuilder(),
                     //overflow: ExtendedTextOverflow.ellipsis,
@@ -72,8 +70,8 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                                 RaisedButton(
                                   child: const Text('more'),
                                   onPressed: () {
-                                    launch(
-                                        'https://github.com/fluttercandies/extended_text');
+                                    // launch(
+                                    //     'https://github.com/fluttercandies/extended_text');
                                   },
                                 )
                               ],

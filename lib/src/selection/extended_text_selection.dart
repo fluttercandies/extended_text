@@ -36,6 +36,7 @@ class ExtendedTextSelection extends StatefulWidget {
       this.selectionHeightStyle = BoxHeightStyle.tight,
       this.selectionWidthStyle = BoxWidthStyle.tight,
       this.overFlowWidget,
+      this.strutStyle,
       Key key})
       : assert(selectionHeightStyle != null),
         assert(selectionWidthStyle != null),
@@ -125,6 +126,8 @@ class ExtendedTextSelection extends StatefulWidget {
   final String data;
 
   final TextSelectionControls textSelectionControls;
+
+  final StrutStyle strutStyle;
 
   @override
   ExtendedTextSelectionState createState() => ExtendedTextSelectionState();
@@ -287,6 +290,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
                 overflowWidget: widget.overFlowWidget,
                 hasFocus: _effectiveFocusNode.hasFocus,
                 textSelectionDelegate: this,
+                strutStyle: widget.strutStyle,
               ),
             )));
 

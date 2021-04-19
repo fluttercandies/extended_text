@@ -2,14 +2,14 @@ import 'package:example/text/my_special_text_span_builder.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+//import 'package:url_launcher/url_launcher.dart';
 
-import 'package:ff_annotation_route/ff_annotation_route.dart';
+//import 'package:ff_annotation_route/ff_annotation_route.dart';
 
-@FFRoute(
-    name: 'fluttercandies://CustomTextOverflowDemo',
-    routeName: 'CustomTextOverflow',
-    description: 'workaround for issue 26748. how to custom text overflow')
+// @FFRoute(
+//     name: 'fluttercandies://CustomTextOverflowDemo',
+//     routeName: 'CustomTextOverflow',
+//     description: 'workaround for issue 26748. how to custom text overflow')
 class CustomTextOverflowDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -27,15 +27,15 @@ class CustomTextOverflowDemo extends StatelessWidget {
             'It\'s my pleasure to invite you to join \$FlutterCandies\$ if you want to improve flutter .[love]'
             'if you meet any problem, please let me konw @zmtzawqlp .[sun_glasses] ',
             onSpecialTextTap: (dynamic parameter) {
-              if (parameter.toString().startsWith('\$')) {
-                if (parameter.toString().contains('issue')) {
-                  launch('https://github.com/flutter/flutter/issues/26748');
-                } else {
-                  launch('https://github.com/fluttercandies');
-                }
-              } else if (parameter.toString().startsWith('@')) {
-                launch('mailto:zmtzawqlp@live.com');
-              }
+              // if (parameter.toString().startsWith('\$')) {
+              //   if (parameter.toString().contains('issue')) {
+              //     launch('https://github.com/flutter/flutter/issues/26748');
+              //   } else {
+              //     launch('https://github.com/fluttercandies');
+              //   }
+              // } else if (parameter.toString().startsWith('@')) {
+              //   launch('mailto:zmtzawqlp@live.com');
+              // }
             },
             specialTextSpanBuilder: MySpecialTextSpanBuilder(),
             selectionEnabled: true,
@@ -52,8 +52,8 @@ class CustomTextOverflowDemo extends StatelessWidget {
                         RaisedButton(
                           child: const Text('more'),
                           onPressed: () {
-                            launch(
-                                'https://github.com/fluttercandies/extended_text');
+                            // launch(
+                            //     'https://github.com/fluttercandies/extended_text');
                           },
                         )
                       ],

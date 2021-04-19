@@ -251,6 +251,7 @@ class ExtendedText extends StatelessWidget {
             textHeightBehavior ?? defaultTextStyle.textHeightBehavior,
         textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
         overFlowWidget: overflowWidget,
+        strutStyle: strutStyle,
       );
     } else {
       result = ExtendedRichText(
@@ -271,6 +272,7 @@ class ExtendedText extends StatelessWidget {
         textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
         overflowWidget: overflowWidget,
         hasFocus: false,
+        strutStyle: strutStyle,
       );
     }
 

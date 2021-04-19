@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:ff_annotation_route/ff_annotation_route.dart';
 
 import 'example_route.dart';
 

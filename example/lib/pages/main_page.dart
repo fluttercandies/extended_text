@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:ff_annotation_route/ff_annotation_route.dart';
-import 'package:url_launcher/url_launcher.dart';
+//import 'package:ff_annotation_route/ff_annotation_route.dart';
+//import 'package:url_launcher/url_launcher.dart';
 
 import '../example_route.dart';
 import '../example_routes.dart' as example_routes;
 
-@FFRoute(
-  name: 'fluttercandies://mainpage',
-  routeName: 'MainPage',
-)
+// @FFRoute(
+//   name: 'fluttercandies://mainpage',
+//   routeName: 'MainPage',
+// )
 class MainPage extends StatelessWidget {
   MainPage() {
     final List<String> routeNames = <String>[];
@@ -41,7 +41,7 @@ class MainPage extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                launch('https://github.com/fluttercandies/extended_text');
+                //launch('https://github.com/fluttercandies/extended_text');
               },
             ),
           ),
@@ -52,7 +52,7 @@ class MainPage extends StatelessWidget {
               child:
                   Image.network('https://pub.idqqimg.com/wpa/images/group.png'),
               onPressed: () {
-                launch('https://jq.qq.com/?_wv=1027&k=5bcc0gy');
+                //launch('https://jq.qq.com/?_wv=1027&k=5bcc0gy');
               },
             ),
           )

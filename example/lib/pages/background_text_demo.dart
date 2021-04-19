@@ -1,14 +1,14 @@
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+//import 'package:url_launcher/url_launcher.dart';
 
-import 'package:ff_annotation_route/ff_annotation_route.dart' hide Path;
+// import 'package:ff_annotation_route/ff_annotation_route.dart' hide Path;
 
-@FFRoute(
-    name: 'fluttercandies://BackgroundTextDemo',
-    routeName: 'BackgroundText',
-    description: 'workaround for issue 24335/24337 about background')
+// @FFRoute(
+//     name: 'fluttercandies://BackgroundTextDemo',
+//     routeName: 'BackgroundText',
+//     description: 'workaround for issue 24335/24337 about background')
 class BackgroundTextDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -31,8 +31,8 @@ class BackgroundTextDemo extends StatelessWidget {
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          launch(
-                              'https://github.com/flutter/flutter/issues/24335');
+                          // launch(
+                          //     'https://github.com/flutter/flutter/issues/24335');
                         }),
                   const TextSpan(text: '/'),
                   TextSpan(
@@ -40,8 +40,8 @@ class BackgroundTextDemo extends StatelessWidget {
                       style: const TextStyle(color: Colors.blue),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          launch(
-                              'https://github.com/flutter/flutter/issues/24337');
+                          // launch(
+                          //     'https://github.com/flutter/flutter/issues/24337');
                         }),
                 ])),
                 const Text(

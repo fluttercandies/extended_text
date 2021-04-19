@@ -1,6 +1,10 @@
+## 5.0.1-non-null-safety
+
+* fix strutStyle miss
 ## 5.0.0-non-null-safety
 
 * non-null-safety
+  
 ## 4.1.0
 
 * Support keyboard copy on web/desktop
