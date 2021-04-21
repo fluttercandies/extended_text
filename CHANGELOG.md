@@ -1,21 +1,26 @@
-## 5.0.1-non-null-safety
+## 6.0.0
+
+* Add [TextOverflowWidget.position] to support show overflow at start, middle or end.
+* Add [ExtendedText.betterLineBreakingAndOverflowStyle] to make line breaking and overflow style better.
+* Fix strutStyle not work.
+## 5.0.5
 
 * fix strutStyle miss
 ## 5.0.0-non-null-safety
 
 * non-null-safety
-  
+
 ## 4.1.0
 
 * Support keyboard copy on web/desktop
 * Fix wrong position of caret
-  
+
 ## 4.0.1
 
 * Change handleSpecialText to hasSpecialInlineSpanBase(extended_text_library)
 * Add hasPlaceholderSpan(extended_text_library)
 * Fix wrong offset of WidgetSpan #86
-  
+
 ## 4.0.0
 
 * Merge from Flutter v1.20

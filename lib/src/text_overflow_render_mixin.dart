@@ -2,7 +2,7 @@ part of 'extended_render_paragraph.dart';
 
 mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
   TextOverflow get oldOverflow;
-  Rect _overFlowRect;
+  Rect _overflowRect;
   bool _hasVisualOverflow = false;
   ui.Shader _overflowShader;
   bool _needsClipping = false;
@@ -43,7 +43,7 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
   void layoutOverflow() {
     final bool didOverflowWidth = _didVisualOverflow();
     layoutOfficalOverflow(didOverflowWidth);
-    _overFlowRect = null;
+    _overflowRect = null;
     if (overflowWidget != null) {
       // #97, the overflowWidget is already added, we must layout it as official.
       lastChild.layout(
@@ -66,8 +66,7 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
 
       final Rect rect = Offset.zero & size;
       final Size overflowWidgetSize = lastChild.size;
-      final TextOverflowPosition textOverflowPosition =
-          overflowWidget.position;
+      final TextOverflowPosition textOverflowPosition = overflowWidget.position;
       final int maxOffset = text.toPlainText().length;
       if (textOverflowPosition == TextOverflowPosition.end) {
         final TextSelection overflowSelection = TextSelection(
@@ -290,7 +289,7 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
 
   TextPainter _findNoOverflow(
       _TextRange range, List<int> hideWidgets, int maxOffset) {
-     TextPainter testTextPainter;
+    TextPainter testTextPainter;
     while (_hasVisualOverflow) {
       testTextPainter = _tryToFindNoOverflow(range, hideWidgets);
 
@@ -345,30 +344,30 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
     int maxOffset,
     TextOverflowPosition position,
   ) {
-    _overFlowRect = textParentData.offset & overFlowWidgetSize;
+    _overflowRect = textParentData.offset & overFlowWidgetSize;
     Rect overflowRect = getTextRect(
       overflowSelection,
       position,
       effectiveOffset: effectiveOffset,
     );
     if (position != TextOverflowPosition.middle ||
-        _overFlowRect.overlaps(overflowRect)) {
-      _overFlowRect = _overFlowRect.expandToInclude(overflowRect);
+        _overflowRect.overlaps(overflowRect)) {
+      _overflowRect = _overflowRect.expandToInclude(overflowRect);
     }
 
     bool go = true;
     while (go) {
       go = false;
       if (overflowSelection.baseOffset > 0 &&
-          rect.left < _overFlowRect.left &&
-          _overFlowRect.left < overflowRect.left) {
+          rect.left < _overflowRect.left &&
+          _overflowRect.left < overflowRect.left) {
         overflowSelection = overflowSelection.copyWith(
             baseOffset: overflowSelection.baseOffset - 1);
         go = true;
       }
       if (overflowSelection.extentOffset < maxOffset &&
-          rect.right > _overFlowRect.right &&
-          _overFlowRect.right > overflowRect.right) {
+          rect.right > _overflowRect.right &&
+          _overflowRect.right > overflowRect.right) {
         overflowSelection = overflowSelection.copyWith(
           extentOffset: overflowSelection.extentOffset + 1,
         );
@@ -388,8 +387,8 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
       if (position == TextOverflowPosition.middle) {
         if (temp != overflowRect) {
           overflowRect = temp;
-          if (_overFlowRect.overlaps(overflowRect)) {
-            _overFlowRect = _overFlowRect.expandToInclude(overflowRect);
+          if (_overflowRect.overlaps(overflowRect)) {
+            _overflowRect = _overflowRect.expandToInclude(overflowRect);
           }
           // line breaking
           else {
@@ -401,35 +400,34 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
           break;
         }
       } else {
-        _overFlowRect = _overFlowRect.expandToInclude(overflowRect);
+        _overflowRect = _overflowRect.expandToInclude(overflowRect);
       }
     }
 
-     double left;
-
+    double left;
     switch (overflowWidget.align) {
       case TextOverflowAlign.left:
-        left = _overFlowRect.left;
+        left = _overflowRect.left;
         break;
       case TextOverflowAlign.right:
-        left = _overFlowRect.right - overFlowWidgetSize.width;
+        left = _overflowRect.right - overFlowWidgetSize.width;
         break;
       case TextOverflowAlign.center:
-        left = _overFlowRect.center.dx - overFlowWidgetSize.width / 2;
+        left = _overflowRect.center.dx - overFlowWidgetSize.width / 2;
         break;
       default:
     }
 
     textParentData.offset = Offset(
       left + overflowWidget.fixedOffset.dx,
-      _overFlowRect.top +
-          (_overFlowRect.height - overFlowWidgetSize.height) / 2.0 +
+      _overflowRect.top +
+          (_overflowRect.height - overFlowWidgetSize.height) / 2.0 +
           overflowWidget.fixedOffset.dy,
     );
   }
 
   void _paintTextOverflow(PaintingContext context, Offset offset) {
-    if (overflowWidget != null && _overFlowRect != null) {
+    if (overflowWidget != null && _overflowRect != null) {
       assert(textPainter.width >= lastChild.size.width);
 
       final TextParentData textParentData =
@@ -458,14 +456,20 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
     List<int> hideWidgets,
     Accumulator hideWidgetIndex,
   ) {
-     InlineSpan output;
+    InlineSpan output;
     String actualText;
+    bool deleteAll = false;
     if (value is SpecialInlineSpanBase) {
-      actualText = (value as SpecialInlineSpanBase).actualText;
+      final SpecialInlineSpanBase base = value as SpecialInlineSpanBase;
+      actualText = base.actualText;
+      deleteAll = base.deleteAll;
+    } else {
+      deleteAll = false;
     }
     if (value is TextSpan) {
       List<InlineSpan> children;
       final int start = offset.value;
+
       String text = value.text;
       if (text != null) {
         String temp = '';
@@ -476,8 +480,12 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
           }
           temp += text[i];
         }
-        offset.increment(value.text.length);
         text = temp;
+      }
+
+      actualText ??= value.text;
+      if (actualText != null) {
+        offset.increment(actualText.length);
       }
 
       if (value.children != null) {
@@ -495,12 +503,12 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
 
       output = SpecialTextSpan(
         text: text ?? '',
-        actualText: actualText ?? value.text,
+        actualText: actualText,
         children: children,
         start: start,
         style: value.style,
         recognizer: value.recognizer,
-        deleteAll: false,
+        deleteAll: deleteAll,
         semanticsLabel: value.semanticsLabel,
       );
     } else if (value is WidgetSpan) {
@@ -522,7 +530,7 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
         hideWidgets.add(hideWidgetIndex.value);
       }
 
-      offset.increment(1);
+      offset.increment(actualText?.length ?? 1);
       hideWidgetIndex.increment(1);
     } else {
       output = value;
@@ -570,7 +578,7 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
   //     String? text = inlineSpan.text;
   //     if (text != null) {
   //       // add '\u{200B}' , make word close
-  //       text = Characters(text).toList().reversed.join('\u{200B}');
+  //       text = Characters(text).toList().reversed.join(zeroWidthSpace);
   //     }
   //     List<InlineSpan>? children;
   //     if (inlineSpan.children != null) {

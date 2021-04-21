@@ -29,12 +29,12 @@ RouteResult getRouteResult({String name, Map<String, dynamic> arguments}) {
         description: 'workaround for issue 26748. how to custom text overflow',
       );
     case 'fluttercandies://LineBreakingOverflowStyle':
-      return FFRouteSettings(
+      return RouteResult(
         name: name,
-        arguments: arguments,
         widget: LineBreakingOverflowStyleDemo(),
         routeName: 'LineBreakingOverflowStyle',
-        description: 'workaround for issue 18761. LineBreakingOverflowStyle',
+        description:
+            'make line breaking and overflow style better,workaround for issue 18761.',
       );
     case 'fluttercandies://TextDemo':
       return RouteResult(

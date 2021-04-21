@@ -9,8 +9,11 @@ environment:
 
 dependencies:
   extended_text_library: ^6.0.0-non-null-safety
+
   flutter:
     sdk: flutter
+
+
 
 dev_dependencies:
   flutter_test:

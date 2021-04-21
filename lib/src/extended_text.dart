@@ -31,12 +31,14 @@ class ExtendedText extends StatelessWidget {
     this.onTap,
     this.selectionColor,
     this.dragStartBehavior = DragStartBehavior.start,
-    this.textSelectionControls,
+    this.selectionControls,
     this.selectionHeightStyle = ui.BoxHeightStyle.tight,
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
     this.overflowWidget,
-    this.perfectLineBreakingAndOverflowStyle = false,
+    this.betterLineBreakingAndOverflowStyle = false,
   })  : textSpan = null,
+        // assert(!(betterLineBreakingAndOverflowStyle && selectionEnabled),
+        //    'join zero width space into text, the word will not be a word, the [TextPainter] won\'t work any more.'),
         super(key: key);
 
   /// Creates a text widget with a [InlineSpan].
@@ -60,13 +62,15 @@ class ExtendedText extends StatelessWidget {
     this.onTap,
     this.selectionColor,
     this.dragStartBehavior = DragStartBehavior.start,
-    this.textSelectionControls,
+    this.selectionControls,
     this.selectionHeightStyle = ui.BoxHeightStyle.tight,
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
     this.overflowWidget,
-    this.perfectLineBreakingAndOverflowStyle = false,
+    this.betterLineBreakingAndOverflowStyle = false,
   })  : data = null,
         specialTextSpanBuilder = null,
+        // assert(!(betterLineBreakingAndOverflowStyle && selectionEnabled),
+        //     'join zero width space into text, the word will not be a word, the [TextPainter] won\'t work any more.'),
         super(key: key);
 
   /// maxheight is equal to textPainter.preferredLineHeight
@@ -85,7 +89,7 @@ class ExtendedText extends StatelessWidget {
 
   /// An interface for building the selection UI, to be provided by the
   /// implementor of the toolbar widget or handle widget
-  final TextSelectionControls textSelectionControls;
+  final TextSelectionControls selectionControls;
 
   ///DragStartBehavior for text selection
   final DragStartBehavior dragStartBehavior;
@@ -209,7 +213,7 @@ class ExtendedText extends StatelessWidget {
   ///
   /// Characters(text).join('\u{200B}')
   ///
-  final bool perfectLineBreakingAndOverflowStyle;
+  final bool betterLineBreakingAndOverflowStyle;
 
 //  ExtendedRenderEditable get _renderEditable =>
 //      _editableTextKey.currentState.renderEditable;
@@ -235,8 +239,12 @@ class ExtendedText extends StatelessWidget {
       children: textSpan != null ? <InlineSpan>[textSpan] : null,
     );
 
-    if (perfectLineBreakingAndOverflowStyle) {
-      innerTextSpan = joinChar(innerTextSpan, Accumulator(), '\u{200B}');
+    if (betterLineBreakingAndOverflowStyle) {
+      innerTextSpan = joinChar(
+        innerTextSpan,
+        Accumulator(),
+        zeroWidthSpace,
+      );
     }
 
     //_createImageConfiguration(<InlineSpan>[innerTextSpan], context);
@@ -259,8 +267,9 @@ class ExtendedText extends StatelessWidget {
         selectionColor: selectionColor ?? Theme.of(context).textSelectionColor,
         dragStartBehavior: dragStartBehavior,
         onTap: onTap,
-        data: data ?? textSpanToActualText(innerTextSpan),
-        textSelectionControls: textSelectionControls,
+        data: (betterLineBreakingAndOverflowStyle ? data?.joinChar() : data) ??
+            textSpanToActualText(innerTextSpan),
+        selectionControls: selectionControls,
         textHeightBehavior:
             textHeightBehavior ?? defaultTextStyle.textHeightBehavior,
         textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,

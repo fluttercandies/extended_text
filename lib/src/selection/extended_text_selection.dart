@@ -17,30 +17,28 @@ import 'extended_text_selection_pointer_handler.dart';
 ///
 
 class ExtendedTextSelection extends StatefulWidget {
-  const ExtendedTextSelection(
-      {this.onTap,
-      this.softWrap,
-      this.locale,
-      this.textDirection,
-      this.textAlign,
-      this.maxLines,
-      this.textScaleFactor,
-      this.overflow,
-      this.text,
-      this.selectionColor,
-      this.dragStartBehavior,
-      this.data,
-      this.textSelectionControls,
-      this.textWidthBasis,
-      this.textHeightBehavior,
-      this.selectionHeightStyle = BoxHeightStyle.tight,
-      this.selectionWidthStyle = BoxWidthStyle.tight,
-      this.overFlowWidget,
-      this.strutStyle,
-      Key key})
-      : assert(selectionHeightStyle != null),
-        assert(selectionWidthStyle != null),
-        super(key: key);
+  const ExtendedTextSelection({
+    this.onTap,
+    this.softWrap,
+    this.locale,
+    this.textDirection,
+    this.textAlign,
+    this.maxLines,
+    this.textScaleFactor,
+    this.overflow,
+    this.text,
+    this.selectionColor,
+    this.dragStartBehavior,
+    this.data,
+    this.selectionControls,
+    this.textWidthBasis,
+    this.textHeightBehavior,
+    this.selectionHeightStyle = BoxHeightStyle.tight,
+    this.selectionWidthStyle = BoxWidthStyle.tight,
+    this.overFlowWidget,
+    this.strutStyle,
+    Key key,
+  }) : super(key: key);
   final TextOverflowWidget overFlowWidget;
 
   /// Controls how tall the selection highlight boxes are computed to be.
@@ -125,9 +123,10 @@ class ExtendedTextSelection extends StatefulWidget {
 
   final String data;
 
-  final TextSelectionControls textSelectionControls;
+  final TextSelectionControls selectionControls;
 
   final StrutStyle strutStyle;
+
 
   @override
   ExtendedTextSelectionState createState() => ExtendedTextSelectionState();
@@ -158,7 +157,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   bool get _hasFocus => _effectiveFocusNode.hasFocus;
   @override
   void initState() {
-    _textSelectionControls = widget.textSelectionControls;
+    _textSelectionControls = widget.selectionControls;
     _clipboardStatus?.addListener(_onChangedClipboardStatus);
     _focusAttachment = _effectiveFocusNode.attach(context);
     _effectiveFocusNode.addListener(_handleFocusChanged);
@@ -179,8 +178,8 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
 
   @override
   void didUpdateWidget(ExtendedTextSelection oldWidget) {
-    if (oldWidget.textSelectionControls != widget.textSelectionControls) {
-      _textSelectionControls = widget.textSelectionControls;
+    if (oldWidget.selectionControls != widget.selectionControls) {
+      _textSelectionControls = widget.selectionControls;
       final ThemeData themeData = Theme.of(context);
       switch (themeData.platform) {
         case TargetPlatform.android:
@@ -199,7 +198,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
           text: widget.data,
           selection: const TextSelection.collapsed(offset: 0));
     }
-    if (pasteEnabled && widget.textSelectionControls?.canPaste(this) == true) {
+    if (pasteEnabled && widget.selectionControls?.canPaste(this) == true) {
       _clipboardStatus?.update();
     }
     super.didUpdateWidget(oldWidget);
