@@ -34,13 +34,13 @@ class Routes {
   static const String fluttercandiesCustomTextOverflowDemo =
       'fluttercandies://CustomTextOverflowDemo';
 
-  /// 'workaround for issue 18761. LineBreakingOverflowStyle'
+  /// 'make line breaking and overflow style better,workaround for issue 18761.'
   ///
   /// [name] : 'fluttercandies://LineBreakingOverflowStyle'
   ///
   /// [routeName] : 'LineBreakingOverflowStyle'
   ///
-  /// [description] : 'workaround for issue 18761. LineBreakingOverflowStyle'
+  /// [description] : 'make line breaking and overflow style better,workaround for issue 18761.'
   static const String fluttercandiesLineBreakingOverflowStyle =
       'fluttercandies://LineBreakingOverflowStyle';
 

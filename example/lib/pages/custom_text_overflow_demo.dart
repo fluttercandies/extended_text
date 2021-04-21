@@ -8,17 +8,35 @@ import 'package:url_launcher/url_launcher.dart';
     name: 'fluttercandies://CustomTextOverflowDemo',
     routeName: 'CustomTextOverflow',
     description: 'workaround for issue 26748. how to custom text overflow')
-class CustomTextOverflowDemo extends StatelessWidget {
-  final String content =
+class CustomTextOverflowDemo extends StatefulWidget {
+  @override
+  _CustomTextOverflowDemoState createState() => _CustomTextOverflowDemoState();
+}
+
+class _CustomTextOverflowDemoState extends State<CustomTextOverflowDemo> {
+  final String content = ''
       'relate to \$issue 26748\$ .[love]Extended text help you to build rich text quickly. any special text you will have with extended text. '
       'It\'s my pleasure to invite you to join \$FlutterCandies\$ if you want to improve flutter .[love]'
-      'if you meet any problem, please let me konw @zmtzawqlp . [sun_glasses] ';
+      '1234567 if you meet any problem, please let me konw @zmtzawqlp .';
   final MySpecialTextSpanBuilder builder = MySpecialTextSpanBuilder();
+  bool _betterLineBreakingAndOverflowStyle = false;
+  bool _selectionEnabled = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('custom text over flow'),
+        actions: <Widget>[
+          IconButton(
+              icon: const Icon(Icons.style),
+              onPressed: () {
+                setState(() {
+                  _betterLineBreakingAndOverflowStyle =
+                      !_betterLineBreakingAndOverflowStyle;
+                  _selectionEnabled = !_betterLineBreakingAndOverflowStyle;
+                });
+              })
+        ],
       ),
       body: Container(
         padding: const EdgeInsets.all(20.0),
@@ -27,17 +45,14 @@ class CustomTextOverflowDemo extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              _buildText(
-                maxLines: null,
-                title: 'Full Text',
-              ),
-              _buildText(position: TextOverflowPosition.end),
+              //_buildText(maxLines: null, title: 'Full Text'),
+              //_buildText(position: TextOverflowPosition.end),
               _buildText(position: TextOverflowPosition.start),
-              _buildText(position: TextOverflowPosition.middle),
-              _buildText(
-                position: TextOverflowPosition.middle,
-                maxLines: 3,
-              ),
+              // _buildText(position: TextOverflowPosition.middle),
+              // _buildText(
+              //   position: TextOverflowPosition.middle,
+              //   maxLines: 3,
+              // ),
             ],
           ),
         ),
@@ -73,8 +88,9 @@ class CustomTextOverflowDemo extends StatelessWidget {
                 content,
                 onSpecialTextTap: onSpecialTextTap,
                 specialTextSpanBuilder: builder,
-                selectionEnabled: true,
-                perfectLineBreakingAndOverflowStyle: true,
+                selectionEnabled: _selectionEnabled,
+                betterLineBreakingAndOverflowStyle:
+                    _betterLineBreakingAndOverflowStyle,
                 overflowWidget: TextOverflowWidget(
                   position: position,
                   align: TextOverflowAlign.center,

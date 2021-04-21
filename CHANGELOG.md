@@ -1,3 +1,8 @@
+## 6.0.0
+
+* Add [TextOverflowWidget.position] to support show overflow at start, middle or end.
+* Add [ExtendedText.betterLineBreakingAndOverflowStyle] to make line breaking and overflow style better.
+* Fix strutStyle not work.
 ## 5.0.5
 
 * Fix issue that childIndex == children.length assert false in assembleSemanticsNode when use overflowWidget and text is not overflow.

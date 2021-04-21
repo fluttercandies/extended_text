@@ -445,22 +445,22 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
 
     _paintTextOverflow(context, offset);
     //clip rect of over flow
-    if (_overFlowRect != null) {
+    if (_overflowRect != null) {
       context.canvas.save();
       context.canvas.saveLayer(_offset & size, Paint());
     }
     _paintSelection(context, offset);
     _paintSpecialText(context, offset);
     _paint(context, offset);
-    if (_overFlowRect != null) {
-      context.canvas
-          .drawRect(_overFlowRect!, Paint()..blendMode = BlendMode.clear);
+    if (_overflowRect != null) {
+      context.canvas.drawRect(
+          _overflowRect!.shift(_offset), Paint()..blendMode = BlendMode.clear);
       context.canvas.restore();
 
       if (kDebugMode &&
           overflowWidget != null &&
           overflowWidget!.debugOverflowRectColor != null) {
-        context.canvas.drawRect(_overFlowRect!,
+        context.canvas.drawRect(_overflowRect!.shift(_offset),
             Paint()..color = overflowWidget!.debugOverflowRectColor!);
       }
     }
@@ -495,7 +495,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
     paintWidgets(
       context,
       offset,
-      overFlowRect: _overFlowRect,
+      overFlowRect: _overflowRect,
     );
 
     if (_needsClipping) {
@@ -873,7 +873,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
 
   @override
   bool hitTestChildren(BoxHitTestResult result, {Offset? position}) {
-    if (overflowWidget != null && _overFlowRect != null) {
+    if (overflowWidget != null && _overflowRect != null) {
       final bool isHit = hitTestChild(result, lastChild!, position: position!);
       if (isHit) {
         return true;
@@ -902,8 +902,8 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
       _selectionRects ??= _textPainter.getBoxesForSelection(actualSelection);
 
       // do not paint Selection in the region of _overFlowRect
-      if (overflowWidget != null && _overFlowRect != null) {
-        final Rect overFlowRect = _overFlowRect!.shift(_offset);
+      if (overflowWidget != null && _overflowRect != null) {
+        final Rect overFlowRect = _overflowRect!.shift(_offset);
         for (final ui.TextBox box in _selectionRects!) {
           if (overFlowRect.overlaps(box.toRect())) {
             if (overflowWidget!.position == TextOverflowPosition.end) {
@@ -912,15 +912,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
                 math.min(overFlowRect.left, box.left),
                 box.top,
                 math.min(overFlowRect.left, box.right),
-                box.bottom,
-                box.direction,
-              );
-            } else if (overflowWidget!.position == TextOverflowPosition.start) {
-              _selectionRects![_selectionRects!.indexOf(box)] =
-                  ui.TextBox.fromLTRBD(
-                math.min(overFlowRect.right, box.left),
-                box.top,
-                math.min(overFlowRect.right, box.right),
                 box.bottom,
                 box.direction,
               );
@@ -982,8 +973,8 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
         return null;
       }
 
-      if (overflowWidget != null && _overFlowRect != null) {
-        final Rect overFlowRect = _overFlowRect!.shift(_offset);
+      if (overflowWidget != null && _overflowRect != null) {
+        final Rect overFlowRect = _overflowRect!.shift(_offset);
         for (final ui.TextBox box in boxes.toList()) {
           if (overFlowRect.overlaps(box.toRect())) {
             if (overflowWidget!.position == TextOverflowPosition.end) {
@@ -991,14 +982,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
                 math.min(overFlowRect.left, box.left),
                 box.top,
                 math.min(overFlowRect.left, box.right),
-                box.bottom,
-                box.direction,
-              );
-            } else if (overflowWidget!.position == TextOverflowPosition.start) {
-              boxes[boxes.indexOf(box)] = ui.TextBox.fromLTRBD(
-                math.min(overFlowRect.right, box.left),
-                box.top,
-                math.min(overFlowRect.right, box.right),
                 box.bottom,
                 box.direction,
               );
@@ -1060,11 +1043,13 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
   @override
   TextPosition getPositionForPoint(Offset? globalPosition) {
     layoutTextWithConstraints(constraints);
-    final TextPosition result =
-        _textPainter.getPositionForOffset(globalToLocal(globalPosition!));
+
+    final Offset offset = globalToLocal(globalPosition!);
+
+    final TextPosition result = _textPainter.getPositionForOffset(offset);
 
     ///never drag over the over flow text span
-    if (overflowWidget != null && _overFlowRect != null) {
+    if (overflowWidget != null && _overflowRect != null) {
       final TextParentData textParentData =
           lastChild!.parentData as TextParentData;
 
@@ -1076,7 +1061,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
         }
       } else if (overflowWidget!.position == TextOverflowPosition.start) {
         final TextPosition position = getPositionForOffset(
-            (textParentData.offset & lastChild!.size).bottomRight + _offset);
+            (textParentData.offset & lastChild!.size).topRight + _offset);
         if (result.offset < position.offset) {
           return position;
         }
