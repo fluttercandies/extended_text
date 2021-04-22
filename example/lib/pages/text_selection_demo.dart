@@ -21,15 +21,15 @@ class TextSelectionDemo extends StatefulWidget {
 }
 
 class _TextSelectionDemoState extends State<TextSelectionDemo> {
-  MyExtendedMaterialTextSelectionControls
-      _myExtendedMaterialTextSelectionControls;
+   TextSelectionControls _myTextSelectionControls;
   final String _attachContent =
       '[love]Extended text help you to build rich text quickly. any special text you will have with extended text.It\'s my pleasure to invite you to join \$FlutterCandies\$ if you want to improve flutter .[love] if you meet any problem, please let me konw @zmtzawqlp .[sun_glasses]';
   @override
   void initState() {
-    _myExtendedMaterialTextSelectionControls =
-        MyExtendedMaterialTextSelectionControls();
+    _myTextSelectionControls =
+        MyTextSelectionControls();
     super.initState();
+    _myTextSelectionControls = MyTextSelectionControls();
   }
 
   @override
@@ -78,8 +78,7 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                             ),
                           ),
                     selectionEnabled: true,
-                    selectionControls:
-                        _myExtendedMaterialTextSelectionControls,
+                    selectionControls: _myTextSelectionControls,
                   ),
                 );
               },

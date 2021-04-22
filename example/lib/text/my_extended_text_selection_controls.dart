@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 //import 'package:url_launcher/url_launcher.dart';
 
 // Minimal padding from all edges of the selection toolbar to all edges of the
@@ -17,9 +18,32 @@ const double _kToolbarContentDistance = 8.0;
 ///  create by zmtzawqlp on 2019/8/3
 ///
 
-class MyExtendedMaterialTextSelectionControls
-    extends ExtendedMaterialTextSelectionControls {
-  MyExtendedMaterialTextSelectionControls();
+class MyTextSelectionControls extends ExtendedMaterialTextSelectionControls {
+  MyTextSelectionControls({this.joinZeroWidthSpace = false});
+  final bool joinZeroWidthSpace;
+
+  @override
+  void handleCopy(TextSelectionDelegate delegate,
+      ClipboardStatusNotifier clipboardStatus) {
+    final TextEditingValue value = delegate.textEditingValue;
+
+    String data = value.selection.textInside(value.text);
+    // remove zeroWidthSpace
+    if (joinZeroWidthSpace) {
+      data = data.replaceAll(zeroWidthSpace, '');
+    }
+    Clipboard.setData(ClipboardData(
+      text: value.selection.textInside(value.text),
+    ));
+    clipboardStatus?.update();
+    delegate.textEditingValue = TextEditingValue(
+      text: value.text,
+      selection: TextSelection.collapsed(offset: value.selection.end),
+    );
+    delegate.bringIntoView(delegate.textEditingValue.selection.extent);
+    delegate.hideToolbar();
+  }
+
   @override
   Widget buildToolbar(
     BuildContext context,

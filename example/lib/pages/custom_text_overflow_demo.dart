@@ -1,3 +1,4 @@
+import 'package:example/text/my_extended_text_selection_controls.dart';
 import 'package:example/text/my_special_text_span_builder.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/foundation.dart';
@@ -21,7 +22,7 @@ class _CustomTextOverflowDemoState extends State<CustomTextOverflowDemo> {
       '1234567 if you meet any problem, please let me konw @zmtzawqlp .';
   final MySpecialTextSpanBuilder builder = MySpecialTextSpanBuilder();
   bool _betterLineBreakingAndOverflowStyle = false;
-  bool _selectionEnabled = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,7 +35,6 @@ class _CustomTextOverflowDemoState extends State<CustomTextOverflowDemo> {
                 setState(() {
                   _betterLineBreakingAndOverflowStyle =
                       !_betterLineBreakingAndOverflowStyle;
-                  _selectionEnabled = !_betterLineBreakingAndOverflowStyle;
                 });
               })
         ],
@@ -46,14 +46,11 @@ class _CustomTextOverflowDemoState extends State<CustomTextOverflowDemo> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              //_buildText(maxLines: null, title: 'Full Text'),
-              //_buildText(position: TextOverflowPosition.end),
+              _buildText(maxLines: null, title: 'Full Text'),
+              _buildText(position: TextOverflowPosition.end),
               _buildText(position: TextOverflowPosition.start),
-              // _buildText(position: TextOverflowPosition.middle),
-              // _buildText(
-              //   position: TextOverflowPosition.middle,
-              //   maxLines: 3,
-              // ),
+              _buildText(position: TextOverflowPosition.middle),
+              _buildText(position: TextOverflowPosition.middle, maxLines: 3),
             ],
           ),
         ),
@@ -89,7 +86,13 @@ class _CustomTextOverflowDemoState extends State<CustomTextOverflowDemo> {
                 content,
                 onSpecialTextTap: onSpecialTextTap,
                 specialTextSpanBuilder: builder,
-                selectionEnabled: _selectionEnabled,
+                selectionEnabled: true,
+                // if betterLineBreakingAndOverflowStyle is true, you must take care of copy text.
+                // override [TextSelectionControls.handleCopy], remove zero width space.
+                selectionControls: MyTextSelectionControls(
+                  joinZeroWidthSpace:
+                      _betterLineBreakingAndOverflowStyle,
+                ),
                 betterLineBreakingAndOverflowStyle:
                     _betterLineBreakingAndOverflowStyle,
                 overflowWidget: TextOverflowWidget(
