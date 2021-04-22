@@ -1,7 +1,9 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:extended_text_library/extended_text_library.dart';
 
 ///
 ///  create by zmtzawqlp on 2019/8/3
@@ -15,6 +17,31 @@ const double _kToolbarContentDistance = 8.0;
 
 /// Android Material styled text selection controls.
 class MyTextSelectionControls extends TextSelectionControls {
+  MyTextSelectionControls({this.betterLineBreakingAndOverflowStyle = false});
+  final bool betterLineBreakingAndOverflowStyle;
+
+  @override
+  void handleCopy(TextSelectionDelegate delegate,
+      ClipboardStatusNotifier? clipboardStatus) {
+    final TextEditingValue value = delegate.textEditingValue;
+
+    String data = value.selection.textInside(value.text);
+    // remove zeroWidthSpace
+    if (betterLineBreakingAndOverflowStyle) {
+      data = data.replaceAll(zeroWidthSpace, '');
+    }
+    Clipboard.setData(ClipboardData(
+      text: value.selection.textInside(value.text),
+    ));
+    clipboardStatus?.update();
+    delegate.textEditingValue = TextEditingValue(
+      text: value.text,
+      selection: TextSelection.collapsed(offset: value.selection.end),
+    );
+    delegate.bringIntoView(delegate.textEditingValue.selection.extent);
+    delegate.hideToolbar();
+  }
+
   /// Returns the size of the Material handle.
   @override
   Size getHandleSize(double textLineHeight) =>

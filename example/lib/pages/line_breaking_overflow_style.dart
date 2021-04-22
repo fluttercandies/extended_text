@@ -1,3 +1,4 @@
+import 'package:example/text/my_extended_text_selection_controls.dart';
 import 'package:example/text/my_special_text_span_builder.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
@@ -77,6 +78,12 @@ class LineBreakingOverflowStyleDemo extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 maxLines: maxLines,
                 selectionEnabled: true,
+                // if betterLineBreakingAndOverflowStyle is true, you must take care of copy text.
+                // override [TextSelectionControls.handleCopy], remove zero width space.
+                selectionControls: MyTextSelectionControls(
+                  betterLineBreakingAndOverflowStyle:
+                      betterLineBreakingAndOverflowStyle,
+                ),
               ),
             ],
           )),
