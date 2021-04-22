@@ -17,10 +17,12 @@ enum TextOverflowAlign {
   center,
 }
 
+/// The position which TextOverflowWidget should be shown
+/// https://github.com/flutter/flutter/issues/45336
 enum TextOverflowPosition {
-  end,
-  middle,
   start,
+  middle,
+  end,
 }
 
 class TextOverflowWidget extends StatelessWidget {
@@ -28,7 +30,6 @@ class TextOverflowWidget extends StatelessWidget {
     required this.child,
     this.align = TextOverflowAlign.right,
     this.maxHeight,
-    this.fixedOffset = Offset.zero,
     this.position = TextOverflowPosition.end,
     this.debugOverflowRectColor,
   });
@@ -42,13 +43,11 @@ class TextOverflowWidget extends StatelessWidget {
   /// The maxHeight of [TextOverflowWidget], default is preferredLineHeight.
   final double? maxHeight;
 
-  /// Fixed offset refer to the Text Overflow Rect and [child].
-  final Offset fixedOffset;
-
   /// The position which TextOverflowWidget should be shown
   final TextOverflowPosition position;
 
   /// Whether paint overflow rect, just for debug
+  /// https://github.com/flutter/flutter/issues/45336
   final Color? debugOverflowRectColor;
 
   @override
