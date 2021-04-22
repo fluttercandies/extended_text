@@ -20,9 +20,6 @@ class LineBreakingOverflowStyleDemo extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('line breaking and overflow'),
-        actions: <Widget>[
-          IconButton(icon: const Icon(Icons.ac_unit_sharp), onPressed: () {})
-        ],
       ),
       body: Container(
         padding: const EdgeInsets.all(20.0),

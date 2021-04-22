@@ -465,8 +465,17 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
     _paintSpecialText(context, offset);
     _paint(context, offset);
     if (_overflowRect != null) {
+      // crop rect before _overflowRect
+      // it's used for [TextOverflowPosition.middle]
+      if (_overflowRects != null && _overflowRects.isNotEmpty) {
+        for (final Rect rect in _overflowRects) {
+          context.canvas.drawRect(
+              rect.shift(_offset), Paint()..blendMode = BlendMode.clear);
+        }
+      }
       context.canvas.drawRect(
           _overflowRect.shift(_offset), Paint()..blendMode = BlendMode.clear);
+
       context.canvas.restore();
 
       if (kDebugMode &&
@@ -1130,7 +1139,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
   List<TextBox> get selectionRects => _selectionRects;
 
   @override
-  Offset get effectiveOffset => Offset.zero;
+  Offset get effectiveOffset => _offset;
 
   @override
   Rect get caretPrototype =>
@@ -1138,9 +1147,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
 
   @override
   TextSelectionDelegate textSelectionDelegate;
-
-  @override
-  bool get ignorePointer => false;
 
   @override
   bool get readOnly => true;
