@@ -17,27 +17,28 @@ import 'extended_text_selection_pointer_handler.dart';
 ///
 
 class ExtendedTextSelection extends StatefulWidget {
-  const ExtendedTextSelection(
-      {this.onTap,
-      this.softWrap,
-      this.locale,
-      this.textDirection,
-      this.textAlign,
-      this.maxLines,
-      this.textScaleFactor,
-      this.overflow,
-      this.text,
-      this.selectionColor,
-      this.dragStartBehavior,
-      this.data,
-      this.textSelectionControls,
-      this.textWidthBasis,
-      this.textHeightBehavior,
-      this.selectionHeightStyle = BoxHeightStyle.tight,
-      this.selectionWidthStyle = BoxWidthStyle.tight,
-      this.overFlowWidget,
-      Key? key})
-      : super(key: key);
+  const ExtendedTextSelection({
+    this.onTap,
+    this.softWrap,
+    this.locale,
+    this.textDirection,
+    this.textAlign,
+    this.maxLines,
+    this.textScaleFactor,
+    this.overflow,
+    this.text,
+    this.selectionColor,
+    this.dragStartBehavior,
+    this.data,
+    this.textSelectionControls,
+    this.textWidthBasis,
+    this.textHeightBehavior,
+    this.selectionHeightStyle = BoxHeightStyle.tight,
+    this.selectionWidthStyle = BoxWidthStyle.tight,
+    this.overFlowWidget,
+    this.strutStyle,
+    Key? key,
+  }) : super(key: key);
   final TextOverflowWidget? overFlowWidget;
 
   /// Controls how tall the selection highlight boxes are computed to be.
@@ -114,7 +115,7 @@ class ExtendedTextSelection extends StatefulWidget {
   /// widget directly to entirely override the [DefaultTextStyle].
   final int? maxLines;
 
-  final TextSpan? text;
+  final InlineSpan? text;
 
   final Color? selectionColor;
 
@@ -123,6 +124,9 @@ class ExtendedTextSelection extends StatefulWidget {
   final String? data;
 
   final TextSelectionControls? textSelectionControls;
+
+  /// {@macro flutter.painting.textPainter.strutStyle}
+  final StrutStyle? strutStyle;
 
   @override
   ExtendedTextSelectionState createState() => ExtendedTextSelectionState();
@@ -328,6 +332,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
                 overflowWidget: widget.overFlowWidget,
                 hasFocus: _effectiveFocusNode.hasFocus,
                 textSelectionDelegate: this,
+                strutStyle: widget.strutStyle,
               ),
             )));
 

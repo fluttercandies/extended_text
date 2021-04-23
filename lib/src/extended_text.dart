@@ -35,7 +35,10 @@ class ExtendedText extends StatelessWidget {
     this.selectionHeightStyle = ui.BoxHeightStyle.tight,
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
     this.overflowWidget,
+    this.joinZeroWidthSpace = false,
   })  : textSpan = null,
+        // assert(!(betterLineBreakingAndOverflowStyle && selectionEnabled),
+        //    'join zero width space into text, the word will not be a word, the [TextPainter] won\'t work any more.'),
         super(key: key);
 
   /// Creates a text widget with a [InlineSpan].
@@ -63,8 +66,11 @@ class ExtendedText extends StatelessWidget {
     this.selectionHeightStyle = ui.BoxHeightStyle.tight,
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
     this.overflowWidget,
+    this.joinZeroWidthSpace = false,
   })  : data = null,
         specialTextSpanBuilder = null,
+        // assert(!(betterLineBreakingAndOverflowStyle && selectionEnabled),
+        //     'join zero width space into text, the word will not be a word, the [TextPainter] won\'t work any more.'),
         super(key: key);
 
   /// maxheight is equal to textPainter.preferredLineHeight
@@ -202,6 +208,13 @@ class ExtendedText extends StatelessWidget {
   /// {@macro flutter.dart:ui.textHeightBehavior}
   final ui.TextHeightBehavior? textHeightBehavior;
 
+  /// Whether join '\u{200B}' into text
+  /// https://github.com/flutter/flutter/issues/18761#issuecomment-812390920
+  ///
+  /// Characters(text).join('\u{200B}')
+  ///
+  final bool joinZeroWidthSpace;
+
 //  ExtendedRenderEditable get _renderEditable =>
 //      _editableTextKey.currentState.renderEditable;
   @override
@@ -214,14 +227,25 @@ class ExtendedText extends StatelessWidget {
       effectiveTextStyle = effectiveTextStyle!
           .merge(const TextStyle(fontWeight: FontWeight.bold));
 
-    TextSpan? innerTextSpan = specialTextSpanBuilder?.build(data!,
-        textStyle: effectiveTextStyle, onTap: onSpecialTextTap);
+    InlineSpan? innerTextSpan = specialTextSpanBuilder?.build(
+      data!,
+      textStyle: effectiveTextStyle,
+      onTap: onSpecialTextTap,
+    );
 
     innerTextSpan ??= TextSpan(
       style: effectiveTextStyle,
       text: data,
       children: textSpan != null ? <InlineSpan>[textSpan!] : null,
     );
+
+    if (joinZeroWidthSpace) {
+      innerTextSpan = joinChar(
+        innerTextSpan,
+        Accumulator(),
+        zeroWidthSpace,
+      );
+    }
 
     //_createImageConfiguration(<InlineSpan>[innerTextSpan], context);
 
@@ -243,12 +267,14 @@ class ExtendedText extends StatelessWidget {
         selectionColor: selectionColor,
         dragStartBehavior: dragStartBehavior,
         onTap: onTap,
-        data: data ?? textSpanToActualText(innerTextSpan),
+        data: (joinZeroWidthSpace ? data?.joinChar() : data) ??
+            textSpanToActualText(innerTextSpan),
         textSelectionControls: selectionControls,
         textHeightBehavior:
             textHeightBehavior ?? defaultTextStyle.textHeightBehavior,
         textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
         overFlowWidget: overflowWidget,
+        strutStyle: strutStyle,
       );
     } else {
       result = ExtendedRichText(
@@ -269,6 +295,7 @@ class ExtendedText extends StatelessWidget {
         textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
         overflowWidget: overflowWidget,
         hasFocus: false,
+        strutStyle: strutStyle,
       );
     }
 

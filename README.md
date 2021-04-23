@@ -21,6 +21,7 @@ Extended official text to build special text like inline image or @somebody quic
       - [Custom Behavior](#custom-behavior)
   - [Custom Background](#custom-background)
   - [Custom Overflow](#custom-overflow)
+  - [Join Zero-Width Space](#join-zero-width-space)
 
 ## Speical Text
 
@@ -295,32 +296,101 @@ refer to issue [26748](https://github.com/flutter/flutter/issues/26748)
 | child       | The widget of TextOverflow.                                  | @required           |
 | maxHeight   | The maxHeight of [TextOverflowWidget], default is preferredLineHeight. | preferredLineHeight |
 | align       | The Align of [TextOverflowWidget], left/right.               | right               |
-| fixedOffset | Fixed offset refer to the Text Overflow Rect and [child].    | -                   |
+| position | The position which TextOverflowWidget should be shown.    | TextOverflowPosition.end                  |
 
 ```dart
-  ExtendedText(...
-            overFlowWidget:
-                TextOverflowWidget(
-                    //maxHeight: double.infinity,
-                    //align: TextOverflowAlign.right,
-                    //fixedOffset: Offset.zero,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        const Text('\u2026 '),
-                        RaisedButton(
-                          child: const Text('more'),
-                          onPressed: () {
-                            launch(
-                                'https://github.com/fluttercandies/extended_text');
-                          },
-                        )
-                      ],
-                    ),
-                  ),
-            ...
-          )
+  ExtendedText(
+   overflowWidget: TextOverflowWidget(
+     position: TextOverflowPosition.end,
+     align: TextOverflowAlign.center,
+     // just for debug
+     debugOverflowRectColor: Colors.red.withOpacity(0.1),
+     child: Container(
+       child: Row(
+         mainAxisSize: MainAxisSize.min,
+         children: <Widget>[
+           const Text('\u2026 '),
+           InkWell(
+             child: const Text(
+               'more',
+             ),
+             onTap: () {
+               launch(
+                   'https://github.com/fluttercandies/extended_text');
+             },
+           )
+         ],
+       ),
+     ),
+   ),
+  )
 ```
 
+## Join Zero-Width Space
 
+![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/JoinZeroWidthSpace.jpg)
+
+refer to issue [18761](https://github.com/flutter/flutter/issues/18761)
+
+if [ExtendedText.joinZeroWidthSpace] is true, it will join '\u{200B}' into text, make line breaking and overflow style better.
+
+
+```dart
+  ExtendedText(
+      joinZeroWidthSpace: true,
+    )
+```
+
+or you can convert by following method:
+
+1. String
+
+```dart
+  String input='abc'.joinChar();
+```
+
+2. InlineSpan
+
+```dart
+     InlineSpan innerTextSpan;
+     innerTextSpan = joinChar(
+        innerTextSpan,
+        Accumulator(),
+        zeroWidthSpace,
+    );
+```
+
+Take care of following things:
+
+1. the word is not a word, it will not working when you want to double tap to select a word.
+
+2. text is changed, if [ExtendedText.selectionEnabled] is true, you should override TextSelectionControls and remove zeroWidthSpace.
+
+``` dart
+
+class MyTextSelectionControls extends TextSelectionControls {
+
+  @override
+  void handleCopy(TextSelectionDelegate delegate,
+      ClipboardStatusNotifier? clipboardStatus) {
+    final TextEditingValue value = delegate.textEditingValue;
+
+    String data = value.selection.textInside(value.text);
+    // remove zeroWidthSpace
+    data = data.replaceAll(zeroWidthSpace, '');
+
+    Clipboard.setData(ClipboardData(
+      text: value.selection.textInside(value.text),
+    ));
+    clipboardStatus?.update();
+    delegate.textEditingValue = TextEditingValue(
+      text: value.text,
+      selection: TextSelection.collapsed(offset: value.selection.end),
+    );
+    delegate.bringIntoView(delegate.textEditingValue.selection.extent);
+    delegate.hideToolbar();
+  }
+}
+
+```
 

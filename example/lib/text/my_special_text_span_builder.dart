@@ -6,10 +6,7 @@ import 'dollar_text.dart';
 import 'emoji_text.dart';
 
 class MySpecialTextSpanBuilder extends SpecialTextSpanBuilder {
-  MySpecialTextSpanBuilder({this.showAtBackground = false});
-
-  /// whether show background for @somebody
-  final bool showAtBackground;
+  MySpecialTextSpanBuilder();
 
   @override
   SpecialText? createSpecialText(String flag,
@@ -20,13 +17,12 @@ class MySpecialTextSpanBuilder extends SpecialTextSpanBuilder {
       return null;
     }
 
-    ///index is end index of start flag, so text start index should be index-(flag.length-1)
+    // index is end index of start flag, so text start index should be index-(flag.length-1)
     if (isStart(flag, AtText.flag)) {
       return AtText(
         textStyle!,
         onTap,
         start: index! - (AtText.flag.length - 1),
-        showAtBackground: showAtBackground,
       );
     } else if (isStart(flag, EmojiText.flag)) {
       return EmojiText(textStyle!, start: index! - (EmojiText.flag.length - 1));

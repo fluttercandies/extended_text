@@ -6,36 +6,21 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 @FFRoute(
-    name: 'fluttercandies://CustomTextOverflowDemo',
-    routeName: 'CustomTextOverflow',
-    description: 'workaround for issue 26748. how to custom text overflow')
-class CustomTextOverflowDemo extends StatefulWidget {
-  @override
-  _CustomTextOverflowDemoState createState() => _CustomTextOverflowDemoState();
-}
-
-class _CustomTextOverflowDemoState extends State<CustomTextOverflowDemo> {
-  final String content = ''
+    name: 'fluttercandies://JoinZeroWidthSpace',
+    routeName: 'JoinZeroWidthSpace',
+    description:
+        'make line breaking and overflow style better, workaround for issue 18761.')
+class JoinZeroWidthSpaceDemo extends StatelessWidget {
+  final String content =
       'relate to \$issue 26748\$ .[love]Extended text help you to build rich text quickly. any special text you will have with extended text. '
       'It\'s my pleasure to invite you to join \$FlutterCandies\$ if you want to improve flutter .[love]'
       '1234567 if you meet any problem, please let me know @zmtzawqlp .';
   final MySpecialTextSpanBuilder builder = MySpecialTextSpanBuilder();
-  bool _joinZeroWidthSpace = false;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('custom text over flow'),
-        actions: <Widget>[
-          IconButton(
-              icon: const Icon(Icons.style),
-              onPressed: () {
-                setState(() {
-                  _joinZeroWidthSpace = !_joinZeroWidthSpace;
-                });
-              })
-        ],
+        title: const Text('Join Zero-Width Space'),
       ),
       body: Container(
         padding: const EdgeInsets.all(20.0),
@@ -44,11 +29,12 @@ class _CustomTextOverflowDemoState extends State<CustomTextOverflowDemo> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              _buildText(maxLines: null, title: 'Full Text'),
-              _buildText(position: TextOverflowPosition.end),
-              _buildText(position: TextOverflowPosition.start),
-              _buildText(position: TextOverflowPosition.middle),
-              _buildText(position: TextOverflowPosition.middle, maxLines: 3),
+              _buildText(
+                joinZeroWidthSpace: false,
+              ),
+              _buildText(
+                joinZeroWidthSpace: true,
+              ),
             ],
           ),
         ),
@@ -57,9 +43,9 @@ class _CustomTextOverflowDemoState extends State<CustomTextOverflowDemo> {
   }
 
   Widget _buildText({
-    TextOverflowPosition position = TextOverflowPosition.end,
     int? maxLines = 4,
     String? title,
+    bool joinZeroWidthSpace = false,
   }) {
     return Card(
       child: Padding(
@@ -69,8 +55,7 @@ class _CustomTextOverflowDemoState extends State<CustomTextOverflowDemo> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                title ??
-                    'position: ${position.toString().replaceAll('TextOverflowPosition.', '')}${maxLines != null ? ' , maxLines: $maxLines' : ''}',
+                title ?? 'joinZeroWidthSpace: $joinZeroWidthSpace',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const Padding(
@@ -84,38 +69,15 @@ class _CustomTextOverflowDemoState extends State<CustomTextOverflowDemo> {
                 content,
                 onSpecialTextTap: onSpecialTextTap,
                 specialTextSpanBuilder: builder,
+                joinZeroWidthSpace: joinZeroWidthSpace,
+                overflow: TextOverflow.ellipsis,
+                maxLines: maxLines,
                 selectionEnabled: true,
-                // if joinZeroWidthSpace is true, you must take care of copy text.
+                // if betterLineBreakingAndOverflowStyle is true, you must take care of copy text.
                 // override [TextSelectionControls.handleCopy], remove zero width space.
                 selectionControls: MyTextSelectionControls(
-                  joinZeroWidthSpace: _joinZeroWidthSpace,
+                  joinZeroWidthSpace: joinZeroWidthSpace,
                 ),
-                joinZeroWidthSpace: _joinZeroWidthSpace,
-                overflowWidget: TextOverflowWidget(
-                  position: position,
-                  align: TextOverflowAlign.center,
-                  // just for debug
-                  debugOverflowRectColor: Colors.red.withOpacity(0.1),
-                  child: Container(
-                    //color: Colors.yellow,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        const Text('\u2026 '),
-                        InkWell(
-                          child: const Text(
-                            'more',
-                          ),
-                          onTap: () {
-                            launch(
-                                'https://github.com/fluttercandies/extended_text');
-                          },
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-                maxLines: maxLines,
               ),
             ],
           )),

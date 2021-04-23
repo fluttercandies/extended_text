@@ -9,7 +9,7 @@ class EmojiText extends SpecialText {
   final int? start;
   @override
   InlineSpan finishText() {
-    final String key = toString();
+    final String key = getContent();
 
     /// widget span is not working on web
     if (EmojiUitl.instance.emojiMap.containsKey(key)) {
@@ -20,15 +20,17 @@ class EmojiText extends SpecialText {
       ///fontSize 26 and text height =30.0
       //final double fontSize = 26.0;
       return ImageSpan(
-          AssetImage(
-            EmojiUitl.instance.emojiMap[key]!,
-          ),
-          actualText: key,
-          imageWidth: size,
-          imageHeight: size,
-          start: start!,
-          fit: BoxFit.fill,
-          margin: const EdgeInsets.only(left: 2.0, top: 2.0, right: 2.0));
+        AssetImage(
+          EmojiUitl.instance.emojiMap[key]!,
+        ),
+        actualText: key,
+        imageWidth: size,
+        imageHeight: size,
+        start: start!,
+        fit: BoxFit.fill,
+        margin: const EdgeInsets.only(left: 2.0, top: 2.0, right: 2.0),
+        alignment: PlaceholderAlignment.middle,
+      );
     }
 
     return TextSpan(text: toString(), style: textStyle);
@@ -37,8 +39,8 @@ class EmojiText extends SpecialText {
 
 class EmojiUitl {
   EmojiUitl._() {
-    _emojiMap['[love]'] = '$_emojiFilePath/love.png';
-    _emojiMap['[sun_glasses]'] = '$_emojiFilePath/sun_glasses.png';
+    _emojiMap['love'] = '$_emojiFilePath/love.png';
+    _emojiMap['sun_glasses'] = '$_emojiFilePath/sun_glasses.png';
   }
 
   final Map<String, String> _emojiMap = <String, String>{};

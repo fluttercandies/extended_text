@@ -20,7 +20,7 @@ class TextDemo extends StatelessWidget {
         child: ExtendedText(
           '[love]Extended text help you to build rich text quickly. any special text you will have with extended text. '
           '\n\nIt\'s my pleasure to invite you to join \$FlutterCandies\$ if you want to improve flutter .[love]'
-          '\n\nif you meet any problem, please let me konw @zmtzawqlp .[sun_glasses]',
+          '\n\nif you meet any problem, please let me know @zmtzawqlp .[sun_glasses]',
           onSpecialTextTap: (dynamic parameter) {
             if (parameter.toString().startsWith('\$')) {
               launch('https://github.com/fluttercandies');

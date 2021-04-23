@@ -7,8 +7,8 @@ import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/widgets.dart';
 import 'pages/background_text_demo.dart';
 import 'pages/custom_text_overflow_demo.dart';
+import 'pages/join_zero_width_space.dart';
 import 'pages/main_page.dart';
-import 'pages/middle_text_overflow_demo.dart';
 import 'pages/text_demo.dart';
 import 'pages/text_selection_demo.dart';
 
@@ -36,13 +36,14 @@ FFRouteSettings getRouteSettings({
         routeName: 'CustomTextOverflow',
         description: 'workaround for issue 26748. how to custom text overflow',
       );
-    case 'fluttercandies://MiddleTextOverflowDemo':
+    case 'fluttercandies://JoinZeroWidthSpace':
       return FFRouteSettings(
         name: name,
         arguments: arguments,
-        widget: MiddleTextOverflowDemo(),
-        routeName: 'MiddleTextOverflow',
-        description: 'how to make text overflow in middle.',
+        widget: JoinZeroWidthSpaceDemo(),
+        routeName: 'JoinZeroWidthSpace',
+        description:
+            'make line breaking and overflow style better, workaround for issue 18761.',
       );
     case 'fluttercandies://TextDemo':
       return FFRouteSettings(

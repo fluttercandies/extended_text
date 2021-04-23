@@ -14,11 +14,13 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'text_overflow_widget.dart';
+part 'text_overflow_render_mixin.dart';
 
 const String _kEllipsis = '\u2026';
 
 /// A render object that displays a paragraph of text
-class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
+class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
+    with TextOverflowMixin {
   /// Creates a paragraph render object.
   ///
   /// The [text], [textAlign], [textDirection], [overflow], [softWrap], and
@@ -52,8 +54,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   })  : assert(text.debugAssertIsValid()),
         assert(maxLines == null || maxLines > 0),
         _softWrap = softWrap,
-        _overflow = overflowWidget != null ? TextOverflow.clip : overflow,
-        _oldOverflow = overflow,
+        oldOverflow = overflow,
         _startHandleLayerLink = startHandleLayerLink,
         _endHandleLayerLink = endHandleLayerLink,
         _textPainter = TextPainter(
@@ -74,9 +75,10 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         _selectionColor = selectionColor,
         _selection = selection,
         _selectionHeightStyle = selectionHeightStyle,
-        _selectionWidthStyle = selectionWidthStyle,
-        _overflowWidget = overflowWidget {
+        _selectionWidthStyle = selectionWidthStyle {
     this.hasFocus = hasFocus ?? false;
+    _overflow = overflowWidget != null ? TextOverflow.clip : overflow;
+    _overflowWidget = overflowWidget;
     addAll(children);
     extractPlaceholderSpans(text);
   }
@@ -230,21 +232,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     markNeedsTextLayout();
   }
 
-  /// How visual overflow should be handled.
-  @override
-  TextOverflow get overflow => _overflow;
-  TextOverflow _overflow;
-  set overflow(TextOverflow value) {
-    final TextOverflow temp =
-        overflowWidget != null ? TextOverflow.clip : value;
-    if (_overflow == temp) {
-      return;
-    }
-    _overflow = temp;
-    _textPainter.ellipsis = value == TextOverflow.ellipsis ? _kEllipsis : null;
-    markNeedsTextLayout();
-  }
-
   /// The number of font pixels for each logical pixel.
   ///
   /// For example, if the text scale factor is 1.5, text will be 50% larger than
@@ -389,10 +376,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     }
   }
 
-  bool _needsClipping = false;
-  bool _hasVisualOverflow = false;
-  ui.Shader? _overflowShader;
-
   /// Whether this paragraph currently has a [dart:ui.Shader] for its overflow
   /// effect.
   ///
@@ -402,11 +385,17 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 
   @override
   void performLayout() {
+    layoutAll();
+    layoutOverflow();
+  }
+
+  void layoutAll() {
     layoutChildren(constraints);
     layoutText(
-        minWidth: constraints.minWidth,
-        maxWidth: constraints.maxWidth,
-        forceLayout: true);
+      minWidth: constraints.minWidth,
+      maxWidth: constraints.maxWidth,
+      forceLayout: true,
+    );
 
     setParentData();
 
@@ -416,125 +405,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     // calculations are destructive. Other _textPainter state will also be
     // affected. See also RenderEditable which has a similar issue.
     final Size textSize = _textPainter.size;
-    final bool textDidExceedMaxLines = _textPainter.didExceedMaxLines;
     size = constraints.constrain(textSize);
-
-    final bool didOverflowHeight =
-        size.height < textSize.height || textDidExceedMaxLines;
-    final bool didOverflowWidth = size.width < textSize.width;
-    // (abarth): We're only measuring the sizes of the line boxes here. If
-    // the glyphs draw outside the line boxes, we might think that there isn't
-    // visual overflow when there actually is visual overflow. This can become
-    // a problem if we start having horizontal overflow and introduce a clip
-    // that affects the actual (but undetected) vertical overflow.
-    _hasVisualOverflow = didOverflowWidth || didOverflowHeight;
-    if (_hasVisualOverflow) {
-      switch (_overflow) {
-        case TextOverflow.visible:
-          _needsClipping = false;
-          _overflowShader = null;
-          break;
-        case TextOverflow.clip:
-        case TextOverflow.ellipsis:
-          _needsClipping = true;
-          _overflowShader = null;
-          break;
-        case TextOverflow.fade:
-          _needsClipping = true;
-          final TextPainter fadeSizePainter = TextPainter(
-            text: TextSpan(style: _textPainter.text!.style, text: '\u2026'),
-            textDirection: textDirection,
-            textScaleFactor: textScaleFactor,
-            locale: locale,
-          )..layout();
-          if (didOverflowWidth) {
-            double fadeEnd, fadeStart;
-            switch (textDirection) {
-              case TextDirection.rtl:
-                fadeEnd = 0.0;
-                fadeStart = fadeSizePainter.width;
-                break;
-              case TextDirection.ltr:
-                fadeEnd = size.width;
-                fadeStart = fadeEnd - fadeSizePainter.width;
-                break;
-            }
-            _overflowShader = ui.Gradient.linear(
-              Offset(fadeStart, 0.0),
-              Offset(fadeEnd, 0.0),
-              <Color>[const Color(0xFFFFFFFF), const Color(0x00FFFFFF)],
-            );
-          } else {
-            final double fadeEnd = size.height;
-            final double fadeStart = fadeEnd - fadeSizePainter.height / 2.0;
-            _overflowShader = ui.Gradient.linear(
-              Offset(0.0, fadeStart),
-              Offset(0.0, fadeEnd),
-              <Color>[const Color(0xFFFFFFFF), const Color(0x00FFFFFF)],
-            );
-          }
-          break;
-      }
-    } else {
-      _needsClipping = false;
-      _overflowShader = null;
-    }
-    _overFlowRect = null;
-    if (overflowWidget != null) {
-      // #97, the overflowWidget is already added, we must layout it as official.
-      lastChild!.layout(
-        BoxConstraints(
-          maxWidth: constraints.maxWidth,
-          maxHeight:
-              overflowWidget!.maxHeight ?? textPainter.preferredLineHeight,
-        ),
-        parentUsesSize: true,
-      );
-
-      if (!_hasVisualOverflow) {
-        return;
-      }
-
-      assert(textPainter.width >= lastChild!.size.width);
-
-      final TextParentData textParentData =
-          lastChild!.parentData as TextParentData;
-      textParentData.scale = 1.0;
-
-      final Rect rect = const Offset(0.0, 0.0) & size;
-      final Size overFlowWidgetSize = lastChild!.size;
-
-      // find TextPosition near bottomRight
-      final TextPosition lastOnePosition =
-          _textPainter.getPositionForOffset(rect.bottomRight);
-
-      // find overflow TextPosition that not clip the original text
-      final Offset finalOverFlowOffset = _findFinalOverflowOffset(
-        rect: rect,
-        x: rect.width -
-            overFlowWidgetSize.width +
-            overflowWidget!.fixedOffset.dx,
-        endTextOffset: lastOnePosition.offset,
-        y: rect.bottom,
-        effectiveOffset: Offset.zero,
-      );
-
-      final double x = overflowWidget!.align == TextOverflowAlign.left
-          ? finalOverFlowOffset.dx
-          : rect.right - overFlowWidgetSize.width;
-
-      textParentData.offset = Offset(
-          x + overflowWidget!.fixedOffset.dx,
-          rect.bottom -
-              overFlowWidgetSize.height +
-              (overFlowWidgetSize.height - _textPainter.preferredLineHeight) /
-                  2.0 +
-              overflowWidget!.fixedOffset.dy);
-      final Rect textRect = Offset.zero & size;
-      // _paintTextOverflow
-      _overFlowRect =
-          Rect.fromPoints(finalOverFlowOffset, textRect.bottomRight);
-    }
   }
 
   late Offset _offset;
@@ -572,17 +443,35 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
       context.canvas.clipRect(bounds);
     }
 
-    final Path? clip = _paintTextOverflow(context, offset);
+    _paintTextOverflow(context, offset);
     //clip rect of over flow
-    if (clip != null) {
+    if (_overflowRect != null) {
       context.canvas.save();
-      context.canvas.clipPath(clip);
+      context.canvas.saveLayer(_offset & size, Paint());
     }
     _paintSelection(context, offset);
     _paintSpecialText(context, offset);
-    _paint(context, offset, clip);
-    if (clip != null) {
+    _paint(context, offset);
+    if (_overflowRect != null) {
+      // crop rect before _overflowRect
+      // it's used for [TextOverflowPosition.middle]
+      if (_overflowRects != null && _overflowRects!.isNotEmpty) {
+        for (final Rect rect in _overflowRects!) {
+          context.canvas.drawRect(
+              rect.shift(_offset), Paint()..blendMode = BlendMode.clear);
+        }
+      }
+      context.canvas.drawRect(
+          _overflowRect!.shift(_offset), Paint()..blendMode = BlendMode.clear);
+
       context.canvas.restore();
+
+      if (kDebugMode &&
+          overflowWidget != null &&
+          overflowWidget!.debugOverflowRectColor != null) {
+        context.canvas.drawRect(_overflowRect!.shift(_offset),
+            Paint()..color = overflowWidget!.debugOverflowRectColor!);
+      }
     }
     paintHandleLayers(context, super.paint);
 
@@ -598,7 +487,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     }
   }
 
-  void _paint(PaintingContext context, Offset offset, Path? clip) {
+  void _paint(PaintingContext context, Offset offset) {
     if (_needsClipping) {
       final Rect bounds = offset & size;
       if (_overflowShader != null) {
@@ -612,7 +501,11 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     }
     _textPainter.paint(context.canvas, offset);
 
-    paintWidgets(context, offset, clip: clip);
+    paintWidgets(
+      context,
+      offset,
+      overFlowRect: _overflowRect,
+    );
 
     if (_needsClipping) {
       if (_overflowShader != null) {
@@ -989,91 +882,13 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 
   @override
   bool hitTestChildren(BoxHitTestResult result, {Offset? position}) {
-    if (_hasVisualOverflow && overflowWidget != null) {
+    if (overflowWidget != null && _overflowRect != null) {
       final bool isHit = hitTestChild(result, lastChild!, position: position!);
       if (isHit) {
         return true;
       }
     }
     return super.hitTestChildren(result, position: position);
-  }
-
-  Rect? _overFlowRect;
-  Path? _paintTextOverflow(PaintingContext context, Offset offset) {
-    if (_hasVisualOverflow && overflowWidget != null && _overFlowRect != null) {
-      assert(textPainter.width >= lastChild!.size.width);
-
-      final TextParentData textParentData =
-          lastChild!.parentData as TextParentData;
-
-      final double scale = textParentData.scale!;
-      context.pushTransform(
-        needsCompositing,
-        offset + textParentData.offset,
-        Matrix4.diagonal3Values(scale, scale, scale),
-        (PaintingContext context, Offset offset) {
-          context.paintChild(
-            lastChild!,
-            offset,
-          );
-        },
-      );
-
-      final Rect textRect = offset & size;
-      final double visibleRegionSlop = _textPainter.preferredLineHeight / 2.0;
-      final Rect overFlowRect = _overFlowRect!.shift(offset);
-      return Path()
-        ..addPolygon(
-          <Offset>[
-            textRect.topLeft,
-            textRect.topRight,
-            overFlowRect.topRight,
-            overFlowRect.topLeft,
-            overFlowRect.bottomLeft.translate(0.0, visibleRegionSlop),
-            textRect.bottomLeft.translate(0.0, visibleRegionSlop),
-          ],
-          true,
-        );
-    }
-    return null;
-  }
-
-  /// y find min y, so that over flow text will be covered
-  Offset _findFinalOverflowOffset({
-    required Rect rect,
-    required double x,
-    required int endTextOffset,
-    required double y,
-    Offset? effectiveOffset,
-  }) {
-    final Offset endOffset = getCaretOffset(
-      TextPosition(
-        offset: endTextOffset,
-      ),
-      effectiveOffset: effectiveOffset,
-    );
-
-    // overflow
-    //
-    if (endTextOffset != 0 && endOffset == Offset.zero) {
-      return _findFinalOverflowOffset(
-          rect: rect,
-          x: x,
-          endTextOffset: endTextOffset - 1,
-          y: y,
-          effectiveOffset: effectiveOffset);
-    }
-
-    if (endOffset.dx > x) {
-      return _findFinalOverflowOffset(
-        rect: rect,
-        x: x,
-        endTextOffset: endTextOffset - 1,
-        y: math.min(y, endOffset.dy),
-        effectiveOffset: effectiveOffset,
-      );
-    }
-    return Offset(endOffset.dx, math.min(y, endOffset.dy));
   }
 
   void _paintSelection(PaintingContext context, Offset effectiveOffset) {
@@ -1083,9 +898,12 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
     bool showSelection = false;
 
     // zmt
-    final TextSelection actualSelection = hasSpecialInlineSpanBase
+    TextSelection actualSelection = hasSpecialInlineSpanBase
         ? convertTextInputSelectionToTextPainterSelection(text, _selection!)
         : _selection!;
+
+    // never drag over the over flow text span
+    actualSelection = neverDragOnOverflow(actualSelection);
 
     if (!actualSelection.isCollapsed && _selectionColor != null) {
       showSelection = true;
@@ -1094,25 +912,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 
     if (showSelection) {
       _selectionRects ??= _textPainter.getBoxesForSelection(actualSelection);
-
-      // do not paint Selection in the region of _overFlowRect
-      if (_hasVisualOverflow &&
-          overflowWidget != null &&
-          _overFlowRect != null) {
-        final Rect overFlowRect = _overFlowRect!.shift(_offset);
-        for (final ui.TextBox box in _selectionRects!) {
-          if (overFlowRect.overlaps(box.toRect())) {
-            _selectionRects![_selectionRects!.indexOf(box)] =
-                ui.TextBox.fromLTRBD(
-              math.min(overFlowRect.left, box.left),
-              box.top,
-              math.min(overFlowRect.left, box.right),
-              box.bottom,
-              box.direction,
-            );
-          }
-        }
-      }
 
       assert(_selectionRects != null);
       paintSelection(context.canvas, effectiveOffset);
@@ -1156,35 +955,15 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
         textPainterSelection =
             convertTextInputSelectionToTextPainterSelection(text, selection);
       }
-      final List<ui.TextBox> boxes = <ui.TextBox>[];
-      _textPainter
-          .getBoxesForSelection(textPainterSelection)
-          .forEach((ui.TextBox element) {
-        boxes.add(element);
-      });
+
+      // never drag over the over flow text span
+      textPainterSelection = neverDragOnOverflow(textPainterSelection);
+
+      final List<ui.TextBox> boxes =
+          _textPainter.getBoxesForSelection(textPainterSelection);
 
       if (boxes.isEmpty) {
         return null;
-      }
-
-      if (_hasVisualOverflow &&
-          overflowWidget != null &&
-          _overFlowRect != null) {
-        final Rect overFlowRect = _overFlowRect!.shift(_offset);
-        for (final ui.TextBox box in boxes.toList()) {
-          if (overFlowRect.overlaps(box.toRect())) {
-            boxes[boxes.indexOf(box)] = ui.TextBox.fromLTRBD(
-              math.min(overFlowRect.left, box.left),
-              box.top,
-              math.min(overFlowRect.left, box.right),
-              box.bottom,
-              box.direction,
-            );
-          }
-        }
-        if (boxes.isEmpty) {
-          return null;
-        }
       }
 
       final Offset start = Offset(boxes.first.start, boxes.first.bottom);
@@ -1237,18 +1016,23 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   @override
   TextPosition getPositionForPoint(Offset? globalPosition) {
     layoutTextWithConstraints(constraints);
-    final TextPosition result =
-        _textPainter.getPositionForOffset(globalToLocal(globalPosition!));
 
-    ///never drag over the over flow text span
-    if (_hasVisualOverflow && overflowWidget != null) {
-      final TextParentData textParentData =
-          lastChild!.parentData as TextParentData;
-      final TextPosition position =
-          getPositionForOffset(textParentData.offset + _offset);
-      if (result.offset > position.offset) {
-        return position;
-      }
+    final Offset offset = globalToLocal(globalPosition!);
+
+    TextPosition result = _textPainter.getPositionForOffset(offset);
+
+    // never drag over the over flow text span
+    final TextSelection selection = neverDragOnOverflow(TextSelection.collapsed(
+      offset: result.offset,
+      affinity: result.affinity,
+    ));
+
+    if (selection.baseOffset != result.offset) {
+      result =
+          TextPosition(offset: selection.baseOffset, affinity: result.affinity);
+    } else if (selection.extentOffset != result.offset) {
+      result = TextPosition(
+          offset: selection.extentOffset, affinity: result.affinity);
     }
 
     return result;
@@ -1318,8 +1102,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   @override
   Offset get paintOffset => Offset.zero;
 
-  // Retuns a cached plain text version of the text in the painter.
-  String? _cachedPlainText;
   @override
   String get plainText {
     _cachedPlainText ??= textSpanToActualText(_textPainter.text!);
@@ -1330,24 +1112,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
   List<TextBox>? get selectionRects => _selectionRects;
 
   @override
-  Offset get effectiveOffset => Offset.zero;
-
-  @override
-  TextOverflowWidget? get overflowWidget => _overflowWidget;
-  final TextOverflow _oldOverflow;
-  TextOverflowWidget? _overflowWidget;
-  set overflowWidget(TextOverflowWidget? value) {
-    if (_overflowWidget == value) {
-      return;
-    }
-    if (value != null) {
-      overflow = TextOverflow.clip;
-    } else {
-      overflow = _oldOverflow;
-    }
-    _overflowWidget = value;
-    markNeedsPaint();
-  }
+  Offset get effectiveOffset => _offset;
 
   @override
   Rect get caretPrototype =>
@@ -1361,4 +1126,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject {
 
   @override
   bool get readOnly => true;
+
+  @override
+  final TextOverflow oldOverflow;
 }
