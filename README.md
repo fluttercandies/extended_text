@@ -21,6 +21,7 @@ Extended official text to build special text like inline image or @somebody quic
       - [Custom Behavior](#custom-behavior)
   - [Custom Background](#custom-background)
   - [Custom Overflow](#custom-overflow)
+  - [Better LineBreaking Overflow Style](#better-linebreaking-overflow-style)
 
 ## Speical Text
 
@@ -295,32 +296,64 @@ refer to issue [26748](https://github.com/flutter/flutter/issues/26748)
 | child       | The widget of TextOverflow.                                  | @required           |
 | maxHeight   | The maxHeight of [TextOverflowWidget], default is preferredLineHeight. | preferredLineHeight |
 | align       | The Align of [TextOverflowWidget], left/right.               | right               |
-| fixedOffset | Fixed offset refer to the Text Overflow Rect and [child].    | -                   |
+| position | The position which TextOverflowWidget should be shown.    | TextOverflowPosition.end                  |
 
 ```dart
-  ExtendedText(...
-            overFlowWidget:
-                TextOverflowWidget(
-                    //maxHeight: double.infinity,
-                    //align: TextOverflowAlign.right,
-                    //fixedOffset: Offset.zero,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        const Text('\u2026 '),
-                        RaisedButton(
-                          child: const Text('more'),
-                          onPressed: () {
-                            launch(
-                                'https://github.com/fluttercandies/extended_text');
-                          },
-                        )
-                      ],
-                    ),
-                  ),
-            ...
-          )
+  ExtendedText(
+   overflowWidget: TextOverflowWidget(
+     position: TextOverflowPosition.end,
+     align: TextOverflowAlign.center,
+     // just for debug
+     debugOverflowRectColor: Colors.red.withOpacity(0.1),
+     child: Container(
+       child: Row(
+         mainAxisSize: MainAxisSize.min,
+         children: <Widget>[
+           const Text('\u2026 '),
+           InkWell(
+             child: const Text(
+               'more',
+             ),
+             onTap: () {
+               launch(
+                   'https://github.com/fluttercandies/extended_text');
+             },
+           )
+         ],
+       ),
+     ),
+   ),
+  )
 ```
 
+## Better LineBreaking Overflow Style
+
+refer to issue [18761](https://github.com/flutter/flutter/issues/18761)
+
+if [ExtendedText.betterLineBreakingAndOverflowStyle] is true, it will join '\u{200B}' into text, make line breaking and overflow style better, but the word is not a word, it will bad for select a word.
 
 
+```dart
+  ExtendedText(
+      betterLineBreakingAndOverflowStyle:true,
+    )
+```
+
+or you can converty by following method:
+
+1. String
+
+```dart
+  String input='abc'.joinChar();
+```
+
+2. InlineSpan
+
+```dart
+     InlineSpan innerTextSpan;
+     innerTextSpan = joinChar(
+        innerTextSpan,
+        Accumulator(),
+        zeroWidthSpace,
+    );
+```

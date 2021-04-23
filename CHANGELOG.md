@@ -1,7 +1,9 @@
 ## 6.0.0
 
 * Add [TextOverflowWidget.position] to support show overflow at start, middle or end.
+  https://github.com/flutter/flutter/issues/45336
 * Add [ExtendedText.betterLineBreakingAndOverflowStyle] to make line breaking and overflow style better.
+  https://github.com/flutter/flutter/issues/18761
 * Fix strutStyle not work.
 * Breaking change: remove [TextOverflowWidget.fixedOffset]
 * Breaking change: [SpecialText.getContent] is not include endflag now.(please check if you call getContent and your endflag length is more than 1)
