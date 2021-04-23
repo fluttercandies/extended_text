@@ -35,7 +35,7 @@ class ExtendedText extends StatelessWidget {
     this.selectionHeightStyle = ui.BoxHeightStyle.tight,
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
     this.overflowWidget,
-    this.betterLineBreakingAndOverflowStyle = false,
+    this.joinZeroWidthSpace = false,
   })  : textSpan = null,
         // assert(!(betterLineBreakingAndOverflowStyle && selectionEnabled),
         //    'join zero width space into text, the word will not be a word, the [TextPainter] won\'t work any more.'),
@@ -66,7 +66,7 @@ class ExtendedText extends StatelessWidget {
     this.selectionHeightStyle = ui.BoxHeightStyle.tight,
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
     this.overflowWidget,
-    this.betterLineBreakingAndOverflowStyle = false,
+    this.joinZeroWidthSpace = false,
   })  : data = null,
         specialTextSpanBuilder = null,
         // assert(!(betterLineBreakingAndOverflowStyle && selectionEnabled),
@@ -213,7 +213,7 @@ class ExtendedText extends StatelessWidget {
   ///
   /// Characters(text).join('\u{200B}')
   ///
-  final bool betterLineBreakingAndOverflowStyle;
+  final bool joinZeroWidthSpace;
 
 //  ExtendedRenderEditable get _renderEditable =>
 //      _editableTextKey.currentState.renderEditable;
@@ -239,7 +239,7 @@ class ExtendedText extends StatelessWidget {
       children: textSpan != null ? <InlineSpan>[textSpan] : null,
     );
 
-    if (betterLineBreakingAndOverflowStyle) {
+    if (joinZeroWidthSpace) {
       innerTextSpan = joinChar(
         innerTextSpan,
         Accumulator(),
@@ -267,7 +267,7 @@ class ExtendedText extends StatelessWidget {
         selectionColor: selectionColor ?? Theme.of(context).textSelectionColor,
         dragStartBehavior: dragStartBehavior,
         onTap: onTap,
-        data: (betterLineBreakingAndOverflowStyle ? data?.joinChar() : data) ??
+        data: (joinZeroWidthSpace ? data?.joinChar() : data) ??
             textSpanToActualText(innerTextSpan),
         selectionControls: selectionControls,
         textHeightBehavior:

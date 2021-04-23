@@ -752,6 +752,26 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
       return rect;
     }
   }
+
+  /// never drag over the over flow text span
+  TextSelection neverDragOnOverflow(TextSelection result) {
+    if (overflowWidget != null && _overflowRect != null) {
+      if (overflowWidget.position == TextOverflowPosition.end) {
+        final TextPosition position =
+            textPainter.getPositionForOffset(_overflowRect.bottomLeft);
+        if (result.extentOffset > position.offset) {
+          result = result.copyWith(extentOffset: position.offset);
+        }
+      } else if (overflowWidget.position == TextOverflowPosition.start) {
+        final TextPosition position =
+            textPainter.getPositionForOffset(_overflowRect.topRight);
+        if (result.baseOffset < position.offset) {
+          result = result.copyWith(baseOffset: position.offset);
+        }
+      }
+    }
+    return result;
+  }
 }
 
 class _TextRange {

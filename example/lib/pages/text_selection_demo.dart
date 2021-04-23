@@ -10,6 +10,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide CircularProgressIndicator;
 //import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/foundation.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // @FFRoute(
 //     name: 'fluttercandies://TextSelectionDemo',
@@ -21,13 +22,12 @@ class TextSelectionDemo extends StatefulWidget {
 }
 
 class _TextSelectionDemoState extends State<TextSelectionDemo> {
-   TextSelectionControls _myTextSelectionControls;
+  TextSelectionControls _myTextSelectionControls;
   final String _attachContent =
-      '[love]Extended text help you to build rich text quickly. any special text you will have with extended text.It\'s my pleasure to invite you to join \$FlutterCandies\$ if you want to improve flutter .[love] if you meet any problem, please let me konw @zmtzawqlp .[sun_glasses]';
+      '[love]Extended text help you to build rich text quickly. any special text you will have with extended text.It\'s my pleasure to invite you to join \$FlutterCandies\$ if you want to improve flutter .[love] if you meet any problem, please let me know @zmtzawqlp .[sun_glasses]';
   @override
   void initState() {
-    _myTextSelectionControls =
-        MyTextSelectionControls();
+    _myTextSelectionControls = MyTextSelectionControls();
     super.initState();
     _myTextSelectionControls = MyTextSelectionControls();
   }
@@ -60,23 +60,29 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                     //overflow: ExtendedTextOverflow.ellipsis,
                     style: const TextStyle(fontSize: 14, color: Colors.grey),
                     maxLines: 4,
-                    overflowWidget: kIsWeb
-                        ? null
-                        : TextOverflowWidget(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                const Text('\u2026 '),
-                                RaisedButton(
-                                  child: const Text('more'),
-                                  onPressed: () {
-                                    // launch(
-                                    //     'https://github.com/fluttercandies/extended_text');
-                                  },
-                                )
-                              ],
-                            ),
-                          ),
+                    overflowWidget: TextOverflowWidget(
+                      align: TextOverflowAlign.center,
+                      // just for debug
+                      debugOverflowRectColor: Colors.red.withOpacity(0.1),
+                      child: Container(
+                        //color: Colors.yellow,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            const Text('\u2026 '),
+                            InkWell(
+                              child: const Text(
+                                'more',
+                              ),
+                              onTap: () {
+                                launch(
+                                    'https://github.com/fluttercandies/extended_text');
+                              },
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
                     selectionEnabled: true,
                     selectionControls: _myTextSelectionControls,
                   ),

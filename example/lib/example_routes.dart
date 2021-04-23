@@ -5,7 +5,7 @@
 const List<String> routeNames = <String>[
   'fluttercandies://BackgroundTextDemo',
   'fluttercandies://CustomTextOverflowDemo',
-  'fluttercandies://LineBreakingOverflowStyle',
+  'fluttercandies://JoinZeroWidthSpace',
   'fluttercandies://TextDemo',
   'fluttercandies://TextSelectionDemo',
   'fluttercandies://mainpage',
@@ -34,15 +34,15 @@ class Routes {
   static const String fluttercandiesCustomTextOverflowDemo =
       'fluttercandies://CustomTextOverflowDemo';
 
-  /// 'make line breaking and overflow style better,workaround for issue 18761.'
+  /// 'make line breaking and overflow style better, workaround for issue 18761.'
   ///
-  /// [name] : 'fluttercandies://LineBreakingOverflowStyle'
+  /// [name] : 'fluttercandies://JoinZeroWidthSpace'
   ///
-  /// [routeName] : 'LineBreakingOverflowStyle'
+  /// [routeName] : 'JoinZeroWidthSpace'
   ///
-  /// [description] : 'make line breaking and overflow style better,workaround for issue 18761.'
-  static const String fluttercandiesLineBreakingOverflowStyle =
-      'fluttercandies://LineBreakingOverflowStyle';
+  /// [description] : 'make line breaking and overflow style better, workaround for issue 18761.'
+  static const String fluttercandiesJoinZeroWidthSpace =
+      'fluttercandies://JoinZeroWidthSpace';
 
   /// 'quickly build special text'
   ///

@@ -5,21 +5,21 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // @FFRoute(
-//     name: 'fluttercandies://LineBreakingOverflowStyle',
-//     routeName: 'LineBreakingOverflowStyle',
+//     name: 'fluttercandies://JoinZeroWidthSpace',
+//     routeName: 'JoinZeroWidthSpace',
 //     description:
-//         'make line breaking and overflow style better,workaround for issue 18761.')
-class LineBreakingOverflowStyleDemo extends StatelessWidget {
+//         'make line breaking and overflow style better, workaround for issue 18761.')
+class JoinZeroWidthSpaceDemo extends StatelessWidget {
   final String content =
       'relate to \$issue 26748\$ .[love]Extended text help you to build rich text quickly. any special text you will have with extended text. '
       'It\'s my pleasure to invite you to join \$FlutterCandies\$ if you want to improve flutter .[love]'
-      '1234567 if you meet any problem, please let me konw @zmtzawqlp .';
+      '1234567 if you meet any problem, please let me know @zmtzawqlp .';
   final MySpecialTextSpanBuilder builder = MySpecialTextSpanBuilder();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('line breaking and overflow'),
+        title: const Text('Join Zero-Width Space'),
       ),
       body: Container(
         padding: const EdgeInsets.all(20.0),
@@ -54,8 +54,7 @@ class LineBreakingOverflowStyleDemo extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                title ??
-                    'joinZeroWidthSpace: $joinZeroWidthSpace',
+                title ?? 'joinZeroWidthSpace: $joinZeroWidthSpace',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const Padding(
@@ -69,16 +68,14 @@ class LineBreakingOverflowStyleDemo extends StatelessWidget {
                 content,
                 onSpecialTextTap: onSpecialTextTap,
                 specialTextSpanBuilder: builder,
-                joinZeroWidthSpace:
-                    joinZeroWidthSpace,
+                joinZeroWidthSpace: joinZeroWidthSpace,
                 overflow: TextOverflow.ellipsis,
                 maxLines: maxLines,
                 selectionEnabled: true,
                 // if betterLineBreakingAndOverflowStyle is true, you must take care of copy text.
                 // override [TextSelectionControls.handleCopy], remove zero width space.
                 selectionControls: MyTextSelectionControls(
-                  joinZeroWidthSpace:
-                      joinZeroWidthSpace,
+                  joinZeroWidthSpace: joinZeroWidthSpace,
                 ),
               ),
             ],

@@ -46,9 +46,9 @@ packages:
   extended_text_library:
     dependency: "direct main"
     description:
-      path: "E:\\Flutter\\FlutterCandies\\extended_text_library\\"
-      relative: false
-    source: path
+      name: extended_text_library
+      url: "https://pub.flutter-io.cn"
+    source: hosted
     version: "6.0.0-non-null-safety"
   fake_async:
     dependency: transitive

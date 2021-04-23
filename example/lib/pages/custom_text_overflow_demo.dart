@@ -18,9 +18,9 @@ class _CustomTextOverflowDemoState extends State<CustomTextOverflowDemo> {
   final String content = ''
       'relate to \$issue 26748\$ .[love]Extended text help you to build rich text quickly. any special text you will have with extended text. '
       'It\'s my pleasure to invite you to join \$FlutterCandies\$ if you want to improve flutter .[love]'
-      '1234567 if you meet any problem, please let me konw @zmtzawqlp .';
+      '1234567 if you meet any problem, please let me know @zmtzawqlp .';
   final MySpecialTextSpanBuilder builder = MySpecialTextSpanBuilder();
-  bool _betterLineBreakingAndOverflowStyle = false;
+  bool _joinZeroWidthSpace = false;
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +32,7 @@ class _CustomTextOverflowDemoState extends State<CustomTextOverflowDemo> {
               icon: const Icon(Icons.style),
               onPressed: () {
                 setState(() {
-                  _betterLineBreakingAndOverflowStyle =
-                      !_betterLineBreakingAndOverflowStyle;
+                  _joinZeroWidthSpace = !_joinZeroWidthSpace;
                 });
               })
         ],
@@ -86,14 +85,12 @@ class _CustomTextOverflowDemoState extends State<CustomTextOverflowDemo> {
                 onSpecialTextTap: onSpecialTextTap,
                 specialTextSpanBuilder: builder,
                 selectionEnabled: true,
-                // if betterLineBreakingAndOverflowStyle is true, you must take care of copy text.
+                // if joinZeroWidthSpace is true, you must take care of copy text.
                 // override [TextSelectionControls.handleCopy], remove zero width space.
                 selectionControls: MyTextSelectionControls(
-                  joinZeroWidthSpace:
-                      _betterLineBreakingAndOverflowStyle,
+                  joinZeroWidthSpace: _joinZeroWidthSpace,
                 ),
-                betterLineBreakingAndOverflowStyle:
-                    _betterLineBreakingAndOverflowStyle,
+                joinZeroWidthSpace: _joinZeroWidthSpace,
                 overflowWidget: TextOverflowWidget(
                   position: position,
                   align: TextOverflowAlign.center,
