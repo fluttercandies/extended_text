@@ -10,7 +10,7 @@ class EmojiText extends SpecialText {
   final int start;
   @override
   InlineSpan finishText() {
-    final String key = toString();
+    final String key = getContent();
 
     ///https://github.com/flutter/flutter/issues/42086
     /// widget span is not working on web
@@ -41,8 +41,8 @@ class EmojiText extends SpecialText {
 
 class EmojiUitl {
   EmojiUitl._() {
-    _emojiMap['[love]'] = '$_emojiFilePath/love.png';
-    _emojiMap['[sun_glasses]'] = '$_emojiFilePath/sun_glasses.png';
+    _emojiMap['love'] = '$_emojiFilePath/love.png';
+    _emojiMap['sun_glasses'] = '$_emojiFilePath/sun_glasses.png';
   }
 
   final Map<String, String> _emojiMap = <String, String>{};

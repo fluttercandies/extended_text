@@ -4,6 +4,8 @@
 * Add [ExtendedText.betterLineBreakingAndOverflowStyle] to make line breaking and overflow style better.
 * Fix strutStyle not work.
 * Breaking change: remove [TextOverflowWidget.fixedOffset]
+* Breaking change: [SpecialText.getContent] is not include endflag now.(please check if you call getContent and your endflag length is more than 1)
+
 ## 5.0.5
 
 * fix strutStyle miss
