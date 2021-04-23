@@ -318,31 +318,66 @@ Text背景相关的issue[24335](https://github.com/flutter/flutter/issues/24335)
 | child       | The widget of TextOverflow.                                  | @required           |
 | maxHeight   | Widget的最大高度，默认为 TextPaint计算出来的行高 preferredLineHeight. | preferredLineHeight |
 | align       | left，靠近最后裁剪文本；right，靠近文本的右下角              | right               |
-| fixedOffset | 调整Widget的位置                                             | -                   |
+| position | 溢出文本出现的地方.    | TextOverflowPosition.end                  |
 
 ```dart
-  ExtendedText(...
-            overFlowWidget:
-                TextOverflowWidget(
-                    //maxHeight: double.infinity,
-                    //align: TextOverflowAlign.right,
-                    //fixedOffset: Offset.zero,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        const Text('\u2026 '),
-                        RaisedButton(
-                          child: const Text('more'),
-                          onPressed: () {
-                            launch(
-                                'https://github.com/fluttercandies/extended_text');
-                          },
-                        )
-                      ],
-                    ),
-                  ),
-            ...
-          )
+  ExtendedText(
+   overflowWidget: TextOverflowWidget(
+     position: TextOverflowPosition.end,
+     align: TextOverflowAlign.center,
+     // just for debug
+     debugOverflowRectColor: Colors.red.withOpacity(0.1),
+     child: Container(
+       child: Row(
+         mainAxisSize: MainAxisSize.min,
+         children: <Widget>[
+           const Text('\u2026 '),
+           InkWell(
+             child: const Text(
+               'more',
+             ),
+             onTap: () {
+               launch(
+                   'https://github.com/fluttercandies/extended_text');
+             },
+           )
+         ],
+       ),
+     ),
+   ),
+  )
+```
+
+## 更好的换行文本溢出效果
+
+相关问题 [18761](https://github.com/flutter/flutter/issues/18761)
+
+如果[ExtendedText.betterLineBreakingAndOverflowStyle] 为true, 将会添加'\u{200B}' 到文本中, 让换行或者文本溢出看起来更好, 但是 word 不再是一个 word，这会影响关于 word 的选择效果.
+
+
+```dart
+  ExtendedText(
+      betterLineBreakingAndOverflowStyle:true,
+    )
+```
+
+或者你也可以通过下面的方法自己转换
+
+1. 文本
+
+```dart
+  String input='abc'.joinChar();
+```
+
+2. InlineSpan
+
+```dart
+     InlineSpan innerTextSpan;
+     innerTextSpan = joinChar(
+        innerTextSpan,
+        Accumulator(),
+        zeroWidthSpace,
+    );
 ```
 
 ## ☕️Buy me a coffee
