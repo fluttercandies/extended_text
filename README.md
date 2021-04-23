@@ -21,7 +21,7 @@ Extended official text to build special text like inline image or @somebody quic
       - [Custom Behavior](#custom-behavior)
   - [Custom Background](#custom-background)
   - [Custom Overflow](#custom-overflow)
-  - [Better LineBreaking Overflow Style](#better-linebreaking-overflow-style)
+  - [Join Zero-Width Space](#join-zero-width-space)
 
 ## Speical Text
 
@@ -326,20 +326,22 @@ refer to issue [26748](https://github.com/flutter/flutter/issues/26748)
   )
 ```
 
-## Better LineBreaking Overflow Style
+## Join Zero-Width Space
+
+![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/JoinZeroWidthSpace.jpg)
 
 refer to issue [18761](https://github.com/flutter/flutter/issues/18761)
 
-if [ExtendedText.betterLineBreakingAndOverflowStyle] is true, it will join '\u{200B}' into text, make line breaking and overflow style better, but the word is not a word, it will bad for select a word.
+if [ExtendedText.joinZeroWidthSpace] is true, it will join '\u{200B}' into text, make line breaking and overflow style better.
 
 
 ```dart
   ExtendedText(
-      betterLineBreakingAndOverflowStyle:true,
+      joinZeroWidthSpace: true,
     )
 ```
 
-or you can converty by following method:
+or you can convert by following method:
 
 1. String
 
@@ -357,3 +359,38 @@ or you can converty by following method:
         zeroWidthSpace,
     );
 ```
+
+Take care of following things:
+
+1. the word is not a word, it will not working when you want to double tap to select a word.
+
+2. text is changed, if [ExtendedText.selectionEnabled] is true, you should override TextSelectionControls and remove zeroWidthSpace.
+
+``` dart
+
+class MyTextSelectionControls extends TextSelectionControls {
+
+  @override
+  void handleCopy(TextSelectionDelegate delegate,
+      ClipboardStatusNotifier? clipboardStatus) {
+    final TextEditingValue value = delegate.textEditingValue;
+
+    String data = value.selection.textInside(value.text);
+    // remove zeroWidthSpace
+    data = data.replaceAll(zeroWidthSpace, '');
+
+    Clipboard.setData(ClipboardData(
+      text: value.selection.textInside(value.text),
+    ));
+    clipboardStatus?.update();
+    delegate.textEditingValue = TextEditingValue(
+      text: value.text,
+      selection: TextSelection.collapsed(offset: value.selection.end),
+    );
+    delegate.bringIntoView(delegate.textEditingValue.selection.extent);
+    delegate.hideToolbar();
+  }
+}
+
+```
+

@@ -17,8 +17,8 @@ const double _kToolbarContentDistance = 8.0;
 
 /// Android Material styled text selection controls.
 class MyTextSelectionControls extends TextSelectionControls {
-  MyTextSelectionControls({this.betterLineBreakingAndOverflowStyle = false});
-  final bool betterLineBreakingAndOverflowStyle;
+  MyTextSelectionControls({this.joinZeroWidthSpace = false});
+  final bool joinZeroWidthSpace;
 
   @override
   void handleCopy(TextSelectionDelegate delegate,
@@ -27,7 +27,7 @@ class MyTextSelectionControls extends TextSelectionControls {
 
     String data = value.selection.textInside(value.text);
     // remove zeroWidthSpace
-    if (betterLineBreakingAndOverflowStyle) {
+    if (joinZeroWidthSpace) {
       data = data.replaceAll(zeroWidthSpace, '');
     }
     Clipboard.setData(ClipboardData(

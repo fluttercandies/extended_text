@@ -348,16 +348,17 @@ Text背景相关的issue[24335](https://github.com/flutter/flutter/issues/24335)
   )
 ```
 
-## 更好的换行文本溢出效果
+## Join Zero-Width Space
+
+![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/JoinZeroWidthSpace.jpg)
 
 相关问题 [18761](https://github.com/flutter/flutter/issues/18761)
 
-如果[ExtendedText.betterLineBreakingAndOverflowStyle] 为true, 将会添加'\u{200B}' 到文本中, 让换行或者文本溢出看起来更好, 但是 word 不再是一个 word，这会影响关于 word 的选择效果.
-
+如果[ExtendedText.joinZeroWidthSpace] 为 true, 将会添加'\u{200B}' 到文本中, 让换行或者文本溢出看起来更好。
 
 ```dart
   ExtendedText(
-      betterLineBreakingAndOverflowStyle:true,
+      joinZeroWidthSpace: true,
     )
 ```
 
@@ -379,6 +380,40 @@ Text背景相关的issue[24335](https://github.com/flutter/flutter/issues/24335)
         zeroWidthSpace,
     );
 ```
+注意以下问题:
+
+1. word 不再是 word，你将无法通过双击选择 word。
+
+2. 文本被修改了, 如果 [ExtendedText.selectionEnabled] 为 true, 你需要重写 TextSelectionControls，将字符串还原。
+
+``` dart
+
+class MyTextSelectionControls extends TextSelectionControls {
+
+  @override
+  void handleCopy(TextSelectionDelegate delegate,
+      ClipboardStatusNotifier? clipboardStatus) {
+    final TextEditingValue value = delegate.textEditingValue;
+
+    String data = value.selection.textInside(value.text);
+    // remove zeroWidthSpace
+    data = data.replaceAll(zeroWidthSpace, '');
+
+    Clipboard.setData(ClipboardData(
+      text: value.selection.textInside(value.text),
+    ));
+    clipboardStatus?.update();
+    delegate.textEditingValue = TextEditingValue(
+      text: value.text,
+      selection: TextSelection.collapsed(offset: value.selection.end),
+    );
+    delegate.bringIntoView(delegate.textEditingValue.selection.extent);
+    delegate.hideToolbar();
+  }
+}
+
+```
+
 
 ## ☕️Buy me a coffee
 
