@@ -1,3 +1,7 @@
+## 6.0.1
+
+* Improve performance when find no overflow.
+
 ## 6.0.0
 
 * Add [TextOverflowWidget.position] to support show overflow at start, middle or end.
