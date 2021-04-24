@@ -1,4 +1,4 @@
-## 6.0.0
+## 6.0.0-non-null-safety
 
 * Add [TextOverflowWidget.position] to support show overflow at start, middle or end.
   https://github.com/flutter/flutter/issues/45336
@@ -8,32 +8,15 @@
 * Breaking change: remove [TextOverflowWidget.fixedOffset]
 * Breaking change: [SpecialText.getContent] is not include endflag now.(please check if you call getContent and your endflag length is more than 1)
 
-## 5.0.5
-
-* fix strutStyle miss
-## 5.0.0-non-null-safety
-
-## 5.0.4
-
-* Fix issue that the overflowWidget is not layout #97
-
-## 5.0.3
-
-* Fix null-safety error #96
-
-## 5.0.2
-
-* Fix null-safety error
-
-## 5.0.1
+## 5.0.1-non-null-safety
 
 * Add add SemanticsInformation for overflowWidget
 * Improve performance for overflowWidget
 * Do not paint Selection in the region of overFlowWidget
 
-## 5.0.0
+## 5.0.0-non-null-safety
 
-* Support null-safety
+* non-null-safety
 
 ## 4.1.0
 
