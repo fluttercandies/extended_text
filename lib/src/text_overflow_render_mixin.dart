@@ -152,7 +152,7 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
         final List<int> hideWidgets = <int>[];
 
         final TextPainter testTextPainter =
-            _findNoOverflow(range, hideWidgets, maxOffset);
+            _findNoOverflow1(range, hideWidgets, maxOffset);
 
         assert(!_hasVisualOverflow);
 
@@ -300,26 +300,103 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
   //   return testTextPainter;
   // }
 
-  TextPainter _findNoOverflow(
-      _TextRange range, List<int> hideWidgets, int maxOffset) {
-    late TextPainter testTextPainter;
-    while (_hasVisualOverflow) {
-      testTextPainter = _tryToFindNoOverflow(range, hideWidgets);
+  // TextPainter _findNoOverflow(
+  //     _TextRange range, List<int> hideWidgets, int maxOffset) {
+  //   _layoutCount = 0;
+  //   late TextPainter testTextPainter;
+  //   while (_hasVisualOverflow) {
+  //     if (kDebugMode) {
+  //       _layoutCount++;
+  //     }
+  //     testTextPainter = _tryToFindNoOverflow(range, hideWidgets);
 
+  //     // try to find no overflow
+  //     if (_hasVisualOverflow) {
+  //       // not find
+  //       assert(range.end != maxOffset, 'can\' find no overflow');
+
+  //       range.end = math.min(range.end + 1, maxOffset);
+  //       hideWidgets.clear();
+  //     }
+  //   }
+  //   if (kDebugMode) {
+  //     print('${overflowWidget?.position}: find no overflow in $_layoutCount times.');
+  //   }
+
+  //   return testTextPainter;
+  // }
+
+  // TextPainter _tryToFindNoOverflow(_TextRange range, List<int> hideWidgets) {
+  //   final InlineSpan inlineSpan = _cutOffInlineSpan(
+  //     text!,
+  //     Accumulator(),
+  //     range,
+  //     hideWidgets,
+  //     Accumulator(),
+  //   );
+
+  //   final TextPainter testTextPainter = _copyTextPainter(
+  //     inlineSpan: inlineSpan,
+  //     maxLines: textPainter.maxLines,
+  //   );
+
+  //   layoutChildren(
+  //     constraints,
+  //     textPainter: testTextPainter,
+  //     hideWidgets: hideWidgets,
+  //   );
+
+  //   testTextPainter.layout(
+  //     minWidth: constraints.minWidth,
+  //     maxWidth: constraints.maxWidth,
+  //   );
+  //   _didVisualOverflow(textPainter: testTextPainter);
+  //   _hasVisualOverflow = testTextPainter.didExceedMaxLines;
+  //   return testTextPainter;
+  // }
+  int _layoutCount = 0;
+  TextPainter _findNoOverflow1(
+      _TextRange range, List<int> hideWidgets, int maxOffset) {
+    _layoutCount = 0;
+    late TextPainter testTextPainter;
+    int oldEnd = range.end;
+    int maxEnd = maxOffset;
+    while (_hasVisualOverflow) {
+      testTextPainter = _tryToFindNoOverflow1(range, hideWidgets);
       // try to find no overflow
       if (_hasVisualOverflow) {
-        assert(!(range.start == 0 && range.end == maxOffset),
-            'can\' find no overflow');
-
-        range.end = math.min(range.end + 1, maxOffset);
+        // not find
+        assert(range.end != maxOffset, 'can\' find no overflow');
+        oldEnd = range.end;
+        range.end = math.min(
+            range.end + math.max((maxEnd - range.end) ~/ 2, 1), maxOffset);
         hideWidgets.clear();
+      } else {
+        // see pre one whether overflow
+        range.end = math.min(range.end - 1, maxOffset);
+        _tryToFindNoOverflow1(range, <int>[]);
+        if (_hasVisualOverflow) {
+          // fix end
+          range.end = math.min(range.end + 1, maxOffset);
+          // find the one
+          _hasVisualOverflow = false;
+        } else {
+          maxEnd = range.end;
+          range.end = oldEnd;
+          // continue
+          _hasVisualOverflow = true;
+        }
       }
+    }
+    if (kDebugMode) {
+      print(
+          '${overflowWidget?.position}: find no overflow by layout TextPainter $_layoutCount times.');
     }
 
     return testTextPainter;
   }
 
-  TextPainter _tryToFindNoOverflow(_TextRange range, List<int> hideWidgets) {
+  TextPainter _tryToFindNoOverflow1(_TextRange range, List<int> hideWidgets) {
     final InlineSpan inlineSpan = _cutOffInlineSpan(
       text!,
       Accumulator(),
@@ -343,7 +420,9 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
       minWidth: constraints.minWidth,
       maxWidth: constraints.maxWidth,
     );
-
+    if (kDebugMode) {
+      _layoutCount++;
+    }
     _didVisualOverflow(textPainter: testTextPainter);
     _hasVisualOverflow = testTextPainter.didExceedMaxLines;
     return testTextPainter;
