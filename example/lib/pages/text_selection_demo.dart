@@ -9,7 +9,6 @@ import 'package:extended_text/extended_text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide CircularProgressIndicator;
 //import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // @FFRoute(
