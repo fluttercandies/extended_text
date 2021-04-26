@@ -388,7 +388,7 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
         }
       }
     }
-    if (kDebugMode) {
+    if (kDebugMode && overflowWidget?.debugOverflowRectColor != null) {
       print(
           '${overflowWidget?.position}: find no overflow by layout TextPainter $_layoutCount times.');
     }
@@ -463,8 +463,8 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
       if (overflowSelection.baseOffset > 0 &&
           rect.left < _overflowRect.left &&
           (leftBig
-              ? _overflowRect.left < overflowRect.left
-              : _overflowRect.left > overflowRect.left)) {
+              ? _overflowRect.left > overflowRect.left
+              : _overflowRect.left < overflowRect.left)) {
         overflowSelection = overflowSelection.copyWith(
             baseOffset: overflowSelection.baseOffset - 1);
         go = true;
