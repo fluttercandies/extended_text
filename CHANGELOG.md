@@ -1,3 +1,6 @@
+## 6.0.2-non-null-safety
+
+* Remove unnecessary canvas.save() when clear _overflowRect
 ## 6.0.1-non-null-safety
 
 * Improve performance when find no overflow.
