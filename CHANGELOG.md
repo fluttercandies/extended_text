@@ -1,3 +1,8 @@
+## 6.0.3
+
+* Fix hitTest is failed when set TextOverflowWidget and selectionEnabled false.
+* Fix text is cut off when set TextOverflowPosition.end.
+  
 ## 6.0.2
 
 * Remove unnecessary canvas.save() when clear _overflowRect

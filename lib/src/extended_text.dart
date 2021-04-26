@@ -297,6 +297,11 @@ class ExtendedText extends StatelessWidget {
         hasFocus: false,
         strutStyle: strutStyle,
       );
+      if (overflowWidget != null) {
+        result = RepaintBoundary(
+          child: result,
+        );
+      }
     }
 
     if (semanticsLabel != null) {
