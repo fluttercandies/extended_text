@@ -1,3 +1,7 @@
+## 6.0.2
+
+* Remove unnecessary canvas.save() when clear _overflowRect
+
 ## 6.0.1
 
 * Improve performance when find no overflow.

@@ -446,7 +446,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
     _paintTextOverflow(context, offset);
     //clip rect of over flow
     if (_overflowRect != null) {
-      context.canvas.save();
       context.canvas.saveLayer(_offset & size, Paint());
     }
     _paintSelection(context, offset);
@@ -464,14 +463,14 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
       context.canvas.drawRect(
           _overflowRect!.shift(_offset), Paint()..blendMode = BlendMode.clear);
 
-      context.canvas.restore();
-
       if (kDebugMode &&
           overflowWidget != null &&
           overflowWidget!.debugOverflowRectColor != null) {
         context.canvas.drawRect(_overflowRect!.shift(_offset),
             Paint()..color = overflowWidget!.debugOverflowRectColor!);
       }
+
+      context.canvas.restore();
     }
     paintHandleLayers(context, super.paint);
 
