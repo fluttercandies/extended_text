@@ -1,3 +1,8 @@
+## 6.0.4
+
+* Fix find no overflow endless loop. #105
+* Store raw text to reduce layout.
+  
 ## 6.0.3
 
 * Fix hitTest is failed when set TextOverflowWidget and selectionEnabled false.
