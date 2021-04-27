@@ -150,15 +150,10 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
             _TextRange(math.min(start, end), math.max(start, end));
         final List<int> hideWidgets = <int>[];
 
-        final TextPainter testTextPainter =
-            _findNoOverflow1(range, hideWidgets, maxOffset);
+        final TextPainter testTextPainter = _findNoOverflow(range, hideWidgets);
 
         assert(!_hasVisualOverflow);
 
-        // testTextPainter = _tryCloseToBottomRight(
-        //     testTextPainter, range, maxOffset, hideWidgets, rect);
-
-        // assert(!_hasVisualOverflow);
         final InlineSpan oldSpan = textPainter.text;
         // recreate text
         textPainter.text = testTextPainter.text;
@@ -241,132 +236,24 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
             maxOffset,
             overflowWidget.position,
           );
-          //_overflowRect = null;
         }
       }
     }
   }
 
-  // bool _isColseToBottomRight(TextPainter testTextPainter, Rect rect) {
-  //   final int last = testTextPainter.text!.toPlainText().length;
-
-  //   final List<ui.TextBox> boxs = testTextPainter
-  //       .getBoxesForSelection(TextSelection(baseOffset: 0, extentOffset: last));
-
-  //   if (boxs.isNotEmpty) {
-  //     return boxs.last.toRect().overlaps(
-  //           Rect.fromPoints(
-  //               Offset(rect.right - testTextPainter.preferredLineHeight,
-  //                   rect.bottom - testTextPainter.preferredLineHeight),
-  //               rect.bottomRight),
-  //         );
-  //   }
-  //   assert(false);
-  //   return true;
-  // }
-
-  // TextPainter _tryCloseToBottomRight(TextPainter testTextPainter,
-  //     _TextRange range, int maxOffset, List<int> hideWidgets, Rect rect) {
-  //   bool closeToBottomRight = _isColseToBottomRight(testTextPainter, rect);
-
-  //   if (!closeToBottomRight) {
-  //     while (!closeToBottomRight) {
-  //       if (!_hasVisualOverflow) {
-  //         // try to close to bottom right
-  //         if (range.start < range.end - 1) {
-  //           range = _TextRange(range.start, range.end - 1);
-  //           hideWidgets.clear();
-  //           testTextPainter = _tryToFindNoOverflow(range, hideWidgets);
-  //           closeToBottomRight = _isColseToBottomRight(testTextPainter, rect);
-  //         } else {
-  //           break;
-  //         }
-  //       }
-  //       // overflow
-  //       // roll back
-  //       else {
-  //         break;
-  //       }
-  //     }
-
-  //     // roll back
-  //     if (_hasVisualOverflow) {
-  //       range = _TextRange(range.start, math.min(range.end + 1, maxOffset));
-  //       testTextPainter = _findNoOverflow(range, hideWidgets, maxOffset);
-  //     }
-  //   }
-
-  //   return testTextPainter;
-  // }
-
-  // TextPainter _findNoOverflow(
-  //     _TextRange range, List<int> hideWidgets, int maxOffset) {
-  //   _layoutCount = 0;
-  //   late TextPainter testTextPainter;
-  //   while (_hasVisualOverflow) {
-  //     if (kDebugMode) {
-  //       _layoutCount++;
-  //     }
-  //     testTextPainter = _tryToFindNoOverflow(range, hideWidgets);
-
-  //     // try to find no overflow
-  //     if (_hasVisualOverflow) {
-  //       // not find
-  //       assert(range.end != maxOffset, 'can\' find no overflow');
-
-  //       range.end = math.min(range.end + 1, maxOffset);
-  //       hideWidgets.clear();
-  //     }
-  //   }
-  //   if (kDebugMode) {
-  //     print('${overflowWidget?.position}: find no overflow in $_layoutCount times.');
-  //   }
-
-  //   return testTextPainter;
-  // }
-
-  // TextPainter _tryToFindNoOverflow(_TextRange range, List<int> hideWidgets) {
-  //   final InlineSpan inlineSpan = _cutOffInlineSpan(
-  //     text!,
-  //     Accumulator(),
-  //     range,
-  //     hideWidgets,
-  //     Accumulator(),
-  //   );
-
-  //   final TextPainter testTextPainter = _copyTextPainter(
-  //     inlineSpan: inlineSpan,
-  //     maxLines: textPainter.maxLines,
-  //   );
-
-  //   layoutChildren(
-  //     constraints,
-  //     textPainter: testTextPainter,
-  //     hideWidgets: hideWidgets,
-  //   );
-
-  //   testTextPainter.layout(
-  //     minWidth: constraints.minWidth,
-  //     maxWidth: constraints.maxWidth,
-  //   );
-  //   _didVisualOverflow(textPainter: testTextPainter);
-  //   _hasVisualOverflow = testTextPainter.didExceedMaxLines;
-  //   return testTextPainter;
-  // }
   int _layoutCount = 0;
-  TextPainter _findNoOverflow1(
-      _TextRange range, List<int> hideWidgets, int maxOffset) {
+  TextPainter _findNoOverflow(_TextRange range, List<int> hideWidgets) {
     _layoutCount = 0;
     TextPainter testTextPainter;
-    int oldEnd = range.end;
+    final int maxOffset = textSpanToActualText(text).length;
     int maxEnd = maxOffset;
     while (_hasVisualOverflow) {
       testTextPainter = _tryToFindNoOverflow1(range, hideWidgets);
       // try to find no overflow
+
       if (_hasVisualOverflow) {
         // not find
         assert(range.end != maxOffset, 'can\' find no overflow');
-        oldEnd = range.end;
         range.end = math.min(
             range.end + math.max((maxEnd - range.end) ~/ 2, 1) as int,
             maxOffset);
@@ -382,7 +269,10 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
           _hasVisualOverflow = false;
         } else {
           maxEnd = range.end;
-          range.end = oldEnd;
+          range.end = math.max(
+              range.start,
+              math.min(maxEnd - math.max((maxEnd - range.start) ~/ 2, 1) as int,
+                  maxEnd));
           // continue
           _hasVisualOverflow = true;
         }

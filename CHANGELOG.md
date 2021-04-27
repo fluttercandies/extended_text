@@ -1,3 +1,8 @@
+## 6.0.4-non-null-safety
+
+* Fix find no overflow endless loop. #105
+* Store raw text to reduce layout.
+
 ## 6.0.3-non-null-safety
 
 * Fix hitTest is failed when set TextOverflowWidget and selectionEnabled false.

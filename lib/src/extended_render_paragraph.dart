@@ -64,6 +64,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
         oldOverflow = overflow,
         _startHandleLayerLink = startHandleLayerLink,
         _endHandleLayerLink = endHandleLayerLink,
+        _rawText = text,
         _textPainter = TextPainter(
           text: text,
           textAlign: textAlign,
@@ -162,14 +163,18 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
   /// The text to display
   @override
   InlineSpan get text => _textPainter.text;
+
+  /// store raw text in case raw text may changed by _findNoOverflow.
+  /// but we don't need layout any more.
+  InlineSpan _rawText;
   set text(InlineSpan value) {
-    assert(value != null);
-    switch (_textPainter.text.compareTo(value)) {
+    switch ((_rawText ?? _textPainter.text).compareTo(value)) {
       case RenderComparison.identical:
       case RenderComparison.metadata:
         return;
       case RenderComparison.paint:
         _textPainter.text = value;
+        _rawText = value;
         extractPlaceholderSpans(value);
         _cachedPlainText = null;
         markNeedsPaint();
@@ -177,6 +182,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
         break;
       case RenderComparison.layout:
         _textPainter.text = value;
+        _rawText = value;
         _cachedPlainText = null;
         _overflowShader = null;
         extractPlaceholderSpans(value);
