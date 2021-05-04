@@ -63,7 +63,7 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
       if (!_hasVisualOverflow) {
         return;
       }
-      assert(textPainter.width >= lastChild.size.width);
+      //assert(textPainter.width >= lastChild.size.width);
 
       final TextParentData textParentData =
           lastChild.parentData as TextParentData;
@@ -436,7 +436,7 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
 
   void _paintTextOverflow(PaintingContext context, Offset offset) {
     if (overflowWidget != null && _overflowRect != null) {
-      assert(textPainter.width >= lastChild.size.width);
+      //assert(textPainter.width >= lastChild.size.width);
 
       final TextParentData textParentData =
           lastChild.parentData as TextParentData;

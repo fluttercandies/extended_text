@@ -1,3 +1,8 @@
+## 6.0.5-non-null-safety
+
+* Remove unnecessary assert (assert(textPainter.width >= lastChild!.size.width))
+* Initialize _offset with Offset.zero.
+  
 ## 6.0.4-non-null-safety
 
 * Fix find no overflow endless loop. #105

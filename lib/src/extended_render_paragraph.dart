@@ -426,7 +426,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
     size = constraints.constrain(textSize);
   }
 
-  Offset _offset;
+  Offset _offset = Offset.zero;
   @override
   void paint(PaintingContext context, Offset offset) {
     _offset = offset;
@@ -464,7 +464,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
     _paintTextOverflow(context, offset);
     //clip rect of over flow
     if (_overflowRect != null) {
-      context.canvas.saveLayer(_offset & size, Paint());
+      context.canvas.saveLayer(offset & size, Paint());
     }
     _paintSelection(context, offset);
     _paintSpecialText(context, offset);
@@ -475,16 +475,16 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
       if (_overflowRects != null && _overflowRects.isNotEmpty) {
         for (final Rect rect in _overflowRects) {
           context.canvas.drawRect(
-              rect.shift(_offset), Paint()..blendMode = BlendMode.clear);
+              rect.shift(offset), Paint()..blendMode = BlendMode.clear);
         }
       }
       context.canvas.drawRect(
-          _overflowRect.shift(_offset), Paint()..blendMode = BlendMode.clear);
+          _overflowRect.shift(offset), Paint()..blendMode = BlendMode.clear);
 
       if (kDebugMode &&
           overflowWidget != null &&
           overflowWidget.debugOverflowRectColor != null) {
-        context.canvas.drawRect(_overflowRect.shift(_offset),
+        context.canvas.drawRect(_overflowRect.shift(offset),
             Paint()..color = overflowWidget.debugOverflowRectColor);
       }
 
