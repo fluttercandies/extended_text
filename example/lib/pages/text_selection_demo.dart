@@ -10,7 +10,6 @@ import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide CircularProgressIndicator;
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter/foundation.dart';
 
 @FFRoute(
     name: 'fluttercandies://TextSelectionDemo',
@@ -59,23 +58,21 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                     //overflow: ExtendedTextOverflow.ellipsis,
                     style: const TextStyle(fontSize: 14, color: Colors.grey),
                     maxLines: 4,
-                    overflowWidget: kIsWeb
-                        ? null
-                        : TextOverflowWidget(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                const Text('\u2026 '),
-                                InkWell(
-                                  child: const Text('more'),
-                                  onTap: () {
-                                    launch(
-                                        'https://github.com/fluttercandies/extended_text');
-                                  },
-                                )
-                              ],
-                            ),
-                          ),
+                    overflowWidget: TextOverflowWidget(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          const Text('\u2026 '),
+                          InkWell(
+                            child: const Text('more'),
+                            onTap: () {
+                              launch(
+                                  'https://github.com/fluttercandies/extended_text');
+                            },
+                          )
+                        ],
+                      ),
+                    ),
                     selectionEnabled: true,
                     selectionControls: _myTextSelectionControls,
                   ),
