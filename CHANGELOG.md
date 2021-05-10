@@ -1,3 +1,8 @@
+
+## 6.0.6-non-null-safety
+
+* Fix overflow rect is not right if overflowSelection has no selection(may be empty text).
+  
 ## 6.0.5-non-null-safety
 
 * Remove unnecessary assert (assert(textPainter.width >= lastChild!.size.width))

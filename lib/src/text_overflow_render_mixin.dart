@@ -386,6 +386,18 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
               overflowRect.width, _overflowRect.height);
         }
         _overflowRect = _overflowRect.expandToInclude(overflowRect);
+      } else {
+        // out _overflowRect and reach rect
+        if (rect.left >= _overflowRect.left ||
+            rect.right <= _overflowRect.right) {
+          // see whether in the same line
+          overflowRect = Rect.fromLTRB(_overflowRect.left, overflowRect.top,
+              _overflowRect.right, overflowRect.bottom);
+          if (_overflowRect.overlaps(overflowRect)) {
+            _overflowRect = _overflowRect.expandToInclude(overflowRect);
+          }
+          go = false;
+        }
       }
 
       // final Rect temp = getTextRect(
