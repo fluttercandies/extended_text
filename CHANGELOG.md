@@ -1,3 +1,7 @@
+## 6.0.6
+
+* Fix overflow rect is not right if overflowSelection has no selection(may be empty text).
+
 ## 6.0.5
 
 * Remove unnecessary assert (assert(textPainter.width >= lastChild!.size.width))
