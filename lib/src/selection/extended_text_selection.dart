@@ -401,6 +401,18 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   }
 
   @override
+  void userUpdateTextEditingValue(TextEditingValue value, SelectionChangedCause cause) {
+    _selectionOverlay?.update(value);
+    _textInputConnection?.setEditingState(value);
+    if (mounted) {
+      setState(() {
+        _value = value;
+      });
+    }
+    //_formatAndSetValue(value);
+  }
+
+  @override
   bool get copyEnabled => !textEditingValue.selection.isCollapsed;
 
   @override
@@ -436,7 +448,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   }
 
   @override
-  void hideToolbar() {
+  void hideToolbar([bool hideHandles = true]) {
     _selectionOverlay?.hide();
   }
 
@@ -444,7 +456,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   void toggleToolbar() {
     assert(_selectionOverlay != null);
     if (_selectionOverlay!.toolbarIsVisible) {
-      hideToolbar();
+      hideToolbar(false);
     } else {
       showToolbar();
     }
