@@ -1,3 +1,8 @@
+## 7.0.0
+
+* Add [SpecialTextSpan.mouseCursor], [SpecialTextSpan.onEnter] and [SpecialTextSpan.onExit].
+* merge code from 2.2.0
+
 ## 6.0.6
 
 * Fix overflow rect is not right if overflowSelection has no selection(may be empty text).

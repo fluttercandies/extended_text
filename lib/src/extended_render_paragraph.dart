@@ -368,20 +368,20 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
   @override
   bool hitTestSelf(Offset position) => true;
 
-  @override
-  void handleEvent(PointerEvent event, BoxHitTestEntry entry) {
-    assert(debugHandleEvent(event, entry));
-    if (event is! PointerDownEvent) {
-      return;
-    }
-    layoutTextWithConstraints(constraints);
-    final Offset offset = entry.localPosition;
-    final TextPosition position = _textPainter.getPositionForOffset(offset);
-    final InlineSpan? span = _textPainter.text!.getSpanForPosition(position);
-    if (span != null && span is TextSpan) {
-      span.recognizer?.addPointer(event);
-    }
-  }
+  // @override
+  // void handleEvent(PointerEvent event, BoxHitTestEntry entry) {
+  //   assert(debugHandleEvent(event, entry));
+  //   if (event is! PointerDownEvent) {
+  //     return;
+  //   }
+  //   layoutTextWithConstraints(constraints);
+  //   final Offset offset = entry.localPosition;
+  //   final TextPosition position = _textPainter.getPositionForOffset(offset);
+  //   final InlineSpan? span = _textPainter.text!.getSpanForPosition(position);
+  //   if (span != null && span is TextSpan) {
+  //     span.recognizer?.addPointer(event);
+  //   }
+  // }
 
   /// Whether this paragraph currently has a [dart:ui.Shader] for its overflow
   /// effect.
@@ -887,9 +887,9 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
   }
 
   @override
-  bool hitTestChildren(BoxHitTestResult result, {Offset? position}) {
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
     if (overflowWidget != null && _overflowRect != null) {
-      final bool isHit = hitTestChild(result, lastChild!, position: position!);
+      final bool isHit = hitTestChild(result, lastChild!, position: position);
       if (isHit) {
         return true;
       }

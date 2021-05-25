@@ -27,6 +27,13 @@ class AtText extends SpecialText {
             onTap!(atText);
           }
         }),
+      mouseCursor: SystemMouseCursors.text,
+      onEnter: (PointerEnterEvent event) {
+        print(event);
+      },
+      onExit: (PointerExitEvent event) {
+        print(event);
+      },
     );
   }
 }

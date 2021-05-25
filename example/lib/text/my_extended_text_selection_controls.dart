@@ -34,10 +34,12 @@ class MyTextSelectionControls extends TextSelectionControls {
       text: value.selection.textInside(value.text),
     ));
     clipboardStatus?.update();
-    delegate.textEditingValue = TextEditingValue(
-      text: value.text,
-      selection: TextSelection.collapsed(offset: value.selection.end),
-    );
+    delegate.userUpdateTextEditingValue(
+        TextEditingValue(
+          text: value.text,
+          selection: TextSelection.collapsed(offset: value.selection.end),
+        ),
+        SelectionChangedCause.toolBar);
     delegate.bringIntoView(delegate.textEditingValue.selection.extent);
     delegate.hideToolbar();
   }
@@ -77,8 +79,10 @@ class MyTextSelectionControls extends TextSelectionControls {
         launch(
             'mailto:zmtzawqlp@live.com?subject=extended_text_share&body=${delegate.textEditingValue.text}');
         delegate.hideToolbar();
-        delegate.textEditingValue = delegate.textEditingValue
-            .copyWith(selection: const TextSelection.collapsed(offset: 0));
+        delegate.userUpdateTextEditingValue(
+            delegate.textEditingValue
+                .copyWith(selection: const TextSelection.collapsed(offset: 0)),
+            SelectionChangedCause.toolBar);
       },
     );
   }
