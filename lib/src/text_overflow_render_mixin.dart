@@ -725,10 +725,10 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
             textPainter.getFullHeightForCaret(textPosition, caretPrototype);
         //assert(height != null, 'can\' find selection');
         if (rect == null) {
-          rect = Rect.fromLTWH(offset.dx, offset.dy, 1, height!);
+          rect = Rect.fromLTWH(offset.dx, offset.dy, 1, height ?? 0);
         } else {
-          rect = rect
-              .expandToInclude(Rect.fromLTWH(offset.dx, offset.dy, 1, height!));
+          rect = rect.expandToInclude(
+              Rect.fromLTWH(offset.dx, offset.dy, 1, height ?? 0));
         }
       }
 

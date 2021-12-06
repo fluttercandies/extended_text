@@ -893,6 +893,10 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
       if (isHit) {
         return true;
       }
+      // stop hittest if overflowRect contains position
+      if (_overflowRect!.contains(position)) {
+        return false;
+      }
     }
     return super.hitTestChildren(result, position: position);
   }

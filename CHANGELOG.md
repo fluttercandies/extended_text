@@ -1,3 +1,7 @@
+## 7.0.1
+
+* Stop hittest if overflowWidget is not hit but overflowRect contains hit pointer.
+
 ## 7.0.0
 
 * Add [SpecialTextSpan.mouseCursor], [SpecialTextSpan.onEnter] and [SpecialTextSpan.onExit].
