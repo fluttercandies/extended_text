@@ -1,3 +1,7 @@
+## 8.0.0
+
+* Migrate to 2.8
+
 ## 7.0.1
 
 * Stop hittest if overflowWidget is not hit but overflowRect contains hit pointer.

@@ -35,11 +35,12 @@ class MyTextSelectionControls extends TextSelectionControls {
     ));
     clipboardStatus?.update();
     delegate.userUpdateTextEditingValue(
-        TextEditingValue(
-          text: value.text,
-          selection: TextSelection.collapsed(offset: value.selection.end),
-        ),
-        SelectionChangedCause.toolBar);
+      TextEditingValue(
+        text: value.text,
+        selection: TextSelection.collapsed(offset: value.selection.end),
+      ),
+      SelectionChangedCause.toolbar,
+    );
     delegate.bringIntoView(delegate.textEditingValue.selection.extent);
     delegate.hideToolbar();
   }
@@ -68,7 +69,8 @@ class MyTextSelectionControls extends TextSelectionControls {
       endpoints: endpoints,
       delegate: delegate,
       clipboardStatus: clipboardStatus,
-      handleCut: canCut(delegate) ? () => handleCut(delegate) : null,
+      handleCut:
+          canCut(delegate) ? () => handleCut(delegate, clipboardStatus) : null,
       handleCopy: canCopy(delegate)
           ? () => handleCopy(delegate, clipboardStatus)
           : null,
@@ -82,7 +84,7 @@ class MyTextSelectionControls extends TextSelectionControls {
         delegate.userUpdateTextEditingValue(
             delegate.textEditingValue
                 .copyWith(selection: const TextSelection.collapsed(offset: 0)),
-            SelectionChangedCause.toolBar);
+            SelectionChangedCause.toolbar);
       },
     );
   }

@@ -7,7 +7,6 @@ import 'package:example/text/my_extended_text_selection_controls.dart';
 import 'package:example/text/my_special_text_span_builder.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide CircularProgressIndicator;
 import 'package:url_launcher/url_launcher.dart';
 
