@@ -565,6 +565,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
   /// <http://www.unicode.org/reports/tr29/#Word_Boundaries>.
   ///
   /// Valid only after [layout].
+  @override
   TextRange getWordBoundary(TextPosition position) {
     assert(!debugNeedsLayout);
     layoutTextWithConstraints(constraints);

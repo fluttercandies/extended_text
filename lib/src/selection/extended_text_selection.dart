@@ -133,6 +133,7 @@ class ExtendedTextSelection extends StatefulWidget {
 }
 
 class ExtendedTextSelectionState extends State<ExtendedTextSelection>
+    with TextEditingActionTarget
     implements
         ExtendedTextSelectionGestureDetectorBuilderDelegate,
         TextSelectionDelegate,
@@ -695,4 +696,20 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
       bringIntoView(textEditingValue.selection.extent);
     }
   }
+
+  @override
+  void debugAssertLayoutUpToDate() {}
+
+  @override
+  bool get obscureText => false;
+
+  @override
+  bool get readOnly => true;
+
+  @override
+  void setTextEditingValue(
+      TextEditingValue newValue, SelectionChangedCause cause) {}
+
+  @override
+  TextLayoutMetrics get textLayoutMetrics => _renderParagraph!;
 }

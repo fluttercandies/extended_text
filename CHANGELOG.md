@@ -1,3 +1,7 @@
+## 8.0.1
+
+* Support copy on desktop
+
 ## 8.0.0
 
 * Migrate to 2.8

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 ///emoji/image text
 class EmojiText extends SpecialText {
-  EmojiText(TextStyle textStyle, {this.start})
+  EmojiText(TextStyle? textStyle, {this.start})
       : super(EmojiText.flag, ']', textStyle);
   static const String flag = '[';
   final int? start;
