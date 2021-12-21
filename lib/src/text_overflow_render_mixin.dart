@@ -204,8 +204,11 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
           overflowSelection = convertTextInputSelectionToTextPainterSelection(
               oldSpan, overflowSelection);
 
-          final List<ui.TextBox> boxs =
-              textPainter.getBoxesForSelection(overflowSelection);
+          final List<ui.TextBox> boxs = textPainter.getBoxesForSelection(
+            overflowSelection,
+            boxWidthStyle: selectionWidthStyle,
+            boxHeightStyle: selectionHeightStyle,
+          );
           _overflowRects ??= <Rect>[];
           for (final ui.TextBox box in boxs) {
             final Rect boxRect = box.toRect();
@@ -697,7 +700,11 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
   }) {
     effectiveOffset ??= Offset.zero;
 
-    final List<TextBox> boxs = textPainter.getBoxesForSelection(selection);
+    final List<TextBox> boxs = textPainter.getBoxesForSelection(
+      selection,
+      boxWidthStyle: selectionWidthStyle,
+      boxHeightStyle: selectionHeightStyle,
+    );
     if (boxs.isNotEmpty) {
       Rect? rect;
       for (final TextBox box in boxs) {

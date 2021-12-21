@@ -1,3 +1,7 @@
+# 8.0.2
+
+* Fix selectionWidthStyle and selectionHeightStyle are not working.
+
 ## 8.0.1
 
 * Support copy on desktop

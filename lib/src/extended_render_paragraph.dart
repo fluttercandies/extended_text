@@ -327,6 +327,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
   /// Controls how tall the selection highlight boxes are computed to be.
   ///
   /// See [ui.BoxHeightStyle] for details on available styles.
+  @override
   ui.BoxHeightStyle get selectionHeightStyle => _selectionHeightStyle;
   ui.BoxHeightStyle _selectionHeightStyle;
   set selectionHeightStyle(ui.BoxHeightStyle value) {
@@ -340,6 +341,7 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
   /// Controls how wide the selection highlight boxes are computed to be.
   ///
   /// See [ui.BoxWidthStyle] for details on available styles.
+  @override
   ui.BoxWidthStyle get selectionWidthStyle => _selectionWidthStyle;
   ui.BoxWidthStyle _selectionWidthStyle;
   set selectionWidthStyle(ui.BoxWidthStyle value) {
@@ -544,7 +546,11 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
   List<ui.TextBox> getBoxesForSelection(TextSelection selection) {
     assert(!debugNeedsLayout);
     layoutTextWithConstraints(constraints);
-    return _textPainter.getBoxesForSelection(selection);
+    return _textPainter.getBoxesForSelection(
+      selection,
+      boxWidthStyle: selectionWidthStyle,
+      boxHeightStyle: selectionHeightStyle,
+    );
   }
 
   /// Returns the position within the text for the given pixel offset.
@@ -922,7 +928,11 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
     }
 
     if (showSelection) {
-      _selectionRects ??= _textPainter.getBoxesForSelection(actualSelection);
+      _selectionRects ??= _textPainter.getBoxesForSelection(
+        actualSelection,
+        boxWidthStyle: selectionWidthStyle,
+        boxHeightStyle: selectionHeightStyle,
+      );
 
       assert(_selectionRects != null);
       paintSelection(context.canvas, effectiveOffset);
@@ -970,8 +980,11 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
       // never drag over the over flow text span
       textPainterSelection = neverDragOnOverflow(textPainterSelection);
 
-      final List<ui.TextBox> boxes =
-          _textPainter.getBoxesForSelection(textPainterSelection);
+      final List<ui.TextBox> boxes = _textPainter.getBoxesForSelection(
+        textPainterSelection,
+        boxWidthStyle: selectionWidthStyle,
+        boxHeightStyle: selectionHeightStyle,
+      );
 
       if (boxes.isEmpty) {
         return null;
