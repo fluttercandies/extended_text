@@ -30,7 +30,6 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
     this.textScaleFactor = 1.0,
     this.maxLines,
     this.locale,
-    this.onSelectionChanged,
     this.strutStyle,
     this.textWidthBasis = TextWidthBasis.parent,
     this.selection,
@@ -77,8 +76,6 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
   final TextSelection? selection;
 
   final Color? selectionColor;
-
-  final TextSelectionChangedHandler? onSelectionChanged;
 
   /// The text to display in this widget.
   final InlineSpan text;
@@ -163,7 +160,6 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       textWidthBasis: textWidthBasis,
       locale: locale ?? Localizations.maybeLocaleOf(context),
       selection: selection,
-      onSelectionChanged: onSelectionChanged,
       selectionColor: selectionColor,
       startHandleLayerLink: startHandleLayerLink,
       endHandleLayerLink: endHandleLayerLink,
@@ -193,7 +189,6 @@ class ExtendedRichText extends MultiChildRenderObjectWidget {
       ..locale = locale ?? Localizations.maybeLocaleOf(context)
       ..selection = selection
       ..selectionColor = selectionColor
-      ..onSelectionChanged = onSelectionChanged
       ..startHandleLayerLink = startHandleLayerLink
       ..endHandleLayerLink = endHandleLayerLink
       ..textHeightBehavior = textHeightBehavior

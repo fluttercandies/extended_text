@@ -40,7 +40,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
     Locale? locale,
     required LayerLink? startHandleLayerLink,
     required LayerLink? endHandleLayerLink,
-    this.onSelectionChanged,
     Color? selectionColor,
     TextSelection? selection,
     StrutStyle? strutStyle,
@@ -83,12 +82,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
     addAll(children);
     extractPlaceholderSpans(text);
   }
-
-  ///TextSelection
-
-  /// Called when the selection changes.
-  @override
-  TextSelectionChangedHandler? onSelectionChanged;
 
   @override
   double get preferredLineHeight => _textPainter.preferredLineHeight;
