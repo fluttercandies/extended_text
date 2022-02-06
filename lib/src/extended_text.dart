@@ -1,9 +1,13 @@
 import 'dart:ui' as ui show TextHeightBehavior, BoxWidthStyle, BoxHeightStyle;
-import 'package:extended_text/extended_text.dart';
+
 import 'package:extended_text/src/extended_rich_text.dart';
+import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+
+import 'selection/extended_text_selection.dart';
+import 'text_overflow_widget.dart';
 
 class ExtendedText extends StatelessWidget {
   /// Creates a text widget.
@@ -36,6 +40,8 @@ class ExtendedText extends StatelessWidget {
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
     this.overflowWidget,
     this.joinZeroWidthSpace = false,
+    this.shouldShowSelectionHandles,
+    this.textSelectionGestureDetectorBuilder,
   })  : textSpan = null,
         // assert(!(betterLineBreakingAndOverflowStyle && selectionEnabled),
         //    'join zero width space into text, the word will not be a word, the [TextPainter] won\'t work any more.'),
@@ -67,11 +73,22 @@ class ExtendedText extends StatelessWidget {
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
     this.overflowWidget,
     this.joinZeroWidthSpace = false,
+    this.shouldShowSelectionHandles,
+    this.textSelectionGestureDetectorBuilder,
   })  : data = null,
         specialTextSpanBuilder = null,
         // assert(!(betterLineBreakingAndOverflowStyle && selectionEnabled),
         //     'join zero width space into text, the word will not be a word, the [TextPainter] won\'t work any more.'),
         super(key: key);
+
+  /// create custom TextSelectionGestureDetectorBuilder
+  final TextSelectionGestureDetectorBuilderCallback?
+      textSelectionGestureDetectorBuilder;
+
+  /// Whether should show selection handles
+  /// handles are not shown in desktop or web as default
+  /// you can define your behavior
+  final ShouldShowSelectionHandlesCallback? shouldShowSelectionHandles;
 
   /// maxheight is equal to textPainter.preferredLineHeight
   /// maxWidth is equal to textPainter.width
@@ -275,6 +292,9 @@ class ExtendedText extends StatelessWidget {
         textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
         overFlowWidget: overflowWidget,
         strutStyle: strutStyle,
+        shouldShowSelectionHandles: shouldShowSelectionHandles,
+        textSelectionGestureDetectorBuilder:
+            textSelectionGestureDetectorBuilder,
       );
     } else {
       result = ExtendedRichText(

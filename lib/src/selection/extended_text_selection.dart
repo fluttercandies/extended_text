@@ -1,3 +1,5 @@
+// ignore_for_file: always_put_control_body_on_new_line
+
 import 'dart:ui';
 
 import 'package:extended_text_library/extended_text_library.dart';
@@ -28,7 +30,7 @@ class ExtendedTextSelection extends StatefulWidget {
     this.overflow,
     this.text,
     this.selectionColor,
-    this.dragStartBehavior,
+    this.dragStartBehavior = DragStartBehavior.start,
     this.data,
     this.textSelectionControls,
     this.textWidthBasis,
@@ -37,8 +39,20 @@ class ExtendedTextSelection extends StatefulWidget {
     this.selectionWidthStyle = BoxWidthStyle.tight,
     this.overFlowWidget,
     this.strutStyle,
+    this.shouldShowSelectionHandles,
+    this.textSelectionGestureDetectorBuilder,
     Key? key,
   }) : super(key: key);
+
+  /// create custom TextSelectionGestureDetectorBuilder
+  final TextSelectionGestureDetectorBuilderCallback?
+      textSelectionGestureDetectorBuilder;
+
+  /// Whether should show selection handles
+  /// handles are not shown in desktop or web as default
+  /// you can define your behavior
+  final ShouldShowSelectionHandlesCallback? shouldShowSelectionHandles;
+
   final TextOverflowWidget? overFlowWidget;
 
   /// Controls how tall the selection highlight boxes are computed to be.
@@ -119,7 +133,7 @@ class ExtendedTextSelection extends StatefulWidget {
 
   final Color? selectionColor;
 
-  final DragStartBehavior? dragStartBehavior;
+  final DragStartBehavior dragStartBehavior;
 
   final String? data;
 
@@ -150,8 +164,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   ExtendedTextSelectionPointerHandlerState? _pointerHandlerState;
   late CommonTextSelectionGestureDetectorBuilder
       _selectionGestureDetectorBuilder;
-  final ClipboardStatusNotifier? _clipboardStatus =
-      kIsWeb ? null : ClipboardStatusNotifier();
+  ClipboardStatusNotifier? _clipboardStatus;
 
   FocusNode? _focusNode;
   FocusAttachment? _focusAttachment;
@@ -165,27 +178,48 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   @override
   void initState() {
     super.initState();
+    _initGestureDetectorBuilder();
     _textSelectionControls = widget.textSelectionControls;
+    _clipboardStatus =
+        kIsWeb && !_selectionGestureDetectorBuilder.showToolbarInWeb
+            ? null
+            : ClipboardStatusNotifier();
     _clipboardStatus?.addListener(_onChangedClipboardStatus);
     _focusAttachment = _effectiveFocusNode.attach(context);
     _effectiveFocusNode.addListener(_handleFocusChanged);
-    _selectionGestureDetectorBuilder =
-        CommonTextSelectionGestureDetectorBuilder(
-      delegate: this,
-      hideToolbar: hideToolbar,
-      showToolbar: showToolbar,
-      onTap: widget.onTap,
-      context: context,
-      requestKeyboard: requestKeyboard,
-    );
     textEditingValue = TextEditingValue(
         text: widget.data!,
         selection: const TextSelection.collapsed(offset: 0));
     _effectiveFocusNode.canRequestFocus = true;
   }
 
+  void _initGestureDetectorBuilder() {
+    if (widget.textSelectionGestureDetectorBuilder != null) {
+      _selectionGestureDetectorBuilder =
+          widget.textSelectionGestureDetectorBuilder!(
+        delegate: this,
+        hideToolbar: hideToolbar,
+        showToolbar: showToolbar,
+        onTap: widget.onTap,
+        context: context,
+        requestKeyboard: requestKeyboard,
+      );
+    } else {
+      _selectionGestureDetectorBuilder =
+          CommonTextSelectionGestureDetectorBuilder(
+        delegate: this,
+        hideToolbar: hideToolbar,
+        showToolbar: showToolbar,
+        onTap: widget.onTap,
+        context: context,
+        requestKeyboard: requestKeyboard,
+      );
+    }
+  }
+
   @override
   void didUpdateWidget(ExtendedTextSelection oldWidget) {
+    super.didUpdateWidget(oldWidget);
     if (oldWidget.textSelectionControls != widget.textSelectionControls) {
       _textSelectionControls = widget.textSelectionControls;
       final ThemeData theme = Theme.of(context);
@@ -221,7 +255,10 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     if (pasteEnabled && widget.textSelectionControls?.canPaste(this) == true) {
       _clipboardStatus?.update();
     }
-    super.didUpdateWidget(oldWidget);
+
+    if (widget.textSelectionGestureDetectorBuilder !=
+        oldWidget.textSelectionGestureDetectorBuilder)
+      _initGestureDetectorBuilder();
   }
 
   @override
@@ -430,13 +467,13 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
           renderObject: renderEditable,
           selectionControls: _textSelectionControls,
           selectionDelegate: this,
-          dragStartBehavior: DragStartBehavior.start,
+          dragStartBehavior: widget.dragStartBehavior,
           onSelectionHandleTapped: _handleSelectionHandleTapped,
         );
       } else {
         _selectionOverlay!.update(_value);
       }
-      _selectionOverlay!.handlesVisible = true;
+      _selectionOverlay!.handlesVisible = _shouldShowSelectionHandles(cause);
       _selectionOverlay!.showHandles();
     }
   }
@@ -491,7 +528,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     // toolbar: copy, paste, select, cut. It might also provide additional
     // functionality depending on the browser (such as translate). Due to this
     // we should not show a Flutter toolbar for the editable text elements.
-    if (kIsWeb) {
+    if (kIsWeb && !_selectionGestureDetectorBuilder.showToolbarInWeb) {
       return false;
     }
 
@@ -663,7 +700,11 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
 
     if (value.text == _value.text && value.composing == _value.composing) {
       // `selection` is the only change.
-      _handleSelectionChanged(value.selection, SelectionChangedCause.keyboard);
+      setState(() {
+        _value = _value.copyWith(selection: value.selection);
+        _handleSelectionChanged(
+            value.selection, SelectionChangedCause.keyboard);
+      });
     } else {
       //hideToolbar();
       textEditingValue = value;
@@ -697,7 +738,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   void userUpdateTextEditingValue(
       TextEditingValue value, SelectionChangedCause cause) {
     // _selectionOverlay?.update(value);
-    //_textInputConnection?.setEditingState(value);
+    _textInputConnection?.setEditingState(value);
     final TextSelection old = _value.selection;
     _value = value;
     if (old != value.selection ||
@@ -767,6 +808,30 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   Action<T> _makeOverridable<T extends Intent>(Action<T> defaultAction) {
     return Action<T>.overridable(
         context: context, defaultAction: defaultAction);
+  }
+
+  bool _shouldShowSelectionHandles(SelectionChangedCause? cause) {
+    if (widget.shouldShowSelectionHandles != null) {
+      return widget.shouldShowSelectionHandles!(
+        cause,
+        _selectionGestureDetectorBuilder,
+        _value,
+      );
+    }
+    // When the text field is activated by something that doesn't trigger the
+    // selection overlay, we shouldn't show the handles either.
+    if (!_selectionGestureDetectorBuilder.shouldShowSelectionToolbar)
+      return false;
+
+    if (cause == SelectionChangedCause.keyboard) return false;
+
+    if (_value.selection.isCollapsed) return false;
+
+    if (cause == SelectionChangedCause.longPress) return true;
+
+    if (_value.text.isNotEmpty) return true;
+
+    return false;
   }
 }
 

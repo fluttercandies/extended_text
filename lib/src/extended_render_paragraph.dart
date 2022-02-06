@@ -236,7 +236,9 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
   ///
   /// For example, if the text scale factor is 1.5, text will be 50% larger than
   /// the specified font size.
+  @override
   double get textScaleFactor => _textPainter.textScaleFactor;
+  @override
   set textScaleFactor(double value) {
     if (_textPainter.textScaleFactor == value) {
       return;

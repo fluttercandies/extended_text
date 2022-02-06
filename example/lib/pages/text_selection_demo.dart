@@ -3,6 +3,8 @@
 ///  create by zmtzawqlp on 2019/4/4
 ///
 
+// ignore_for_file: always_put_control_body_on_new_line
+
 import 'package:example/text/my_extended_text_selection_controls.dart';
 import 'package:example/text/my_special_text_span_builder.dart';
 import 'package:extended_text/extended_text.dart';
@@ -74,6 +76,25 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                     ),
                     selectionEnabled: true,
                     selectionControls: _myTextSelectionControls,
+                    shouldShowSelectionHandles: _shouldShowSelectionHandles,
+                    textSelectionGestureDetectorBuilder: ({
+                      required ExtendedTextSelectionGestureDetectorBuilderDelegate
+                          delegate,
+                      required Function showToolbar,
+                      required Function hideToolbar,
+                      required Function? onTap,
+                      required BuildContext context,
+                      required Function? requestKeyboard,
+                    }) {
+                      return MyCommonTextSelectionGestureDetectorBuilder(
+                        delegate: delegate,
+                        showToolbar: showToolbar,
+                        hideToolbar: hideToolbar,
+                        onTap: onTap,
+                        context: context,
+                        requestKeyboard: requestKeyboard,
+                      );
+                    },
                   ),
                 );
               },
@@ -110,4 +131,59 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
       },
     );
   }
+
+  bool _shouldShowSelectionHandles(
+    SelectionChangedCause? cause,
+    CommonTextSelectionGestureDetectorBuilder selectionGestureDetectorBuilder,
+    TextEditingValue editingValue,
+  ) {
+    // When the text field is activated by something that doesn't trigger the
+    // selection overlay, we shouldn't show the handles either.
+
+    //
+    // if (!selectionGestureDetectorBuilder.shouldShowSelectionToolbar)
+    //   return false;
+
+    if (cause == SelectionChangedCause.keyboard) return false;
+
+    // if (widget.readOnly && _effectiveController.selection.isCollapsed)
+    //   return false;
+
+    // if (!_isEnabled) return false;
+
+    if (cause == SelectionChangedCause.longPress) return true;
+
+    if (editingValue.text.isNotEmpty) return true;
+
+    return false;
+  }
+}
+
+class MyCommonTextSelectionGestureDetectorBuilder
+    extends CommonTextSelectionGestureDetectorBuilder {
+  MyCommonTextSelectionGestureDetectorBuilder(
+      {required ExtendedTextSelectionGestureDetectorBuilderDelegate delegate,
+      required Function showToolbar,
+      required Function hideToolbar,
+      required Function? onTap,
+      required BuildContext context,
+      required Function? requestKeyboard})
+      : super(
+          delegate: delegate,
+          showToolbar: showToolbar,
+          hideToolbar: hideToolbar,
+          onTap: onTap,
+          context: context,
+          requestKeyboard: requestKeyboard,
+        );
+  @override
+  void onTapDown(TapDownDetails details) {
+    super.onTapDown(details);
+
+    /// always show toolbar
+    shouldShowSelectionToolbar = true;
+  }
+
+  @override
+  bool get showToolbarInWeb => true;
 }

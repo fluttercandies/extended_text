@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:extended_text/src/extended_render_paragraph.dart';
-import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'text_overflow_widget.dart';
