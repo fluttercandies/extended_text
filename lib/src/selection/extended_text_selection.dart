@@ -17,6 +17,8 @@ import 'extended_text_selection_pointer_handler.dart';
 ///
 ///  create by zmtzawqlp on 2019/6/5
 ///
+///  flutter/packages/flutter/lib/src/widgets/text_selection.dart
+///
 
 class ExtendedTextSelection extends StatefulWidget {
   const ExtendedTextSelection({
@@ -482,7 +484,6 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   @override
   TextEditingValue get textEditingValue => _value;
 
-  @override
   set textEditingValue(TextEditingValue value) {
     //value = _handleSpecialTextSpan(value);
 
@@ -523,6 +524,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   ///
   /// Returns `false` if a toolbar couldn't be shown, such as when the toolbar
   /// is already shown, or when no text selection currently exists.
+  @override
   bool showToolbar() {
     // Web is using native dom elements to enable clipboard functionality of the
     // toolbar: copy, paste, select, cut. It might also provide additional
@@ -833,6 +835,12 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
 
     return false;
   }
+
+  @override
+  void insertTextPlaceholder(Size size) {}
+
+  @override
+  void removeTextPlaceholder() {}
 }
 
 class _CopySelectionAction extends ContextAction<CopySelectionTextIntent> {
