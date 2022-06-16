@@ -271,6 +271,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     _focusNode?.dispose();
     _focusAttachment?.detach();
     _closeInputConnectionIfNeeded();
+    _selectionOverlay?.dispose();
     super.dispose();
   }
 
