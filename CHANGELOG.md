@@ -1,3 +1,7 @@
+# 9.1.1
+
+* Fix cutOffInlineSpan should take care of emoji #131.
+
 # 9.1.0
 
 * Migrate to 3.0.0

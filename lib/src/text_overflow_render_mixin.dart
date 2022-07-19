@@ -73,7 +73,7 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
       final Size overflowWidgetSize = lastChild!.size;
       final TextOverflowPosition textOverflowPosition =
           overflowWidget!.position;
-      final int maxOffset = text!.toPlainText().length;
+      final int maxOffset = text!.toPlainText().runes.length;
       if (textOverflowPosition == TextOverflowPosition.end) {
         final TextSelection overflowSelection = TextSelection(
           baseOffset: textPainter
@@ -198,7 +198,7 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
         else {
           TextSelection overflowSelection = TextSelection(
             baseOffset: range.start,
-            extentOffset: range.end,
+            extentOffset: range.start + math.max(1, range.end - range.start),
           );
 
           overflowSelection = convertTextInputSelectionToTextPainterSelection(
@@ -250,7 +250,7 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
   TextPainter _findNoOverflow(_TextRange range, List<int> hideWidgets) {
     _layoutCount = 0;
     late TextPainter testTextPainter;
-    final int maxOffset = textSpanToActualText(text!).length;
+    final int maxOffset = textSpanToActualText(text!).runes.length;
     int maxEnd = maxOffset;
     while (_hasVisualOverflow) {
       testTextPainter = _tryToFindNoOverflow1(range, hideWidgets);
@@ -265,7 +265,10 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
       } else {
         // see pre one whether overflow
         range.end = math.min(range.end - 1, maxOffset);
+
+        final _TextRange pre = range.copyWith();
         _tryToFindNoOverflow1(range, <int>[]);
+
         if (_hasVisualOverflow) {
           // fix end
           range.end = math.min(range.end + 1, maxOffset);
@@ -277,8 +280,12 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
               range.start,
               math.min(
                   maxEnd - math.max((maxEnd - range.start) ~/ 2, 1), maxEnd));
-          // continue
-          _hasVisualOverflow = true;
+          // if range is not changed, so maybe we should break.
+          if (pre == range) {
+            _hasVisualOverflow = false;
+          } else {
+            _hasVisualOverflow = true;
+          }
         }
       }
     }
@@ -495,20 +502,41 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
 
       String? text = value.text;
       if (text != null) {
-        String temp = '';
-        for (int i = 0; i < text.length; i++) {
+        // https://github.com/dart-lang/sdk/issues/35798
+        final List<int> runes = text.runes.toList();
+
+        // if (kDebugMode) {
+        //   if (runes.length != text.length) {}
+        // }
+
+        final List<int> finallyRunes = <int>[];
+        //bool hasUtf16Surrogate = false;
+        for (int i = 0; i < runes.length; i++) {
           final int index = i + offset.value;
           if (range.contains(index)) {
+            // if (_isUtf16Surrogate(text.codeUnitAt(index))) {
+            //   hasUtf16Surrogate = true;
+            // }
             continue;
           }
-          temp += text[i];
+          finallyRunes.add(runes[i]);
         }
-        text = temp;
+        text = String.fromCharCodes(finallyRunes);
+
+        // String temp = '';
+        // for (int i = 0; i < text.length; i++) {
+        //   final int index = i + offset.value;
+        //   if (range.contains(index)) {
+        //     continue;
+        //   }
+        //   temp += text[i];
+        // }
+        // text = temp;
       }
 
       actualText ??= value.text;
       if (actualText != null) {
-        offset.increment(actualText.length);
+        offset.increment(actualText.runes.length);
       }
 
       if (value.children != null) {
@@ -574,6 +602,11 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
     }
 
     return output;
+  }
+
+  // ignore: unused_element
+  bool _isUtf16Surrogate(int value) {
+    return value & 0xF800 == 0xD800;
   }
 
   TextPainter _copyTextPainter({
@@ -771,6 +804,24 @@ class _TextRange {
 
   bool contains(int value) {
     return start <= value && value <= end;
+  }
+
+  int get length => (end - start) + 1;
+
+  _TextRange copyWith({int? start, int? end}) => _TextRange(
+        start ?? this.start,
+        end ?? this.end,
+      );
+
+  @override
+  int get hashCode => hashValues(start, end);
+
+  @override
+  bool operator ==(Object other) {
+    if (other.runtimeType != runtimeType) {
+      return false;
+    }
+    return (other is _TextRange) && start == other.start && end == other.end;
   }
 }
 
