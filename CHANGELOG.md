@@ -1,3 +1,7 @@
+# 9.1.2
+
+* Add TextOverflowWidget.clearType
+
 # 9.1.1
 
 * Fix cutOffInlineSpan should take care of emoji #131.

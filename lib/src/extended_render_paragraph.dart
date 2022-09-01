@@ -8,6 +8,7 @@ import 'dart:ui' as ui
         TextHeightBehavior,
         BoxWidthStyle,
         BoxHeightStyle;
+import 'dart:ui';
 import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -435,6 +436,11 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
       }
       return true;
     }());
+
+    _innnPaint(offset, context);
+  }
+
+  void _innnPaint(Offset offset, PaintingContext context) {
     if (_needsClipping) {
       final Rect bounds = offset & size;
       if (_overflowShader != null) {
@@ -447,25 +453,47 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
       context.canvas.clipRect(bounds);
     }
 
-    _paintTextOverflow(context, offset);
     //clip rect of over flow
     if (_overflowRect != null) {
       context.canvas.saveLayer(offset & size, Paint());
+      // clip should be before textpainter
+      if (overflowWidget?.clearType == TextOverflowClearType.clipRect) {
+        // crop rect before _overflowRect
+        // it's used for [TextOverflowPosition.middle]
+
+        if (_overflowRects != null && _overflowRects!.isNotEmpty) {
+          for (final Rect rect in _overflowRects!) {
+            context.canvas.clipRect(
+              rect.shift(offset),
+              clipOp: ClipOp.difference,
+            );
+          }
+        }
+
+        context.canvas.clipRect(
+          _overflowRect!.shift(offset),
+          clipOp: ClipOp.difference,
+        );
+      }
     }
     _paintSelection(context, offset);
     _paintSpecialText(context, offset);
     _paint(context, offset);
     if (_overflowRect != null) {
-      // crop rect before _overflowRect
-      // it's used for [TextOverflowPosition.middle]
-      if (_overflowRects != null && _overflowRects!.isNotEmpty) {
-        for (final Rect rect in _overflowRects!) {
-          context.canvas.drawRect(
-              rect.shift(offset), Paint()..blendMode = BlendMode.clear);
+      // BlendMode.clear should be after textpainter
+      if (overflowWidget?.clearType == TextOverflowClearType.blendModeClear) {
+        // crop rect before _overflowRect
+        // it's used for [TextOverflowPosition.middle]
+        if (_overflowRects != null && _overflowRects!.isNotEmpty) {
+          for (final Rect rect in _overflowRects!) {
+            context.canvas.drawRect(
+                rect.shift(offset), Paint()..blendMode = BlendMode.clear);
+          }
         }
+
+        context.canvas.drawRect(
+            _overflowRect!.shift(offset), Paint()..blendMode = BlendMode.clear);
       }
-      context.canvas.drawRect(
-          _overflowRect!.shift(offset), Paint()..blendMode = BlendMode.clear);
 
       if (kDebugMode &&
           overflowWidget != null &&
@@ -476,6 +504,9 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
 
       context.canvas.restore();
     }
+
+    _paintTextOverflow(context, offset);
+
     paintHandleLayers(context, super.paint);
 
     if (_needsClipping) {
@@ -491,17 +522,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
   }
 
   void _paint(PaintingContext context, Offset offset) {
-    if (_needsClipping) {
-      final Rect bounds = offset & size;
-      if (_overflowShader != null) {
-        // This layer limits what the shader below blends with to be just the text
-        // (as opposed to the text and its background).
-        context.canvas.saveLayer(bounds, Paint());
-      } else {
-        context.canvas.save();
-      }
-      context.canvas.clipRect(bounds);
-    }
     _textPainter.paint(context.canvas, offset);
 
     paintWidgets(
@@ -509,17 +529,6 @@ class ExtendedRenderParagraph extends ExtendedTextSelectionRenderObject
       offset,
       overFlowRect: _overflowRect,
     );
-
-    if (_needsClipping) {
-      if (_overflowShader != null) {
-        context.canvas.translate(offset.dx, offset.dy);
-        final Paint paint = Paint()
-          ..blendMode = BlendMode.modulate
-          ..shader = _overflowShader;
-        context.canvas.drawRect(Offset.zero & size, paint);
-      }
-      context.canvas.restore();
-    }
   }
 
   /// Returns the offset at which to paint the caret.
