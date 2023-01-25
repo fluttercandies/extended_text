@@ -47,8 +47,7 @@ class ExtendedTextSelection extends StatefulWidget {
   }) : super(key: key);
 
   /// create custom TextSelectionGestureDetectorBuilder
-  final TextSelectionGestureDetectorBuilderCallback?
-      textSelectionGestureDetectorBuilder;
+  final TextSelectionGestureDetectorBuilderCallback? textSelectionGestureDetectorBuilder;
 
   /// Whether should show selection handles
   /// handles are not shown in desktop or web as default
@@ -155,17 +154,14 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
         TextSelectionDelegate,
         TextInputClient {
   final GlobalKey _renderParagraphKey = GlobalKey();
-  ExtendedRenderParagraph? get _renderParagraph =>
-      _renderParagraphKey.currentContext!.findRenderObject()
-          as ExtendedRenderParagraph?;
+  ExtendedRenderParagraph? get _renderParagraph => _renderParagraphKey.currentContext!.findRenderObject() as ExtendedRenderParagraph?;
   ExtendedTextSelectionOverlay? _selectionOverlay;
   TextSelectionControls? _textSelectionControls;
   final LayerLink _toolbarLayerLink = LayerLink();
   final LayerLink _startHandleLayerLink = LayerLink();
   final LayerLink _endHandleLayerLink = LayerLink();
   ExtendedTextSelectionPointerHandlerState? _pointerHandlerState;
-  late CommonTextSelectionGestureDetectorBuilder
-      _selectionGestureDetectorBuilder;
+  late CommonTextSelectionGestureDetectorBuilder _selectionGestureDetectorBuilder;
   ClipboardStatusNotifier? _clipboardStatus;
 
   FocusNode? _focusNode;
@@ -182,23 +178,17 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     super.initState();
     _initGestureDetectorBuilder();
     _textSelectionControls = widget.textSelectionControls;
-    _clipboardStatus =
-        kIsWeb && !_selectionGestureDetectorBuilder.showToolbarInWeb
-            ? null
-            : ClipboardStatusNotifier();
+    _clipboardStatus = kIsWeb && !_selectionGestureDetectorBuilder.showToolbarInWeb ? null : ClipboardStatusNotifier();
     _clipboardStatus?.addListener(_onChangedClipboardStatus);
     _focusAttachment = _effectiveFocusNode.attach(context);
     _effectiveFocusNode.addListener(_handleFocusChanged);
-    textEditingValue = TextEditingValue(
-        text: widget.data!,
-        selection: const TextSelection.collapsed(offset: 0));
+    textEditingValue = TextEditingValue(text: widget.data!, selection: const TextSelection.collapsed(offset: 0));
     _effectiveFocusNode.canRequestFocus = true;
   }
 
   void _initGestureDetectorBuilder() {
     if (widget.textSelectionGestureDetectorBuilder != null) {
-      _selectionGestureDetectorBuilder =
-          widget.textSelectionGestureDetectorBuilder!(
+      _selectionGestureDetectorBuilder = widget.textSelectionGestureDetectorBuilder!(
         delegate: this,
         hideToolbar: hideToolbar,
         showToolbar: showToolbar,
@@ -207,8 +197,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
         requestKeyboard: requestKeyboard,
       );
     } else {
-      _selectionGestureDetectorBuilder =
-          CommonTextSelectionGestureDetectorBuilder(
+      _selectionGestureDetectorBuilder = CommonTextSelectionGestureDetectorBuilder(
         delegate: this,
         hideToolbar: hideToolbar,
         showToolbar: showToolbar,
@@ -250,17 +239,13 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     }
 
     if (oldWidget.data != widget.data) {
-      textEditingValue = TextEditingValue(
-          text: widget.data!,
-          selection: const TextSelection.collapsed(offset: 0));
+      textEditingValue = TextEditingValue(text: widget.data!, selection: const TextSelection.collapsed(offset: 0));
     }
     if (pasteEnabled && widget.textSelectionControls?.canPaste(this) == true) {
       _clipboardStatus?.update();
     }
 
-    if (widget.textSelectionGestureDetectorBuilder !=
-        oldWidget.textSelectionGestureDetectorBuilder)
-      _initGestureDetectorBuilder();
+    if (widget.textSelectionGestureDetectorBuilder != oldWidget.textSelectionGestureDetectorBuilder) _initGestureDetectorBuilder();
   }
 
   @override
@@ -301,10 +286,8 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   Widget build(BuildContext context) {
     _focusAttachment?.reparent();
     final ThemeData theme = Theme.of(context);
-    final TextSelectionThemeData selectionTheme =
-        TextSelectionTheme.of(context);
-    _pointerHandlerState = context
-        .findAncestorStateOfType<ExtendedTextSelectionPointerHandlerState>();
+    final TextSelectionThemeData selectionTheme = TextSelectionTheme.of(context);
+    _pointerHandlerState = context.findAncestorStateOfType<ExtendedTextSelectionPointerHandlerState>();
     if (_pointerHandlerState != null) {
       if (!_pointerHandlerState!.selectionStates.contains(this)) {
         _pointerHandlerState!.selectionStates.add(this);
@@ -319,8 +302,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
         forcePressEnabled = true;
         _textSelectionControls ??= cupertinoTextSelectionControls;
 
-        selectionColor ??= selectionTheme.selectionColor ??
-            cupertinoTheme.primaryColor.withOpacity(0.40);
+        selectionColor ??= selectionTheme.selectionColor ?? cupertinoTheme.primaryColor.withOpacity(0.40);
 
         break;
 
@@ -329,12 +311,10 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
         forcePressEnabled = false;
         _textSelectionControls ??= cupertinoDesktopTextSelectionControls;
 
-        selectionColor ??= selectionTheme.selectionColor ??
-            cupertinoTheme.primaryColor.withOpacity(0.40);
+        selectionColor ??= selectionTheme.selectionColor ?? cupertinoTheme.primaryColor.withOpacity(0.40);
         handleDidGainAccessibilityFocus = () {
           // Automatically activate the TextField when it receives accessibility focus.
-          if (!_effectiveFocusNode.hasFocus &&
-              _effectiveFocusNode.canRequestFocus) {
+          if (!_effectiveFocusNode.hasFocus && _effectiveFocusNode.canRequestFocus) {
             _effectiveFocusNode.requestFocus();
           }
         };
@@ -344,21 +324,18 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
       case TargetPlatform.fuchsia:
         forcePressEnabled = false;
         _textSelectionControls ??= materialTextSelectionControls;
-        selectionColor ??= selectionTheme.selectionColor ??
-            theme.colorScheme.primary.withOpacity(0.40);
+        selectionColor ??= selectionTheme.selectionColor ?? theme.colorScheme.primary.withOpacity(0.40);
         break;
 
       case TargetPlatform.linux:
       case TargetPlatform.windows:
         forcePressEnabled = false;
         _textSelectionControls ??= desktopTextSelectionControls;
-        selectionColor ??= selectionTheme.selectionColor ??
-            theme.colorScheme.primary.withOpacity(0.40);
+        selectionColor ??= selectionTheme.selectionColor ?? theme.colorScheme.primary.withOpacity(0.40);
         if (theme.platform == TargetPlatform.windows)
           handleDidGainAccessibilityFocus = () {
             // Automatically activate the TextField when it receives accessibility focus.
-            if (!_effectiveFocusNode.hasFocus &&
-                _effectiveFocusNode.canRequestFocus) {
+            if (!_effectiveFocusNode.hasFocus && _effectiveFocusNode.canRequestFocus) {
               _effectiveFocusNode.requestFocus();
             }
           };
@@ -373,10 +350,8 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
               onDidGainAccessibilityFocus: handleDidGainAccessibilityFocus,
               child: ExtendedRichText(
                 textAlign: widget.textAlign!,
-                textDirection: widget
-                    .textDirection, // RichText uses Directionality.of to obtain a default if this is null.
-                locale: widget
-                    .locale, // RichText uses Localizations.localeOf to obtain a default if this is null
+                textDirection: widget.textDirection, // RichText uses Directionality.of to obtain a default if this is null.
+                locale: widget.locale, // RichText uses Localizations.localeOf to obtain a default if this is null
                 softWrap: widget.softWrap!,
                 overflow: widget.overflow!,
                 textScaleFactor: widget.textScaleFactor!,
@@ -417,13 +392,10 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   }
 
   VoidCallback? _semanticsOnCopy(TextSelectionControls? controls) {
-    return controls?.canCopy(this) == true
-        ? () => controls!.handleCopy(this, _clipboardStatus)
-        : null;
+    return controls?.canCopy(this) == true ? () => controls!.handleCopy(this, _clipboardStatus) : null;
   }
 
-  void _handleSelectionChanged(
-      TextSelection selection, SelectionChangedCause? cause) {
+  void _handleSelectionChanged(TextSelection selection, SelectionChangedCause? cause) {
     // We return early if the selection is not valid. This can happen when the
     // text of [EditableText] is updated at the same time as the selection is
     // changed by a gesture event.
@@ -511,9 +483,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   @override
   bool get selectAllEnabled =>
       textEditingValue.text.isNotEmpty &&
-      !(textEditingValue.selection.baseOffset == 0 &&
-          textEditingValue.selection.extentOffset ==
-              textEditingValue.text.length);
+      !(textEditingValue.selection.baseOffset == 0 && textEditingValue.selection.extentOffset == textEditingValue.text.length);
 
   @override
   void bringIntoView(TextPosition position) {
@@ -574,8 +544,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   /// clear selection if it has.
   void clearSelection() {
     if (!textEditingValue.selection.isCollapsed) {
-      textEditingValue = textEditingValue.copyWith(
-          selection: const TextSelection.collapsed(offset: 0));
+      textEditingValue = textEditingValue.copyWith(selection: const TextSelection.collapsed(offset: 0));
     }
   }
 
@@ -609,8 +578,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   /// - cmd/ctrl+a to select all.
   /// - Changing the selection using a physical keyboard.
   bool get _shouldCreateInputConnection => kIsWeb;
-  bool get _hasInputConnection =>
-      _textInputConnection != null && _textInputConnection!.attached;
+  bool get _hasInputConnection => _textInputConnection != null && _textInputConnection!.attached;
 
   TextInputConnection? _textInputConnection;
 
@@ -706,8 +674,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
       // `selection` is the only change.
       setState(() {
         _value = _value.copyWith(selection: value.selection);
-        _handleSelectionChanged(
-            value.selection, SelectionChangedCause.keyboard);
+        _handleSelectionChanged(value.selection, SelectionChangedCause.keyboard);
       });
     } else {
       //hideToolbar();
@@ -732,22 +699,18 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     }
   }
 
-  TextInputConfiguration get textInputConfiguration =>
-      const TextInputConfiguration(
+  TextInputConfiguration get textInputConfiguration => const TextInputConfiguration(
         inputAction: TextInputAction.newline,
         inputType: TextInputType.multiline,
       );
 
   @override
-  void userUpdateTextEditingValue(
-      TextEditingValue value, SelectionChangedCause cause) {
+  void userUpdateTextEditingValue(TextEditingValue value, SelectionChangedCause cause) {
     // _selectionOverlay?.update(value);
     _textInputConnection?.setEditingState(value);
     final TextSelection old = _value.selection;
     _value = value;
-    if (old != value.selection ||
-        cause == SelectionChangedCause.longPress ||
-        cause == SelectionChangedCause.keyboard) {
+    if (old != value.selection || cause == SelectionChangedCause.longPress || cause == SelectionChangedCause.keyboard) {
       _handleSelectionChanged(value.selection, cause);
     }
     if (mounted) {
@@ -779,8 +742,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
           userUpdateTextEditingValue(
             TextEditingValue(
               text: textEditingValue.text,
-              selection: TextSelection.collapsed(
-                  offset: textEditingValue.selection.end),
+              selection: TextSelection.collapsed(offset: textEditingValue.selection.end),
             ),
             SelectionChangedCause.toolbar,
           );
@@ -810,8 +772,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   }
 
   Action<T> _makeOverridable<T extends Intent>(Action<T> defaultAction) {
-    return Action<T>.overridable(
-        context: context, defaultAction: defaultAction);
+    return Action<T>.overridable(context: context, defaultAction: defaultAction);
   }
 
   bool _shouldShowSelectionHandles(SelectionChangedCause? cause) {
@@ -824,8 +785,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     }
     // When the text field is activated by something that doesn't trigger the
     // selection overlay, we shouldn't show the handles either.
-    if (!_selectionGestureDetectorBuilder.shouldShowSelectionToolbar)
-      return false;
+    if (!_selectionGestureDetectorBuilder.shouldShowSelectionToolbar) return false;
 
     if (cause == SelectionChangedCause.keyboard) return false;
 
@@ -843,6 +803,18 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
 
   @override
   void removeTextPlaceholder() {}
+
+  @override
+  void didChangeInputControl(TextInputControl? oldControl, TextInputControl? newControl) {
+    /// TODO: implement didChangeInputControl
+    /// * addded flutter 3.7
+  }
+
+  @override
+  void performSelector(String selectorName) {
+    /// TODO: implement performSelector
+    /// * addded flutter 3.7
+  }
 }
 
 class _CopySelectionAction extends ContextAction<CopySelectionTextIntent> {
@@ -860,8 +832,7 @@ class _CopySelectionAction extends ContextAction<CopySelectionTextIntent> {
   }
 
   @override
-  bool get isActionEnabled =>
-      state._value.selection.isValid && !state._value.selection.isCollapsed;
+  bool get isActionEnabled => state._value.selection.isValid && !state._value.selection.isCollapsed;
 }
 
 class _SelectAllAction extends ContextAction<SelectAllTextIntent> {
