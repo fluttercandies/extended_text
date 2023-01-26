@@ -87,12 +87,12 @@ class JoinZeroWidthSpaceDemo extends StatelessWidget {
   void onSpecialTextTap(dynamic parameter) {
     if (parameter.toString().startsWith('\$')) {
       if (parameter.toString().contains('issue')) {
-        launch('https://github.com/flutter/flutter/issues/26748');
+        launchUrl(Uri.parse('https://github.com/flutter/flutter/issues/26748'));
       } else {
-        launch('https://github.com/fluttercandies');
+        launchUrl(Uri.parse('https://github.com/fluttercandies'));
       }
     } else if (parameter.toString().startsWith('@')) {
-      launch('mailto:zmtzawqlp@live.com');
+      launchUrl(Uri.parse('mailto:zmtzawqlp@live.com'));
     }
   }
 }

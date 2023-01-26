@@ -843,6 +843,27 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
 
   @override
   void removeTextPlaceholder() {}
+
+  @override
+  void didChangeInputControl(
+      TextInputControl? oldControl, TextInputControl? newControl) {
+    if (_hasFocus && _hasInputConnection) {
+      oldControl?.hide();
+      newControl?.show();
+    }
+  }
+
+  @override
+  void performSelector(String selectorName) {
+    final Intent? intent = intentForMacOSSelector(selectorName);
+
+    if (intent != null) {
+      final BuildContext? primaryContext = primaryFocus?.context;
+      if (primaryContext != null) {
+        Actions.invoke(primaryContext, intent);
+      }
+    }
+  }
 }
 
 class _CopySelectionAction extends ContextAction<CopySelectionTextIntent> {

@@ -23,11 +23,11 @@ class RegExpTextDemo extends StatelessWidget {
           '\n\nif you meet any problem, please let me know @zmtzawqlp and send an mailto:zmtzawqlp@live.com to me .[sun_glasses] ',
           onSpecialTextTap: (dynamic parameter) {
             if (parameter.toString().startsWith('\$')) {
-              launch('https://github.com/fluttercandies');
+              launchUrl(Uri.parse('https://github.com/fluttercandies'));
             } else if (parameter.toString().startsWith('@')) {
-              launch('mailto:zmtzawqlp@live.com');
+              launchUrl(Uri.parse('mailto:zmtzawqlp@live.com'));
             } else if (parameter.toString().startsWith('mailto:')) {
-              launch(parameter.toString());
+              launchUrl(Uri.parse(parameter.toString()));
             }
           },
           specialTextSpanBuilder: MyRegExpSpecialTextSpanBuilder(),

@@ -50,9 +50,10 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                     _attachContent,
                     onSpecialTextTap: (dynamic parameter) {
                       if (parameter.toString().startsWith('\$')) {
-                        launch('https://github.com/fluttercandies');
+                        launchUrl(
+                            Uri.parse('https://github.com/fluttercandies'));
                       } else if (parameter.toString().startsWith('@')) {
-                        launch('mailto:zmtzawqlp@live.com');
+                        launchUrl(Uri.parse('mailto:zmtzawqlp@live.com'));
                       }
                     },
                     specialTextSpanBuilder: MySpecialTextSpanBuilder(),
@@ -67,8 +68,8 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                           InkWell(
                             child: const Text('more'),
                             onTap: () {
-                              launch(
-                                  'https://github.com/fluttercandies/extended_text');
+                              launchUrl(Uri.parse(
+                                  'https://github.com/fluttercandies/extended_text'));
                             },
                           )
                         ],

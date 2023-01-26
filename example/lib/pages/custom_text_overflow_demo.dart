@@ -107,8 +107,8 @@ class _CustomTextOverflowDemoState extends State<CustomTextOverflowDemo> {
                             'more',
                           ),
                           onTap: () {
-                            launch(
-                                'https://github.com/fluttercandies/extended_text');
+                            launchUrl(Uri.parse(
+                                'https://github.com/fluttercandies/extended_text'));
                           },
                         )
                       ],
@@ -125,12 +125,12 @@ class _CustomTextOverflowDemoState extends State<CustomTextOverflowDemo> {
   void onSpecialTextTap(dynamic parameter) {
     if (parameter.toString().startsWith('\$')) {
       if (parameter.toString().contains('issue')) {
-        launch('https://github.com/flutter/flutter/issues/26748');
+        launchUrl(Uri.parse('https://github.com/flutter/flutter/issues/26748'));
       } else {
-        launch('https://github.com/fluttercandies');
+        launchUrl(Uri.parse('https://github.com/fluttercandies'));
       }
     } else if (parameter.toString().startsWith('@')) {
-      launch('mailto:zmtzawqlp@live.com');
+      launchUrl(Uri.parse('mailto:zmtzawqlp@live.com'));
     }
   }
 }

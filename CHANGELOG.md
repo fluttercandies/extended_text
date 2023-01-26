@@ -1,3 +1,7 @@
+# 10.0.0
+
+* Migrate to 3.7.0
+
 # 9.1.2
 
 * Add TextOverflowWidget.clearType
