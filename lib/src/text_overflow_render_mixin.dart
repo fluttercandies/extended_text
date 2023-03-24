@@ -75,20 +75,34 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
           overflowWidget!.position;
       final int maxOffset = text!.toPlainText().runes.length;
       if (textOverflowPosition == TextOverflowPosition.end) {
-        final TextSelection overflowSelection = TextSelection(
-          baseOffset: textPainter
-              .getPositionForOffset(rect.bottomRight -
-                  Offset(
-                      overflowWidgetSize.width, overflowWidgetSize.height / 2))
-              .offset,
-          extentOffset:
-              textPainter.getPositionForOffset(rect.bottomRight).offset,
-        );
+        TextSelection overflowSelection;
+        if (textDirection == TextDirection.ltr) {
+          overflowSelection = TextSelection(
+            baseOffset: textPainter
+                .getPositionForOffset(rect.bottomRight -
+                Offset(
+                    overflowWidgetSize.width, overflowWidgetSize.height / 2))
+                .offset,
+            extentOffset: textPainter.getPositionForOffset(rect.bottomRight).offset,
+          );
 
-        textParentData.offset = rect.bottomRight -
-            Offset(overflowWidgetSize.width, overflowWidgetSize.height);
+          textParentData.offset = rect.bottomRight -
+              Offset(overflowWidgetSize.width, overflowWidgetSize.height);
+        } else {
+          overflowSelection = TextSelection(
+            baseOffset: textPainter
+                .getPositionForOffset(rect.bottomLeft -
+                Offset(0, overflowWidgetSize.height / 2))
+                .offset,
+            extentOffset: textPainter.getPositionForOffset(rect.bottomLeft
+                + Offset(overflowWidgetSize.width, 0)).offset,
+          );
 
-        _setOverflowRect(
+          textParentData.offset = rect.bottomLeft -
+              Offset(0, overflowWidgetSize.height);
+        }
+ 
+         _setOverflowRect(
           overflowSelection,
           overflowWidgetSize,
           textParentData,
