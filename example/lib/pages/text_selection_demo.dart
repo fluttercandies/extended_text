@@ -12,10 +12,7 @@ import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/material.dart' hide CircularProgressIndicator;
 import 'package:url_launcher/url_launcher.dart';
 
-@FFRoute(
-    name: 'fluttercandies://TextSelectionDemo',
-    routeName: 'TextSelection',
-    description: 'text selection support')
+@FFRoute(name: 'fluttercandies://TextSelectionDemo', routeName: 'TextSelection', description: 'text selection support')
 class TextSelectionDemo extends StatefulWidget {
   @override
   _TextSelectionDemoState createState() => _TextSelectionDemoState();
@@ -50,8 +47,7 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                     _attachContent,
                     onSpecialTextTap: (dynamic parameter) {
                       if (parameter.toString().startsWith('\$')) {
-                        launchUrl(
-                            Uri.parse('https://github.com/fluttercandies'));
+                        launchUrl(Uri.parse('https://github.com/fluttercandies'));
                       } else if (parameter.toString().startsWith('@')) {
                         launchUrl(Uri.parse('mailto:zmtzawqlp@live.com'));
                       }
@@ -68,8 +64,7 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                           InkWell(
                             child: const Text('more'),
                             onTap: () {
-                              launchUrl(Uri.parse(
-                                  'https://github.com/fluttercandies/extended_text'));
+                              launchUrl(Uri.parse('https://github.com/fluttercandies/extended_text'));
                             },
                           )
                         ],
@@ -79,8 +74,7 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
                     selectionControls: _myTextSelectionControls,
                     shouldShowSelectionHandles: _shouldShowSelectionHandles,
                     textSelectionGestureDetectorBuilder: ({
-                      required ExtendedTextSelectionGestureDetectorBuilderDelegate
-                          delegate,
+                      required ExtendedTextSelectionGestureDetectorBuilderDelegate delegate,
                       required Function showToolbar,
                       required Function hideToolbar,
                       required Function? onTap,
@@ -160,8 +154,7 @@ class _TextSelectionDemoState extends State<TextSelectionDemo> {
   }
 }
 
-class MyCommonTextSelectionGestureDetectorBuilder
-    extends CommonTextSelectionGestureDetectorBuilder {
+class MyCommonTextSelectionGestureDetectorBuilder extends CommonTextSelectionGestureDetectorBuilder {
   MyCommonTextSelectionGestureDetectorBuilder(
       {required ExtendedTextSelectionGestureDetectorBuilderDelegate delegate,
       required Function showToolbar,
@@ -177,13 +170,6 @@ class MyCommonTextSelectionGestureDetectorBuilder
           context: context,
           requestKeyboard: requestKeyboard,
         );
-  @override
-  void onTapDown(TapDownDetails details) {
-    super.onTapDown(details);
-
-    /// always show toolbar
-    shouldShowSelectionToolbar = true;
-  }
 
   @override
   bool get showToolbarInWeb => true;
