@@ -8,8 +8,7 @@ environment:
   flutter: ">=3.7.0"
 
 dependencies:
-  extended_text_library:
-    git: https://github.com/fluttercandies/extended_text_library
+  extended_text_library: ^10.0.0
   flutter:
     sdk: flutter
 
