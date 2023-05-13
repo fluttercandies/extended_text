@@ -11,7 +11,12 @@ dependencies:
   extended_text_library: ^10.0.0
   flutter:
     sdk: flutter
-
+dependency_overrides:
+  extended_text_library:
+    git: 
+      url: https://github.com/fluttercandies/extended_text_library.git
+      ref: refactor
+ 
 dev_dependencies:
   flutter_test:
     sdk: flutter

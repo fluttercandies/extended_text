@@ -32,7 +32,6 @@ class RegExpTextDemo extends StatelessWidget {
           },
           specialTextSpanBuilder: MyRegExpSpecialTextSpanBuilder(),
           overflow: TextOverflow.ellipsis,
-          selectionEnabled: true,
           //style: TextStyle(background: Paint()..color = Colors.red),
           maxLines: 10,
         ),

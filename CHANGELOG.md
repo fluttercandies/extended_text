@@ -1,3 +1,12 @@
+# 11.0.0
+
+* Migrate to Flutter 3.10.0
+* Refactoring codes and sync codes from 3.10.0
+* Support SelectionArea
+* Breaking change: 
+  Remove [ExtendedText.textSelectionGestureDetectorBuilder],[ExtendedText.shouldShowSelectionHandles],[ExtendedText.selectionHeightStyle],[sExtendedText.electionWidthStyle],[ExtendedText.dragStartBehavior],[ExtendedText.selectionEnabled], [ExtendedTextSelectionPointerHandler]. They are all refer to selection function. It's replaced by  SelectionArea.
+* Add [ExtendedText.canSelectPlaceholderSpan] and [ExtendedText.copyTextType] to control selection behavior.
+ 
 # 10.0.1
 
 * fix issue on ios after flutter version 3.7.0. #191 #198
