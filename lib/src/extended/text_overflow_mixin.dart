@@ -169,8 +169,6 @@ mixin TextOverflowMixin on _RenderParagraph {
         _layoutText(
           minWidth: constraints.minWidth,
           maxWidth: constraints.maxWidth,
-          // TODO
-          // forceLayout: true,
         );
 
         _setParentData();
@@ -186,7 +184,7 @@ mixin TextOverflowMixin on _RenderParagraph {
                 .offset,
           );
 
-          textParentData.offset = ExtendedTextLibraryUtil.getCaretOffset(
+          textParentData.offset = ExtendedTextLibraryUtils.getCaretOffset(
             TextPosition(offset: overflowSelection.baseOffset),
             _textPainter,
             _placeholderSpans.isNotEmpty,
@@ -211,12 +209,8 @@ mixin TextOverflowMixin on _RenderParagraph {
           overflowSelection = convertTextInputSelectionToTextPainterSelection(
               oldSpan, overflowSelection);
 
-          final List<ui.TextBox> boxs = _textPainter.getBoxesForSelection(
-            overflowSelection,
-            // TODO
-            // boxWidthStyle: selectionWidthStyle,
-            // boxHeightStyle: selectionHeightStyle,
-          );
+          final List<ui.TextBox> boxs =
+              _textPainter.getBoxesForSelection(overflowSelection);
           _overflowRects ??= <Rect>[];
           for (final ui.TextBox box in boxs) {
             final Rect boxRect = box.toRect();
@@ -744,12 +738,7 @@ mixin TextOverflowMixin on _RenderParagraph {
   }) {
     effectiveOffset ??= Offset.zero;
 
-    final List<TextBox> boxs = _textPainter.getBoxesForSelection(
-      selection,
-      // TODO
-      // boxWidthStyle: selectionWidthStyle,
-      // boxHeightStyle: selectionHeightStyle,
-    );
+    final List<TextBox> boxs = _textPainter.getBoxesForSelection(selection);
     if (boxs.isNotEmpty) {
       Rect? rect;
       for (final TextBox box in boxs) {
@@ -811,7 +800,7 @@ mixin TextOverflowMixin on _RenderParagraph {
   @override
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
     if (overflowWidget != null && _overflowRect != null) {
-      final bool isHit = ExtendedTextLibraryUtil.hitTestChild(
+      final bool isHit = ExtendedTextLibraryUtils.hitTestChild(
           result, lastChild!, _effectiveOffset,
           position: position);
       if (isHit) {

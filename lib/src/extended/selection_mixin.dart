@@ -38,7 +38,7 @@ mixin SelectionMixin on TextOverflowMixin {
     // }
 
     text.visitChildren((InlineSpan span) {
-      final int length = ExtendedTextLibraryUtil.getInlineOffset(span);
+      final int length = ExtendedTextLibraryUtils.getInlineOffset(span);
 
       if (length == 0) {
         return true;
@@ -136,20 +136,6 @@ class _ExtendedSelectableFragment extends _SelectableFragment {
         return null;
       }
       if (range.start <= start && end <= range.end) {
-        // var _overflowSelection =
-        //     (paragraph as ExtendedRenderParagraph)._overflowSelection;
-        // if (_overflowSelection != null) {
-        //   var sss = specialInlineSpanBase!.actualText;
-        //   var sss1 = fullText.substring(
-        //     start,
-        //     end,
-        //   );
-        //   if (sss != sss1) {
-        //     int i = 1;
-        //     // int index = sss.indexOf(sss1, start);
-        //     int j = 1;
-        //   }
-        // }
         return SelectedContent(
             plainText:
                 specialInlineSpanBase!.getSelectedContent(fullText.substring(
