@@ -166,10 +166,10 @@ class ExtendedText extends Text {
     );
 
     if (joinZeroWidthSpace) {
-      innerTextSpan = joinChar(
+      innerTextSpan = ExtendedTextLibraryUtils.joinChar(
         innerTextSpan,
         Accumulator(),
-        zeroWidthSpace,
+        ExtendedTextLibraryUtils.zeroWidthSpace,
       );
     }
 

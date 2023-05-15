@@ -125,7 +125,7 @@ mixin TextOverflowMixin on _RenderParagraph {
                   rect.centerLeft.dy + _textPainter.preferredLineHeight / 2.0)
               : rect.center - Offset(overflowWidgetSize.width / 2, 0));
           position =
-              convertTextPainterPostionToTextInputPostion(text, position)!;
+              ExtendedTextLibraryUtils.convertTextPainterPostionToTextInputPostion(text, position)!;
 
           start = position.offset;
           end = start + 1;
@@ -147,7 +147,7 @@ mixin TextOverflowMixin on _RenderParagraph {
           TextPosition position = _textPainter.getPositionForOffset(Offset(
               overflowWidgetSize.width, _textPainter.preferredLineHeight / 2));
           position =
-              convertTextPainterPostionToTextInputPostion(text, position)!;
+              ExtendedTextLibraryUtils.convertTextPainterPostionToTextInputPostion(text, position)!;
 
           end = position.offset;
         }
@@ -206,7 +206,7 @@ mixin TextOverflowMixin on _RenderParagraph {
             extentOffset: range.start + math.max(1, range.end - range.start),
           );
 
-          overflowSelection = convertTextInputSelectionToTextPainterSelection(
+          overflowSelection = ExtendedTextLibraryUtils.convertTextInputSelectionToTextPainterSelection(
               oldSpan, overflowSelection);
 
           final List<ui.TextBox> boxs =
@@ -254,7 +254,7 @@ mixin TextOverflowMixin on _RenderParagraph {
     _layoutCount = 0;
 
     late TextPainter testTextPainter;
-    final int maxOffset = textSpanToActualText(text).runes.length;
+    final int maxOffset = ExtendedTextLibraryUtils.textSpanToActualText(text).runes.length;
     int maxEnd = maxOffset;
     while (_hasVisualOverflow) {
       testTextPainter = _tryToFindNoOverflow1(range, hideWidgets);
