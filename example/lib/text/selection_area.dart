@@ -1,3 +1,4 @@
+import 'package:example/text/my_extended_text_selection_controls.dart';
 import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -17,13 +18,45 @@ class CommonSelectionArea extends StatelessWidget {
   Widget build(BuildContext context) {
     SelectedContent? _selectedContent;
     return SelectionArea(
+      selectionControls: MyTextSelectionControls(),
       contextMenuBuilder:
           (BuildContext context, SelectableRegionState selectableRegionState) {
         return AdaptiveTextSelectionToolbar.buttonItems(
           buttonItems: <ContextMenuButtonItem>[
             ContextMenuButtonItem(
               onPressed: () {
-                // how to get Selectable
+                // TODO(zmtzawqlp):  how to get Selectable
+                // and  _clearSelection is not public
+                // https://github.com/flutter/flutter/issues/126980
+
+                //  onCopy: () {
+                //   _copy();
+
+                //   // In Android copy should clear the selection.
+                //   switch (defaultTargetPlatform) {
+                //     case TargetPlatform.android:
+                //     case TargetPlatform.fuchsia:
+                //       _clearSelection();
+                //     case TargetPlatform.iOS:
+                //       hideToolbar(false);
+                //     case TargetPlatform.linux:
+                //     case TargetPlatform.macOS:
+                //     case TargetPlatform.windows:
+                //       hideToolbar();
+                //   }
+                // },
+
+                // if (_selectedContent != null) {
+                //   String content = _selectedContent!.plainText;
+                //   if (joinZeroWidthSpace) {
+                //     content = content.replaceAll(zeroWidthSpace, '');
+                //   }
+
+                //   Clipboard.setData(ClipboardData(text: content));
+                //   selectableRegionState.hideToolbar(true);
+                //   selectableRegionState._clearSelection();
+                // }
+
                 selectableRegionState
                     .copySelection(SelectionChangedCause.toolbar);
 

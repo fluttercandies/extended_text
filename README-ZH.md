@@ -214,30 +214,201 @@ ImageSpan(AssetImage("xxx.jpg"),
 
 ### 文本选择控制器
 
-extended_text提供了默认的控制器MaterialExtendedTextSelectionControls/CupertinoExtendedTextSelectionControls
-
-你可以通过重写，来定义工具栏和选择器
+ 
+你可以通过重写 [SelectionArea.contextMenuBuilder] 和 [TextSelectionControls]， 来定义工具栏和选择器
 
 ```dart
-class MyExtendedMaterialTextSelectionControls
-    extends ExtendedMaterialTextSelectionControls {
-  MyExtendedMaterialTextSelectionControls();
-  @override
-  Widget buildToolbar(
-    BuildContext context,
-    Rect globalEditableRegion,
-    double textLineHeight,
-    Offset selectionMidpoint,
-    List<TextSelectionPoint> endpoints,
-    TextSelectionDelegate delegate,
-  ) {}
+const double _kHandleSize = 22.0;
 
+/// Android Material styled text selection controls.
+
+class MyTextSelectionControls extends TextSelectionControls
+    with TextSelectionHandleControls {
+  MyTextSelectionControls({this.joinZeroWidthSpace = false});
+  final bool joinZeroWidthSpace;
+
+  /// Returns the size of the Material handle.
+  @override
+  Size getHandleSize(double textLineHeight) =>
+      const Size(_kHandleSize, _kHandleSize);
+
+  /// Builder for material-style text selection handles.
   @override
   Widget buildHandle(
-      BuildContext context, TextSelectionHandleType type, double textHeight) {
+      BuildContext context, TextSelectionHandleType type, double textLineHeight,
+      [VoidCallback? onTap, double? startGlyphHeight, double? endGlyphHeight]) {
+    final Widget handle = SizedBox(
+      width: _kHandleSize,
+      height: _kHandleSize,
+      child: Image.asset(
+        'assets/40.png',
+      ),
+    );
+
+    // [handle] is a circle, with a rectangle in the top left quadrant of that
+    // circle (an onion pointing to 10:30). We rotate [handle] to point
+    // straight up or up-right depending on the handle type.
+    switch (type) {
+      case TextSelectionHandleType.left: // points up-right
+        return Transform.rotate(
+          angle: math.pi / 4.0,
+          child: handle,
+        );
+      case TextSelectionHandleType.right: // points up-left
+        return Transform.rotate(
+          angle: -math.pi / 4.0,
+          child: handle,
+        );
+      case TextSelectionHandleType.collapsed: // points up
+        return handle;
+    }
+  }
+
+  /// Gets anchor for material-style text selection handles.
+  ///
+  /// See [TextSelectionControls.getHandleAnchor].
+  @override
+  Offset getHandleAnchor(TextSelectionHandleType type, double textLineHeight,
+      [double? startGlyphHeight, double? endGlyphHeight]) {
+    switch (type) {
+      case TextSelectionHandleType.left:
+        return const Offset(_kHandleSize, 0);
+      case TextSelectionHandleType.right:
+        return Offset.zero;
+      default:
+        return const Offset(_kHandleSize / 2, -4);
+    }
   }
 }
 
+class CommonSelectionArea extends StatelessWidget {
+  const CommonSelectionArea({
+    super.key,
+    required this.child,
+    this.joinZeroWidthSpace = false,
+  });
+  final Widget child;
+  final bool joinZeroWidthSpace;
+
+  @override
+  Widget build(BuildContext context) {
+    SelectedContent? _selectedContent;
+    return SelectionArea(
+      contextMenuBuilder:
+          (BuildContext context, SelectableRegionState selectableRegionState) {
+        return AdaptiveTextSelectionToolbar.buttonItems(
+          buttonItems: <ContextMenuButtonItem>[
+            ContextMenuButtonItem(
+              onPressed: () {
+                // TODO(zmtzawqlp):  how to get Selectable
+                // and  _clearSelection is not public
+                // https://github.com/flutter/flutter/issues/126980
+
+                //  onCopy: () {
+                //   _copy();
+
+                //   // In Android copy should clear the selection.
+                //   switch (defaultTargetPlatform) {
+                //     case TargetPlatform.android:
+                //     case TargetPlatform.fuchsia:
+                //       _clearSelection();
+                //     case TargetPlatform.iOS:
+                //       hideToolbar(false);
+                //     case TargetPlatform.linux:
+                //     case TargetPlatform.macOS:
+                //     case TargetPlatform.windows:
+                //       hideToolbar();
+                //   }
+                // },
+
+                // if (_selectedContent != null) {
+                //   String content = _selectedContent!.plainText;
+                //   if (joinZeroWidthSpace) {
+                //     content = content.replaceAll(zeroWidthSpace, '');
+                //   }
+
+                //   Clipboard.setData(ClipboardData(text: content));
+                //   selectableRegionState.hideToolbar(true);
+                //   selectableRegionState._clearSelection();
+                // }
+
+                selectableRegionState
+                    .copySelection(SelectionChangedCause.toolbar);
+
+                // remove zeroWidthSpace
+                if (joinZeroWidthSpace) {
+                  Clipboard.getData('text/plain').then((ClipboardData? value) {
+                    if (value != null) {
+                      // remove zeroWidthSpace
+                      final String? plainText =
+                          value.text?.replaceAll(zeroWidthSpace, '');
+                      if (plainText != null) {
+                        Clipboard.setData(ClipboardData(text: plainText));
+                      }
+                    }
+                  });
+                }
+              },
+              type: ContextMenuButtonType.copy,
+            ),
+            ContextMenuButtonItem(
+              onPressed: () {
+                selectableRegionState.selectAll(SelectionChangedCause.toolbar);
+              },
+              type: ContextMenuButtonType.selectAll,
+            ),
+            ContextMenuButtonItem(
+              onPressed: () {
+                launchUrl(Uri.parse(
+                    'mailto:zmtzawqlp@live.com?subject=extended_text_share&body=${_selectedContent?.plainText}'));
+                selectableRegionState.hideToolbar();
+              },
+              type: ContextMenuButtonType.custom,
+              label: 'like',
+            ),
+          ],
+          anchors: selectableRegionState.contextMenuAnchors,
+        );
+        // return AdaptiveTextSelectionToolbar.selectableRegion(
+        //   selectableRegionState: selectableRegionState,
+        // );
+      },
+      // magnifierConfiguration: TextMagnifierConfiguration(
+      //   magnifierBuilder: (
+      //     BuildContext context,
+      //     MagnifierController controller,
+      //     ValueNotifier<MagnifierInfo> magnifierInfo,
+      //   ) {
+      //     return TextMagnifier(
+      //       magnifierInfo: magnifierInfo,
+      //     );
+      //     // switch (defaultTargetPlatform) {
+      //     //   case TargetPlatform.iOS:
+      //     //     return CupertinoTextMagnifier(
+      //     //       controller: controller,
+      //     //       magnifierInfo: magnifierInfo,
+      //     //     );
+      //     //   case TargetPlatform.android:
+      //     //     return TextMagnifier(
+      //     //       magnifierInfo: magnifierInfo,
+      //     //     );
+      //     //   case TargetPlatform.fuchsia:
+      //     //   case TargetPlatform.linux:
+      //     //   case TargetPlatform.macOS:
+      //     //   case TargetPlatform.windows:
+      //     //     return null;
+      //     // }
+      //   },
+      // ),
+      // selectionControls: MyTextSelectionControls(),
+      onSelectionChanged: (SelectedContent? value) {
+        print(value?.plainText);
+        _selectedContent = value;
+      },
+      child: child,
+    );
+  }
+}
 ```
 
 ### 工具栏和选择器的控制
