@@ -172,4 +172,35 @@ class _ExtendedSelectableFragment extends _SelectableFragment {
       _textSelectionStart = position;
     }
   }
+
+  @override
+  SelectionResult _handleSelectWord(Offset globalPosition) {
+    final TextPosition position =
+        paragraph.getPositionForOffset(paragraph.globalToLocal(globalPosition));
+    if (_positionIsWithinCurrentSelection(position)) {
+      return SelectionResult.end;
+    }
+    final TextRange word = paragraph.getWordBoundary(position);
+    assert(word.isNormalized);
+
+    // zmtzawqlp
+    // https://github.com/flutter/flutter/issues/127076
+    if (!(word.start >= range.start && word.end <= range.end)) {
+      return SelectionResult.none;
+    }
+    // Fragments are separated by placeholder span, the word boundary shouldn't
+    // expand across fragments.
+    // assert(word.start >= range.start && word.end <= range.end);
+    late TextPosition start;
+    late TextPosition end;
+    if (position.offset >= word.end) {
+      start = end = TextPosition(offset: position.offset);
+    } else {
+      start = TextPosition(offset: word.start);
+      end = TextPosition(offset: word.end, affinity: TextAffinity.upstream);
+    }
+    _textSelectionStart = start;
+    _textSelectionEnd = end;
+    return SelectionResult.end;
+  }
 }
