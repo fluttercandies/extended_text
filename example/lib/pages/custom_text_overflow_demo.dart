@@ -1,5 +1,5 @@
-import 'package:example/text/my_extended_text_selection_controls.dart';
 import 'package:example/text/my_special_text_span_builder.dart';
+import 'package:example/text/selection_area.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/material.dart';
@@ -80,42 +80,43 @@ class _CustomTextOverflowDemoState extends State<CustomTextOverflowDemo> {
                   color: Colors.grey,
                 ),
               ),
-              ExtendedText(
-                content,
-                onSpecialTextTap: onSpecialTextTap,
-                specialTextSpanBuilder: builder,
-                selectionEnabled: true,
-                // if joinZeroWidthSpace is true, you must take care of copy text.
+              CommonSelectionArea(
+                // if betterLineBreakingAndOverflowStyle is true, you must take care of copy text.
                 // override [TextSelectionControls.handleCopy], remove zero width space.
-                selectionControls: MyTextSelectionControls(
-                  joinZeroWidthSpace: _joinZeroWidthSpace,
-                ),
                 joinZeroWidthSpace: _joinZeroWidthSpace,
-                overflowWidget: TextOverflowWidget(
-                  position: position,
-                  align: TextOverflowAlign.center,
-                  // just for debug
-                  debugOverflowRectColor: Colors.red.withOpacity(0.1),
-                  child: Container(
-                    //color: Colors.yellow,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        const Text('\u2026 '),
-                        InkWell(
-                          child: const Text(
-                            'more',
-                          ),
-                          onTap: () {
-                            launchUrl(Uri.parse(
-                                'https://github.com/fluttercandies/extended_text'));
-                          },
-                        )
-                      ],
+                child: ExtendedText(
+                  content,
+                  onSpecialTextTap: onSpecialTextTap,
+                  specialTextSpanBuilder: builder,
+                  joinZeroWidthSpace: _joinZeroWidthSpace,
+                  overflowWidget: TextOverflowWidget(
+                    position: position,
+                    align: TextOverflowAlign.center,
+                    // just for debug
+                    debugOverflowRectColor: Colors.red.withOpacity(0.1),
+                    child: Container(
+                      //color: Colors.yellow,
+                      child: SelectionContainer.disabled(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            const Text('\u2026 '),
+                            InkWell(
+                              child: const Text(
+                                'more',
+                              ),
+                              onTap: () {
+                                launchUrl(Uri.parse(
+                                    'https://github.com/fluttercandies/extended_text'));
+                              },
+                            )
+                          ],
+                        ),
+                      ),
                     ),
                   ),
+                  maxLines: maxLines,
                 ),
-                maxLines: maxLines,
               ),
             ],
           )),

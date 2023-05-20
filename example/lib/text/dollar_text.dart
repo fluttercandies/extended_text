@@ -1,3 +1,5 @@
+// ignore_for_file: unused_element
+
 import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -12,20 +14,40 @@ class DollarText extends SpecialText {
   InlineSpan finishText() {
     final String text = getContent();
 
-    return SpecialTextSpan(
+    return _SpecialTextSpan(
         text: text,
         actualText: toString(),
         start: start!,
-
-        ///caret can move into special text
-        deleteAll: true,
-        style: textStyle?.copyWith(color: Colors.orange),
+        deleteAll: false,
+        style: textStyle?.copyWith(color: Colors.orange, fontSize: 16),
+        mouseCursor: SystemMouseCursors.text,
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             if (onTap != null) {
               onTap!(toString());
             }
           });
+  }
+}
+
+class _SpecialTextSpan extends SpecialTextSpan {
+  _SpecialTextSpan({
+    super.style,
+    required super.text,
+    super.actualText,
+    super.start = 0,
+    super.deleteAll = true,
+    super.recognizer,
+    super.children,
+    super.semanticsLabel,
+    super.mouseCursor,
+    super.onEnter,
+    super.onExit,
+  });
+
+  @override
+  String getSelectedContent(String showText) {
+    return '${DollarText.flag}$showText${DollarText.flag}';
   }
 }
 
