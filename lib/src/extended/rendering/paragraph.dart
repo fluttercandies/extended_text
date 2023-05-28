@@ -212,7 +212,7 @@ class ExtendedRenderParagraph extends _RenderParagraph
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    _effectiveOffset = offset;
+    // _effectiveOffset = offset;
     // Ideally we could compute the min/max intrinsic width/height with a
     // non-destructive operation. However, currently, computing these values
     // will destroy state inside the painter. If that happens, we need to get

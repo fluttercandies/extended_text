@@ -5,7 +5,7 @@ part of 'package:extended_text/src/extended/rendering/paragraph.dart';
 mixin TextOverflowMixin on _RenderParagraph {
   TextOverflow _oldOverflow = TextOverflow.clip;
   Rect? _overflowRect;
-  Offset _effectiveOffset = Offset.zero;
+  // Offset _effectiveOffset = Offset.zero;
   int get textChildCount =>
       overflowWidget != null ? childCount - 1 : childCount;
 
@@ -124,8 +124,8 @@ mixin TextOverflowMixin on _RenderParagraph {
               ? Offset(0,
                   rect.centerLeft.dy + _textPainter.preferredLineHeight / 2.0)
               : rect.center - Offset(overflowWidgetSize.width / 2, 0));
-          position =
-              ExtendedTextLibraryUtils.convertTextPainterPostionToTextInputPostion(text, position)!;
+          position = ExtendedTextLibraryUtils
+              .convertTextPainterPostionToTextInputPostion(text, position)!;
 
           start = position.offset;
           end = start + 1;
@@ -146,8 +146,8 @@ mixin TextOverflowMixin on _RenderParagraph {
           //     reversedTextPainter.getPositionForOffset(rect.bottomRight);
           TextPosition position = _textPainter.getPositionForOffset(Offset(
               overflowWidgetSize.width, _textPainter.preferredLineHeight / 2));
-          position =
-              ExtendedTextLibraryUtils.convertTextPainterPostionToTextInputPostion(text, position)!;
+          position = ExtendedTextLibraryUtils
+              .convertTextPainterPostionToTextInputPostion(text, position)!;
 
           end = position.offset;
         }
@@ -206,8 +206,9 @@ mixin TextOverflowMixin on _RenderParagraph {
             extentOffset: range.start + math.max(1, range.end - range.start),
           );
 
-          overflowSelection = ExtendedTextLibraryUtils.convertTextInputSelectionToTextPainterSelection(
-              oldSpan, overflowSelection);
+          overflowSelection = ExtendedTextLibraryUtils
+              .convertTextInputSelectionToTextPainterSelection(
+                  oldSpan, overflowSelection);
 
           final List<ui.TextBox> boxs =
               _textPainter.getBoxesForSelection(overflowSelection);
@@ -254,7 +255,8 @@ mixin TextOverflowMixin on _RenderParagraph {
     _layoutCount = 0;
 
     late TextPainter testTextPainter;
-    final int maxOffset = ExtendedTextLibraryUtils.textSpanToActualText(text).runes.length;
+    final int maxOffset =
+        ExtendedTextLibraryUtils.textSpanToActualText(text).runes.length;
     int maxEnd = maxOffset;
     while (_hasVisualOverflow) {
       testTextPainter = _tryToFindNoOverflow1(range, hideWidgets);
@@ -801,8 +803,14 @@ mixin TextOverflowMixin on _RenderParagraph {
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
     if (overflowWidget != null && _overflowRect != null) {
       final bool isHit = ExtendedTextLibraryUtils.hitTestChild(
-          result, lastChild!, _effectiveOffset,
-          position: position);
+        result,
+        lastChild!,
+        // _effectiveOffset is not the same under 3.10.0
+        // it should be zero for [ExtendedTexts]
+        // _effectiveOffset,
+        Offset.zero,
+        position: position,
+      );
       if (isHit) {
         return true;
       }

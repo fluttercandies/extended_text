@@ -1,3 +1,7 @@
+## 11.0.1
+
+* Fix Flutter 3.10 onTap not triggered inside TextOverflowWidget #147
+
 ## 11.0.0
 
 * Migrate to Flutter 3.10.0
