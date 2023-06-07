@@ -12,7 +12,7 @@ ExtendedText is a third-party extension library for Flutter's official Text comp
 
 | Feature                                   | ExtendedText                                                |  Text                                  |
 |------------------------------------------|-------------------------------------------------------------|-------------------------------------------------------|
-| Customized text overflow effects          | Supported, allows customizing the overflow widget and controlling overflow positions (before, middle, after) | Not supported ([26748](https://github.com/flutter/flutter/issues/26748)) |
+| Customized text overflow effects          | Supported, allows customizing the overflow widget and controlling overflow positions (before, middle, after) | Not supported ([26748](https://github.com/flutter/flutter/issues/26748),[45336](https://github.com/flutter/flutter/issues/45336)) |
 | Copying the actual value of special text  | Supported, enables copying the actual value of the text, not just the placeholder value of WidgetSpan | Can only copy the placeholder value of WidgetSpan (\uFFFC) |
 | Quick construction of rich text based on text format  | Supported, enables quick construction of rich text based on text format | Not supported                                            |
 
