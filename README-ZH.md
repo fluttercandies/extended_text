@@ -14,7 +14,14 @@
 - [Flutter RichText 支持特殊文字效果](https://juejin.im/post/5c8bf4fce51d451066008fa2)
 - [Flutter RichText支持文本选择](https://juejin.im/post/5cff71d46fb9a07ea6486a0e)
 
-欢迎加入[Flutter Candies](https://github.com/fluttercandies)，一起生产可爱的Flutter小糖果(QQ群181398081)
+
+ExtendedText 是 Flutter 官方 Text 的三方扩展库，主要扩展功能如下:
+| 功能                                   | ExtendedText                                              | Flutter 官方 Text                                     |
+|--------------------------------------|-----------------------------------------------------------|-----------------------------------------------------|
+| 支持自定义文本溢出效果                | 支持，可以自定义溢出的 Widget，并控制溢出位置（前、中、后）   | 不支 持 [26748](https://github.com/flutter/flutter/issues/26748)                                               |
+| 支持复制特殊文本的真实值                         | 支持，可以复制出文本的真实值，而不仅是 WidgetSpan 的占位值    | 只能复制出 WidgetSpan 的占位值 (\uFFFC)                  |
+| 根据文本格式快速构建富文本                 | 支持，可以根据文本格式快速构建富文本                         | 不支持                                               |
+
 
 ## 目录
 - [extended_text](#extendedtext)

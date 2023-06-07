@@ -7,6 +7,16 @@ Language: English | [中文简体](README-ZH.md)
 Extended official text to build special text like inline image or @somebody quickly,it also support custom background,custom over flow and custom selection toolbar and handles.
 
 [Web demo for ExtendedText](https://fluttercandies.github.io/extended_text/)
+
+ExtendedText is a third-party extension library for Flutter's official Text component. The main extended features are as follows:
+
+| Feature                                   | ExtendedText                                                |  Text                                  |
+|------------------------------------------|-------------------------------------------------------------|-------------------------------------------------------|
+| Customized text overflow effects          | Supported, allows customizing the overflow widget and controlling overflow positions (before, middle, after) | Not supported ([26748](https://github.com/flutter/flutter/issues/26748)) |
+| Copying the actual value of special text  | Supported, enables copying the actual value of the text, not just the placeholder value of WidgetSpan | Can only copy the placeholder value of WidgetSpan (\uFFFC) |
+| Quick construction of rich text based on text format  | Supported, enables quick construction of rich text based on text format | Not supported                                            |
+
+
 ## Table of contents
 - [extended\_text](#extended_text)
   - [Table of contents](#table-of-contents)
