@@ -36,10 +36,10 @@ class SelectionAreaDemo extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                // const Text(
-                //   content,
-                //   maxLines: 4,
-                // ),
+                const Text(
+                  content,
+                  maxLines: 4,
+                ),
                 const SizedBox(height: 10),
                 ExtendedText(
                   content,

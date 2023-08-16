@@ -25,7 +25,7 @@ class ExtendedRichText extends _RichText {
     this.overflowWidget,
     this.canSelectPlaceholderSpan = true,
   }) : super(
-          children: _extractChildren(text, overflowWidget),
+          children: _extractChildren(text, overflowWidget, textScaleFactor),
         );
 
   final TextOverflowWidget? overflowWidget;
@@ -82,18 +82,13 @@ class ExtendedRichText extends _RichText {
   static List<Widget> _extractChildren(
     InlineSpan span,
     TextOverflowWidget? overflowWidget,
+    double textScaleFactor,
   ) {
     int index = 0;
-    final List<Widget> result = <Widget>[];
-    span.visitChildren((InlineSpan span) {
-      if (span is WidgetSpan) {
-        result.add(Semantics(
-          tagForChildren: PlaceholderSpanIndexSemanticsTag(index++),
-          child: span.child,
-        ));
-      }
-      return true;
-    });
+    final List<Widget> result = <Widget>[
+      ...WidgetSpan.extractFromInlineSpan(span, textScaleFactor)
+    ];
+
     if (overflowWidget != null) {
       result.add(Semantics(
         tagForChildren: PlaceholderSpanIndexSemanticsTag(index++),

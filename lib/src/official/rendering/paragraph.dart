@@ -5,11 +5,10 @@ part of 'package:extended_text/src/extended/rendering/paragraph.dart';
 const String _kEllipsis = '\u2026';
 
 /// A render object that displays a paragraph of text.
-/// [RenderParagraph]
 class _RenderParagraph extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, TextParentData>,
-        RenderBoxContainerDefaultsMixin<RenderBox, TextParentData>,
+        RenderInlineChildrenContainerDefaults,
         RelayoutWhenSystemFontsChangeMixin {
   /// Creates a paragraph render object.
   ///
@@ -51,15 +50,7 @@ class _RenderParagraph extends RenderBox
           textHeightBehavior: textHeightBehavior,
         ) {
     addAll(children);
-    _extractPlaceholderSpans(text);
     this.registrar = registrar;
-  }
-
-  @override
-  void setupParentData(RenderBox child) {
-    if (child.parentData is! TextParentData) {
-      child.parentData = TextParentData();
-    }
   }
 
   static final String _placeholderCharacter =
@@ -84,8 +75,8 @@ class _RenderParagraph extends RenderBox
       case RenderComparison.paint:
         _textPainter.text = value;
         _cachedAttributedLabels = null;
+        _canComputeIntrinsicsCached = null;
         _cachedCombinedSemanticsInfos = null;
-        _extractPlaceholderSpans(value);
         markNeedsPaint();
         markNeedsSemanticsUpdate();
         break;
@@ -94,7 +85,7 @@ class _RenderParagraph extends RenderBox
         _overflowShader = null;
         _cachedAttributedLabels = null;
         _cachedCombinedSemanticsInfos = null;
-        _extractPlaceholderSpans(value);
+        _canComputeIntrinsicsCached = null;
         markNeedsLayout();
         _removeSelectionRegistrarSubscription();
         _disposeSelectableFragments();
@@ -205,17 +196,6 @@ class _RenderParagraph extends RenderBox
     _lastSelectableFragments = null;
     _textPainter.dispose();
     super.dispose();
-  }
-
-  late List<PlaceholderSpan> _placeholderSpans;
-  void _extractPlaceholderSpans(InlineSpan span) {
-    _placeholderSpans = <PlaceholderSpan>[];
-    span.visitChildren((InlineSpan span) {
-      if (span is PlaceholderSpan) {
-        _placeholderSpans.add(span);
-      }
-      return true;
-    });
   }
 
   /// How the text should be aligned horizontally.
@@ -396,7 +376,11 @@ class _RenderParagraph extends RenderBox
     if (!_canComputeIntrinsics()) {
       return 0.0;
     }
-    _computeChildrenWidthWithMinIntrinsics(height);
+    _textPainter.setPlaceholderDimensions(layoutInlineChildren(
+      double.infinity,
+      (RenderBox child, BoxConstraints constraints) =>
+          Size(child.getMinIntrinsicWidth(double.infinity), 0.0),
+    ));
     _layoutText(); // layout with infinite width.
     return _textPainter.minIntrinsicWidth;
   }
@@ -406,7 +390,13 @@ class _RenderParagraph extends RenderBox
     if (!_canComputeIntrinsics()) {
       return 0.0;
     }
-    _computeChildrenWidthWithMaxIntrinsics(height);
+    _textPainter.setPlaceholderDimensions(layoutInlineChildren(
+      double.infinity,
+      // Height and baseline is irrelevant as all text will be laid
+      // out in a single line. Therefore, using 0.0 as a dummy for the height.
+      (RenderBox child, BoxConstraints constraints) =>
+          Size(child.getMaxIntrinsicWidth(double.infinity), 0.0),
+    ));
     _layoutText(); // layout with infinite width.
     return _textPainter.maxIntrinsicWidth;
   }
@@ -415,7 +405,8 @@ class _RenderParagraph extends RenderBox
     if (!_canComputeIntrinsics()) {
       return 0.0;
     }
-    _computeChildrenHeightWithMinIntrinsics(width);
+    _textPainter.setPlaceholderDimensions(
+        layoutInlineChildren(width, ChildLayoutHelper.dryLayoutChild));
     _layoutText(minWidth: width, maxWidth: width);
     return _textPainter.height;
   }
@@ -445,94 +436,40 @@ class _RenderParagraph extends RenderBox
         .computeDistanceToActualBaseline(TextBaseline.alphabetic);
   }
 
+  /// Whether all inline widget children of this [RenderBox] support dry layout
+  /// calculation.
+  bool _canComputeDryLayoutForInlineWidgets() {
+    // Dry layout cannot be calculated without a full layout for
+    // alignments that require the baseline (baseline, aboveBaseline,
+    // belowBaseline).
+    return text.visitChildren((InlineSpan span) {
+      return (span is! PlaceholderSpan) ||
+          switch (span.alignment) {
+            ui.PlaceholderAlignment.baseline ||
+            ui.PlaceholderAlignment.aboveBaseline ||
+            ui.PlaceholderAlignment.belowBaseline =>
+              false,
+            ui.PlaceholderAlignment.top ||
+            ui.PlaceholderAlignment.middle ||
+            ui.PlaceholderAlignment.bottom =>
+              true,
+          };
+    });
+  }
+
+  bool? _canComputeIntrinsicsCached;
   // Intrinsics cannot be calculated without a full layout for
   // alignments that require the baseline (baseline, aboveBaseline,
   // belowBaseline).
   bool _canComputeIntrinsics() {
-    for (final PlaceholderSpan span in _placeholderSpans) {
-      switch (span.alignment) {
-        case ui.PlaceholderAlignment.baseline:
-        case ui.PlaceholderAlignment.aboveBaseline:
-        case ui.PlaceholderAlignment.belowBaseline:
-          {
-            assert(
-              RenderObject.debugCheckingIntrinsics,
-              'Intrinsics are not available for PlaceholderAlignment.baseline, '
-              'PlaceholderAlignment.aboveBaseline, or PlaceholderAlignment.belowBaseline.',
-            );
-            return false;
-          }
-        case ui.PlaceholderAlignment.top:
-        case ui.PlaceholderAlignment.middle:
-        case ui.PlaceholderAlignment.bottom:
-          {
-            continue;
-          }
-      }
-    }
-    return true;
-  }
-
-  void _computeChildrenWidthWithMaxIntrinsics(double height) {
-    RenderBox? child = firstChild;
-    final List<PlaceholderDimensions> placeholderDimensions =
-        List<PlaceholderDimensions>.filled(
-            childCount, PlaceholderDimensions.empty);
-    int childIndex = 0;
-    while (child != null) {
-      // Height and baseline is irrelevant as all text will be laid
-      // out in a single line. Therefore, using 0.0 as a dummy for the height.
-      placeholderDimensions[childIndex] = PlaceholderDimensions(
-        size: Size(child.getMaxIntrinsicWidth(double.infinity), 0.0),
-        alignment: _placeholderSpans[childIndex].alignment,
-        baseline: _placeholderSpans[childIndex].baseline,
-      );
-      child = childAfter(child);
-      childIndex += 1;
-    }
-    _textPainter.setPlaceholderDimensions(placeholderDimensions);
-  }
-
-  void _computeChildrenWidthWithMinIntrinsics(double height) {
-    RenderBox? child = firstChild;
-    final List<PlaceholderDimensions> placeholderDimensions =
-        List<PlaceholderDimensions>.filled(
-            childCount, PlaceholderDimensions.empty);
-    int childIndex = 0;
-    while (child != null) {
-      // Height and baseline is irrelevant; only looking for the widest word or
-      // placeholder. Therefore, using 0.0 as a dummy for height.
-      placeholderDimensions[childIndex] = PlaceholderDimensions(
-        size: Size(child.getMinIntrinsicWidth(double.infinity), 0.0),
-        alignment: _placeholderSpans[childIndex].alignment,
-        baseline: _placeholderSpans[childIndex].baseline,
-      );
-      child = childAfter(child);
-      childIndex += 1;
-    }
-    _textPainter.setPlaceholderDimensions(placeholderDimensions);
-  }
-
-  void _computeChildrenHeightWithMinIntrinsics(double width) {
-    RenderBox? child = firstChild;
-    final List<PlaceholderDimensions> placeholderDimensions =
-        List<PlaceholderDimensions>.filled(
-            childCount, PlaceholderDimensions.empty);
-    int childIndex = 0;
-    // Takes textScaleFactor into account because the content of the placeholder
-    // span will be scaled up when it paints.
-    width = width / textScaleFactor;
-    while (child != null) {
-      final Size size = child.getDryLayout(BoxConstraints(maxWidth: width));
-      placeholderDimensions[childIndex] = PlaceholderDimensions(
-        size: size,
-        alignment: _placeholderSpans[childIndex].alignment,
-        baseline: _placeholderSpans[childIndex].baseline,
-      );
-      child = childAfter(child);
-      childIndex += 1;
-    }
-    _textPainter.setPlaceholderDimensions(placeholderDimensions);
+    final bool returnValue =
+        _canComputeIntrinsicsCached ??= _canComputeDryLayoutForInlineWidgets();
+    assert(
+      returnValue || RenderObject.debugCheckingIntrinsics,
+      'Intrinsics are not available for PlaceholderAlignment.baseline, '
+      'PlaceholderAlignment.aboveBaseline, or PlaceholderAlignment.belowBaseline.',
+    );
+    return returnValue;
   }
 
   @override
@@ -540,54 +477,14 @@ class _RenderParagraph extends RenderBox
 
   @override
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
-    // Hit test text spans.
-    bool hitText = false;
     final TextPosition textPosition =
         _textPainter.getPositionForOffset(position);
-    final InlineSpan? span =
-        _textPainter.text!.getSpanForPosition(textPosition);
-    if (span != null && span is HitTestTarget) {
-      result.add(HitTestEntry(span as HitTestTarget));
-      hitText = true;
+    final Object? span = _textPainter.text!.getSpanForPosition(textPosition);
+    if (span is HitTestTarget) {
+      result.add(HitTestEntry(span));
+      return true;
     }
-
-    // Hit test render object children
-    RenderBox? child = firstChild;
-    int childIndex = 0;
-    while (child != null &&
-        childIndex < _textPainter.inlinePlaceholderBoxes!.length) {
-      final TextParentData textParentData = child.parentData! as TextParentData;
-      final Matrix4 transform = Matrix4.translationValues(
-        textParentData.offset.dx,
-        textParentData.offset.dy,
-        0.0,
-      )..scale(
-          textParentData.scale,
-          textParentData.scale,
-          textParentData.scale,
-        );
-      final bool isHit = result.addWithPaintTransform(
-        transform: transform,
-        position: position,
-        hitTest: (BoxHitTestResult result, Offset transformed) {
-          assert(() {
-            final Offset manualPosition =
-                (position - textParentData.offset) / textParentData.scale!;
-            return (transformed.dx - manualPosition.dx).abs() <
-                    precisionErrorTolerance &&
-                (transformed.dy - manualPosition.dy).abs() <
-                    precisionErrorTolerance;
-          }());
-          return child!.hitTest(result, position: transformed);
-        },
-      );
-      if (isHit) {
-        return true;
-      }
-      child = childAfter(child);
-      childIndex += 1;
-    }
-    return hitText;
+    return hitTestInlineChildren(result, position);
   }
 
   bool _needsClipping = false;
@@ -626,123 +523,17 @@ class _RenderParagraph extends RenderBox
     _layoutText(minWidth: constraints.minWidth, maxWidth: constraints.maxWidth);
   }
 
-  // Layout the child inline widgets. We then pass the dimensions of the
-  // children to _textPainter so that appropriate placeholders can be inserted
-  // into the LibTxt layout. This does not do anything if no inline widgets were
-  // specified.
-  List<PlaceholderDimensions> _layoutChildren(
-    BoxConstraints constraints, {
-    bool dry = false,
-    // zmtzawqlp
-    List<int>? hideWidgets,
-    // zmtzawqlp
-    TextPainter? textPainter,
-  }) {
-    if (childCount == 0) {
-      return <PlaceholderDimensions>[];
-    }
-    RenderBox? child = firstChild;
-    final List<PlaceholderDimensions> placeholderDimensions =
-        List<PlaceholderDimensions>.filled(
-            childCount, PlaceholderDimensions.empty);
-    int childIndex = 0;
-    // Only constrain the width to the maximum width of the paragraph.
-    // Leave height unconstrained, which will overflow if expanded past.
-    BoxConstraints boxConstraints =
-        BoxConstraints(maxWidth: constraints.maxWidth);
-    // The content will be enlarged by textScaleFactor during painting phase.
-    // We reduce constraints by textScaleFactor, so that the content will fit
-    // into the box once it is enlarged.
-    boxConstraints = boxConstraints / textScaleFactor;
-    while (child != null) {
-      double? baselineOffset;
-      final Size childSize;
-      if (!dry) {
-        child.layout(
-          boxConstraints,
-          parentUsesSize: true,
-        );
-        childSize = child.size;
-        switch (_placeholderSpans[childIndex].alignment) {
-          case ui.PlaceholderAlignment.baseline:
-            baselineOffset = child.getDistanceToBaseline(
-              _placeholderSpans[childIndex].baseline!,
-            );
-            break;
-          case ui.PlaceholderAlignment.aboveBaseline:
-          case ui.PlaceholderAlignment.belowBaseline:
-          case ui.PlaceholderAlignment.bottom:
-          case ui.PlaceholderAlignment.middle:
-          case ui.PlaceholderAlignment.top:
-            baselineOffset = null;
-            break;
-        }
-      } else {
-        assert(_placeholderSpans[childIndex].alignment !=
-            ui.PlaceholderAlignment.baseline);
-        childSize = child.getDryLayout(boxConstraints);
-      }
-      placeholderDimensions[childIndex] = PlaceholderDimensions(
-        size: childSize,
-        alignment: _placeholderSpans[childIndex].alignment,
-        baseline: _placeholderSpans[childIndex].baseline,
-        baselineOffset: baselineOffset,
-      );
-      child = childAfter(child);
-      childIndex += 1;
-    }
-
-    return placeholderDimensions;
-  }
-
-  // Iterate through the laid-out children and set the parentData offsets based
-  // off of the placeholders inserted for each child.
-  void _setParentData() {
-    RenderBox? child = firstChild;
-    int childIndex = 0;
-    while (child != null &&
-        childIndex < _textPainter.inlinePlaceholderBoxes!.length) {
-      final TextParentData textParentData = child.parentData! as TextParentData;
-      textParentData.offset = Offset(
-        _textPainter.inlinePlaceholderBoxes![childIndex].left,
-        _textPainter.inlinePlaceholderBoxes![childIndex].top,
-      );
-      textParentData.scale = _textPainter.inlinePlaceholderScales![childIndex];
-      child = childAfter(child);
-      childIndex += 1;
-    }
-  }
-
-  bool _canComputeDryLayout() {
-    // Dry layout cannot be calculated without a full layout for
-    // alignments that require the baseline (baseline, aboveBaseline,
-    // belowBaseline).
-    for (final PlaceholderSpan span in _placeholderSpans) {
-      switch (span.alignment) {
-        case ui.PlaceholderAlignment.baseline:
-        case ui.PlaceholderAlignment.aboveBaseline:
-        case ui.PlaceholderAlignment.belowBaseline:
-          return false;
-        case ui.PlaceholderAlignment.top:
-        case ui.PlaceholderAlignment.middle:
-        case ui.PlaceholderAlignment.bottom:
-          continue;
-      }
-    }
-    return true;
-  }
-
   @override
   Size computeDryLayout(BoxConstraints constraints) {
-    if (!_canComputeDryLayout()) {
+    if (!_canComputeIntrinsics()) {
       assert(debugCannotComputeDryLayout(
         reason:
             'Dry layout not available for alignments that require baseline.',
       ));
       return Size.zero;
     }
-    _textPainter
-        .setPlaceholderDimensions(_layoutChildren(constraints, dry: true));
+    _textPainter.setPlaceholderDimensions(layoutInlineChildren(
+        constraints.maxWidth, ChildLayoutHelper.dryLayoutChild));
     _layoutText(minWidth: constraints.minWidth, maxWidth: constraints.maxWidth);
     return constraints.constrain(_textPainter.size);
   }
@@ -750,9 +541,10 @@ class _RenderParagraph extends RenderBox
   @override
   void performLayout() {
     final BoxConstraints constraints = this.constraints;
-    _placeholderDimensions = _layoutChildren(constraints);
+    _placeholderDimensions = layoutInlineChildren(
+        constraints.maxWidth, ChildLayoutHelper.layoutChild);
     _layoutTextWithConstraints(constraints);
-    _setParentData();
+    positionInlineChildren(_textPainter.inlinePlaceholderBoxes!);
 
     // We grab _textPainter.size and _textPainter.didExceedMaxLines here because
     // assigning to `size` will trigger us to validate our intrinsic sizes,
@@ -825,8 +617,12 @@ class _RenderParagraph extends RenderBox
     }
   }
 
+  @override
+  void applyPaintTransform(RenderBox child, Matrix4 transform) {
+    defaultApplyPaintTransform(child, transform);
+  }
+
   // zmtzawqlp
-  // @override
   // void paint(PaintingContext context, Offset offset) {
   //   // Ideally we could compute the min/max intrinsic width/height with a
   //   // non-destructive operation. However, currently, computing these values
@@ -842,7 +638,8 @@ class _RenderParagraph extends RenderBox
 
   //   assert(() {
   //     if (debugRepaintTextRainbowEnabled) {
-  //       final Paint paint = Paint()..color = debugCurrentRepaintColor.toColor();
+  //       final Paint paint = Paint()
+  //         ..color = debugCurrentRepaintColor.toColor();
   //       context.canvas.drawRect(offset & size, paint);
   //     }
   //     return true;
@@ -859,33 +656,17 @@ class _RenderParagraph extends RenderBox
   //     }
   //     context.canvas.clipRect(bounds);
   //   }
+
+  //   if (_lastSelectableFragments != null) {
+  //     for (final _SelectableFragment fragment in _lastSelectableFragments!) {
+  //       fragment.paint(context, offset);
+  //     }
+  //   }
+
   //   _textPainter.paint(context.canvas, offset);
 
-  //   RenderBox? child = firstChild;
-  //   int childIndex = 0;
-  //   // childIndex might be out of index of placeholder boxes. This can happen
-  //   // if engine truncates children due to ellipsis. Sadly, we would not know
-  //   // it until we finish layout, and RenderObject is in immutable state at
-  //   // this point.
-  //   while (child != null &&
-  //       childIndex < _textPainter.inlinePlaceholderBoxes!.length) {
-  //     final TextParentData textParentData = child.parentData! as TextParentData;
+  //   paintInlineChildren(context, offset);
 
-  //     final double scale = textParentData.scale!;
-  //     context.pushTransform(
-  //       needsCompositing,
-  //       offset + textParentData.offset,
-  //       Matrix4.diagonal3Values(scale, scale, scale),
-  //       (PaintingContext context, Offset offset) {
-  //         context.paintChild(
-  //           child!,
-  //           offset,
-  //         );
-  //       },
-  //     );
-  //     child = childAfter(child);
-  //     childIndex += 1;
-  //   }
   //   if (_needsClipping) {
   //     if (_overflowShader != null) {
   //       context.canvas.translate(offset.dx, offset.dy);
@@ -896,12 +677,6 @@ class _RenderParagraph extends RenderBox
   //     }
   //     context.canvas.restore();
   //   }
-  //   if (_lastSelectableFragments != null) {
-  //     for (final _SelectableFragment fragment in _lastSelectableFragments!) {
-  //       fragment.paint(context, offset);
-  //     }
-  //   }
-  //   super.paint(context, offset);
   // }
 
   /// Returns the offset at which to paint the caret.
@@ -1173,15 +948,8 @@ class _RenderParagraph extends RenderBox
           final SemanticsNode childNode = children.elementAt(childIndex);
           final TextParentData parentData =
               child!.parentData! as TextParentData;
-          assert(parentData.scale != null || parentData.offset == Offset.zero);
           // parentData.scale may be null if the render object is truncated.
-          if (parentData.scale != null) {
-            childNode.rect = Rect.fromLTWH(
-              childNode.rect.left,
-              childNode.rect.top,
-              childNode.rect.width * parentData.scale!,
-              childNode.rect.height * parentData.scale!,
-            );
+          if (parentData.offset != null) {
             newChildren.add(childNode);
           }
           childIndex += 1;
@@ -1388,6 +1156,14 @@ class _SelectableFragment
         isReversed != (TextDirection.rtl == paragraph.textDirection);
     final Matrix4 paragraphToFragmentTransform = getTransformToParagraph()
       ..invert();
+    final TextSelection selection = TextSelection(
+      baseOffset: selectionStart,
+      extentOffset: selectionEnd,
+    );
+    final List<Rect> selectionRects = <Rect>[];
+    for (final TextBox textBox in paragraph.getBoxesForSelection(selection)) {
+      selectionRects.add(textBox.toRect());
+    }
     return SelectionGeometry(
       startSelectionPoint: SelectionPoint(
           localPosition: MatrixUtils.transformPoint(
@@ -1404,6 +1180,7 @@ class _SelectableFragment
             ? TextSelectionHandleType.left
             : TextSelectionHandleType.right,
       ),
+      selectionRects: selectionRects,
       status: _textSelectionStart!.offset == _textSelectionEnd!.offset
           ? SelectionStatus.collapsed
           : SelectionStatus.uncollapsed,
@@ -1556,12 +1333,17 @@ class _SelectableFragment
     }
     final TextRange word = paragraph.getWordBoundary(position);
     assert(word.isNormalized);
+    if (word.start < range.start && word.end < range.start) {
+      return SelectionResult.previous;
+    } else if (word.start > range.end && word.end > range.end) {
+      return SelectionResult.next;
+    }
     // Fragments are separated by placeholder span, the word boundary shouldn't
     // expand across fragments.
     assert(word.start >= range.start && word.end <= range.end);
     late TextPosition start;
     late TextPosition end;
-    if (position.offset >= word.end) {
+    if (position.offset > word.end) {
       start = end = TextPosition(offset: position.offset);
     } else {
       start = TextPosition(offset: word.start);

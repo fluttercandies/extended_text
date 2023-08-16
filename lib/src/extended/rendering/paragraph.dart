@@ -14,6 +14,14 @@ part 'package:extended_text/src/official/rendering/paragraph.dart';
 part 'package:extended_text/src/extended/text_overflow_mixin.dart';
 part 'package:extended_text/src/extended/selection_mixin.dart';
 
+/// Parent data used by [RenderParagraph] and [RenderEditable] to annotate
+/// inline contents (such as [WidgetSpan]s) with.
+class _TextParentData extends TextParentData {
+  @override
+  Offset? get offset => _offset;
+  Offset? _offset;
+}
+
 /// [RenderParagraph]
 ///
 class ExtendedRenderParagraph extends _RenderParagraph
@@ -41,93 +49,47 @@ class ExtendedRenderParagraph extends _RenderParagraph
     _canSelectPlaceholderSpan = canSelectPlaceholderSpan;
   }
 
-  // Layout the child inline widgets. We then pass the dimensions of the
-  // children to _textPainter so that appropriate placeholders can be inserted
-  // into the LibTxt layout. This does not do anything if no inline widgets were
-  // specified.
   @override
-  List<PlaceholderDimensions> _layoutChildren(
-    BoxConstraints constraints, {
-    bool dry = false,
-    // zmtzawqlp
-    List<int>? hideWidgets,
-    // zmtzawqlp
-    TextPainter? textPainter,
-  }) {
-    if (childCount == 0) {
-      return <PlaceholderDimensions>[];
+  void setupParentData(RenderBox child) {
+    if (child.parentData is! _TextParentData) {
+      child.parentData = _TextParentData();
     }
-    RenderBox? child = firstChild;
-    final List<PlaceholderDimensions> placeholderDimensions =
-        List<PlaceholderDimensions>.filled(
-            // zmtzawqlp
-            textChildCount,
-            PlaceholderDimensions.empty);
-    int childIndex = 0;
-    // Only constrain the width to the maximum width of the paragraph.
-    // Leave height unconstrained, which will overflow if expanded past.
-    BoxConstraints boxConstraints =
-        BoxConstraints(maxWidth: constraints.maxWidth);
-    // The content will be enlarged by textScaleFactor during painting phase.
-    // We reduce constraints by textScaleFactor, so that the content will fit
-    // into the box once it is enlarged.
-    boxConstraints = boxConstraints / textScaleFactor;
-    // zmtzawqlp
-    while (child != null && childIndex < textChildCount) {
-      double? baselineOffset;
-      final Size childSize;
-      if (!dry) {
-        child.layout(
-          // zmtzawqlp
-          hideWidgets != null && hideWidgets.contains(childIndex)
-              ? const BoxConstraints(maxWidth: 0)
-              : boxConstraints,
-          parentUsesSize: true,
-        );
-        childSize = child.size;
-        switch (_placeholderSpans[childIndex].alignment) {
-          case ui.PlaceholderAlignment.baseline:
-            baselineOffset = child.getDistanceToBaseline(
-              _placeholderSpans[childIndex].baseline!,
-            );
-            break;
-          case ui.PlaceholderAlignment.aboveBaseline:
-          case ui.PlaceholderAlignment.belowBaseline:
-          case ui.PlaceholderAlignment.bottom:
-          case ui.PlaceholderAlignment.middle:
-          case ui.PlaceholderAlignment.top:
-            baselineOffset = null;
-            break;
-        }
-      } else {
-        assert(_placeholderSpans[childIndex].alignment !=
-            ui.PlaceholderAlignment.baseline);
-        childSize = child.getDryLayout(boxConstraints);
-      }
+  }
 
-      placeholderDimensions[childIndex] = PlaceholderDimensions(
-        size: childSize,
-        alignment: _placeholderSpans[childIndex].alignment,
-        baseline: _placeholderSpans[childIndex].baseline,
-        baselineOffset: baselineOffset,
-      );
-      child = childAfter(child);
-      childIndex += 1;
-    }
-
-    if (textPainter != null) {
-      textPainter.setPlaceholderDimensions(placeholderDimensions);
-      return _placeholderDimensions ?? <PlaceholderDimensions>[];
-    }
-    return placeholderDimensions;
+  static PlaceholderDimensions _layoutChild(
+    RenderBox child,
+    double maxWidth,
+    ChildLayouter layoutChild,
+  ) {
+    final TextParentData parentData = child.parentData! as TextParentData;
+    final PlaceholderSpan? span = parentData.span;
+    assert(span != null);
+    return span == null
+        ? PlaceholderDimensions.empty
+        : PlaceholderDimensions(
+            size: layoutChild(child, BoxConstraints(maxWidth: maxWidth)),
+            alignment: span.alignment,
+            baseline: span.baseline,
+            baselineOffset: switch (span.alignment) {
+              ui.PlaceholderAlignment.aboveBaseline ||
+              ui.PlaceholderAlignment.belowBaseline ||
+              ui.PlaceholderAlignment.bottom ||
+              ui.PlaceholderAlignment.middle ||
+              ui.PlaceholderAlignment.top =>
+                null,
+              ui.PlaceholderAlignment.baseline =>
+                child.getDistanceToBaseline(span.baseline!),
+            },
+          );
   }
 
   @override
   void performLayout() {
     final BoxConstraints constraints = this.constraints;
-    _placeholderDimensions = _layoutChildren(constraints);
+    _placeholderDimensions = layoutInlineChildren(
+        constraints.maxWidth, ChildLayoutHelper.layoutChild);
     _layoutTextWithConstraints(constraints);
-    _setParentData();
+    positionInlineChildren(_textPainter.inlinePlaceholderBoxes!);
 
     // We grab _textPainter.size and _textPainter.didExceedMaxLines here because
     // assigning to `size` will trigger us to validate our intrinsic sizes,
@@ -272,31 +234,7 @@ class ExtendedRenderParagraph extends _RenderParagraph
     _paintSpecialText(context, offset);
     _textPainter.paint(context.canvas, offset);
 
-    RenderBox? child = firstChild;
-    int childIndex = 0;
-    // childIndex might be out of index of placeholder boxes. This can happen
-    // if engine truncates children due to ellipsis. Sadly, we would not know
-    // it until we finish layout, and RenderObject is in immutable state at
-    // this point.
-    while (child != null &&
-        childIndex < _textPainter.inlinePlaceholderBoxes!.length) {
-      final TextParentData textParentData = child.parentData! as TextParentData;
-
-      final double scale = textParentData.scale!;
-      context.pushTransform(
-        needsCompositing,
-        offset + textParentData.offset,
-        Matrix4.diagonal3Values(scale, scale, scale),
-        (PaintingContext context, Offset offset) {
-          context.paintChild(
-            child!,
-            offset,
-          );
-        },
-      );
-      child = childAfter(child);
-      childIndex += 1;
-    }
+    paintInlineChildren(context, offset);
 
     // zmtzawqlp
     if (_overflowRect != null) {

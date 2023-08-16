@@ -15,28 +15,6 @@ mixin SelectionMixin on TextOverflowMixin {
     int start = 0;
     final String plainText = text.toPlainText(includeSemanticsLabels: false);
 
-    // final List<_TextRange> skipRanges = <_TextRange>[];
-
-    // if (_hasVisualOverflow &&
-    //         overflowWidget != null &&
-    //         _overflowSelection != null
-    //     // && (_overflowRects != null || _overflowRect != null)
-
-    //     ) {
-    //   // void _getRange(Rect rect) {
-    //   //   skipRanges.add(_TextRange(
-    //   //       _textPainter.getPositionForOffset(rect.centerLeft).offset,
-    //   //       _textPainter.getPositionForOffset(rect.centerRight).offset));
-    //   // }
-
-    //   // if (_overflowRect != null) {
-    //   //   _getRange(_overflowRect!);
-    //   // }
-    //   // if (_overflowRects != null) {
-    //   //   _overflowRects!.forEach(_getRange);
-    //   // }
-    // }
-
     text.visitChildren((InlineSpan span) {
       final int length = ExtendedTextLibraryUtils.getInlineOffset(span);
 
@@ -166,41 +144,6 @@ class _ExtendedSelectableFragment extends _SelectableFragment {
       }
     }
 
-    if (isEnd) {
-      _textSelectionEnd = position;
-    } else {
-      _textSelectionStart = position;
-    }
-  }
-
-  @override
-  SelectionResult _handleSelectWord(Offset globalPosition) {
-    final TextPosition position =
-        paragraph.getPositionForOffset(paragraph.globalToLocal(globalPosition));
-    if (_positionIsWithinCurrentSelection(position)) {
-      return SelectionResult.end;
-    }
-    final TextRange word = paragraph.getWordBoundary(position);
-    assert(word.isNormalized);
-
-    // zmtzawqlp
-    // https://github.com/flutter/flutter/issues/127076
-    if (!(word.start >= range.start && word.end <= range.end)) {
-      return SelectionResult.none;
-    }
-    // Fragments are separated by placeholder span, the word boundary shouldn't
-    // expand across fragments.
-    // assert(word.start >= range.start && word.end <= range.end);
-    late TextPosition start;
-    late TextPosition end;
-    if (position.offset >= word.end) {
-      start = end = TextPosition(offset: position.offset);
-    } else {
-      start = TextPosition(offset: word.start);
-      end = TextPosition(offset: word.end, affinity: TextAffinity.upstream);
-    }
-    _textSelectionStart = start;
-    _textSelectionEnd = end;
-    return SelectionResult.end;
+    super._setSelectionPosition(position, isEnd: isEnd);
   }
 }

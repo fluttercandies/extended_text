@@ -69,9 +69,8 @@ mixin TextOverflowMixin on _RenderParagraph {
       }
       //assert(textPainter.width >= lastChild!.size.width);
 
-      final TextParentData textParentData =
-          lastChild!.parentData as TextParentData;
-      textParentData.scale = 1.0;
+      final _TextParentData textParentData =
+          lastChild!.parentData as _TextParentData;
 
       final Rect rect = Offset.zero & size;
       final Size overflowWidgetSize = lastChild!.size;
@@ -89,7 +88,7 @@ mixin TextOverflowMixin on _RenderParagraph {
               _textPainter.getPositionForOffset(rect.bottomRight).offset,
         );
 
-        textParentData.offset = rect.bottomRight -
+        textParentData._offset = rect.bottomRight -
             Offset(overflowWidgetSize.width, overflowWidgetSize.height);
 
         _setOverflowRect(
@@ -162,16 +161,12 @@ mixin TextOverflowMixin on _RenderParagraph {
 
         final InlineSpan oldSpan = _textPainter.text!;
         // recreate text
+
         _textPainter.text = testTextPainter.text;
-        _extractPlaceholderSpans(_textPainter.text!);
-
-        _layoutChildren(constraints, hideWidgets: hideWidgets);
-        _layoutText(
-          minWidth: constraints.minWidth,
-          maxWidth: constraints.maxWidth,
-        );
-
-        _setParentData();
+        _placeholderDimensions = layoutInlineChildren(
+            constraints.maxWidth, ChildLayoutHelper.layoutChild);
+        _layoutTextWithConstraints(constraints);
+        positionInlineChildren(_textPainter.inlinePlaceholderBoxes!);
 
         final Size textSize = _textPainter.size;
         size = constraints.constrain(textSize);
@@ -184,10 +179,10 @@ mixin TextOverflowMixin on _RenderParagraph {
                 .offset,
           );
 
-          textParentData.offset = ExtendedTextLibraryUtils.getCaretOffset(
+          textParentData._offset = ExtendedTextLibraryUtils.getCaretOffset(
             TextPosition(offset: overflowSelection.baseOffset),
             _textPainter,
-            _placeholderSpans.isNotEmpty,
+            textChildCount > 0,
           );
 
           _setOverflowRect(
@@ -219,7 +214,7 @@ mixin TextOverflowMixin on _RenderParagraph {
               continue;
             }
             if (boxRect.left + overflowWidgetSize.width < rect.width) {
-              textParentData.offset = boxRect.topLeft;
+              textParentData._offset = boxRect.topLeft;
 
               overflowSelection = TextSelection(
                   baseOffset: _textPainter
@@ -317,8 +312,9 @@ mixin TextOverflowMixin on _RenderParagraph {
       maxLines: _textPainter.maxLines,
     );
 
-    _layoutChildren(
-      constraints,
+    layoutInlineChildren(
+      constraints.maxWidth,
+      ChildLayoutHelper.layoutChild,
       textPainter: testTextPainter,
       hideWidgets: hideWidgets,
     );
@@ -338,12 +334,12 @@ mixin TextOverflowMixin on _RenderParagraph {
   void _setOverflowRect(
     TextSelection overflowSelection,
     Size overFlowWidgetSize,
-    TextParentData textParentData,
+    _TextParentData textParentData,
     Rect rect,
     int maxOffset,
     TextOverflowPosition position,
   ) {
-    _overflowRect = textParentData.offset & overFlowWidgetSize;
+    _overflowRect = textParentData.offset! & overFlowWidgetSize;
     Rect overflowRect = getTextRect(
       overflowSelection,
       position,
@@ -457,7 +453,7 @@ mixin TextOverflowMixin on _RenderParagraph {
         break;
       default:
     }
-    textParentData.offset = Offset(
+    textParentData._offset = Offset(
         left,
         _overflowRect!.top +
             (_overflowRect!.height - overFlowWidgetSize.height) / 2.0);
@@ -468,13 +464,12 @@ mixin TextOverflowMixin on _RenderParagraph {
     if (overflowWidget != null && _overflowRect != null) {
       //assert(textPainter.width >= lastChild!.size.width);
 
-      final TextParentData textParentData =
-          lastChild!.parentData as TextParentData;
-      final double scale = textParentData.scale!;
+      final _TextParentData textParentData =
+          lastChild!.parentData as _TextParentData;
       context.pushTransform(
         needsCompositing,
-        offset + textParentData.offset,
-        Matrix4.diagonal3Values(scale, scale, scale),
+        offset + textParentData._offset!,
+        Matrix4.diagonal3Values(1.0, 1.0, 1.0),
         (PaintingContext context, Offset offset) {
           context.paintChild(
             lastChild!,
@@ -823,71 +818,6 @@ mixin TextOverflowMixin on _RenderParagraph {
   }
 
   @override
-  void _computeChildrenWidthWithMaxIntrinsics(double height) {
-    RenderBox? child = firstChild;
-    final List<PlaceholderDimensions> placeholderDimensions =
-        List<PlaceholderDimensions>.filled(
-            childCount, PlaceholderDimensions.empty);
-    int childIndex = 0;
-    while (child != null && childIndex < textChildCount) {
-      // Height and baseline is irrelevant as all text will be laid
-      // out in a single line. Therefore, using 0.0 as a dummy for the height.
-      placeholderDimensions[childIndex] = PlaceholderDimensions(
-        size: Size(child.getMaxIntrinsicWidth(double.infinity), 0.0),
-        alignment: _placeholderSpans[childIndex].alignment,
-        baseline: _placeholderSpans[childIndex].baseline,
-      );
-      child = childAfter(child);
-      childIndex += 1;
-    }
-    _textPainter.setPlaceholderDimensions(placeholderDimensions);
-  }
-
-  @override
-  void _computeChildrenWidthWithMinIntrinsics(double height) {
-    RenderBox? child = firstChild;
-    final List<PlaceholderDimensions> placeholderDimensions =
-        List<PlaceholderDimensions>.filled(
-            childCount, PlaceholderDimensions.empty);
-    int childIndex = 0;
-    while (child != null && childIndex < textChildCount) {
-      // Height and baseline is irrelevant; only looking for the widest word or
-      // placeholder. Therefore, using 0.0 as a dummy for height.
-      placeholderDimensions[childIndex] = PlaceholderDimensions(
-        size: Size(child.getMinIntrinsicWidth(double.infinity), 0.0),
-        alignment: _placeholderSpans[childIndex].alignment,
-        baseline: _placeholderSpans[childIndex].baseline,
-      );
-      child = childAfter(child);
-      childIndex += 1;
-    }
-    _textPainter.setPlaceholderDimensions(placeholderDimensions);
-  }
-
-  @override
-  void _computeChildrenHeightWithMinIntrinsics(double width) {
-    RenderBox? child = firstChild;
-    final List<PlaceholderDimensions> placeholderDimensions =
-        List<PlaceholderDimensions>.filled(
-            childCount, PlaceholderDimensions.empty);
-    int childIndex = 0;
-    // Takes textScaleFactor into account because the content of the placeholder
-    // span will be scaled up when it paints.
-    width = width / textScaleFactor;
-    while (child != null && childIndex < textChildCount) {
-      final Size size = child.getDryLayout(BoxConstraints(maxWidth: width));
-      placeholderDimensions[childIndex] = PlaceholderDimensions(
-        size: size,
-        alignment: _placeholderSpans[childIndex].alignment,
-        baseline: _placeholderSpans[childIndex].baseline,
-      );
-      child = childAfter(child);
-      childIndex += 1;
-    }
-    _textPainter.setPlaceholderDimensions(placeholderDimensions);
-  }
-
-  @override
   void describeSemanticsConfiguration(SemanticsConfiguration config) {
     super.describeSemanticsConfiguration(config);
     _semanticsInfo = text.getSemanticsInformation();
@@ -945,6 +875,103 @@ mixin TextOverflowMixin on _RenderParagraph {
       }
       config.attributedLabel = _cachedAttributedLabels![0];
       config.textDirection = textDirection;
+    }
+  }
+
+  @override
+  List<PlaceholderDimensions> layoutInlineChildren(
+    double maxWidth,
+    ChildLayouter layoutChild, {
+    // zmtzawqlp
+    List<int>? hideWidgets,
+    // zmtzawqlp
+    TextPainter? textPainter,
+  }) {
+    if (childCount == 0) {
+      return <PlaceholderDimensions>[];
+    }
+    RenderBox? child = firstChild;
+    final List<PlaceholderDimensions> placeholderDimensions =
+        List<PlaceholderDimensions>.filled(
+            // zmtzawqlp
+            textChildCount,
+            PlaceholderDimensions.empty);
+    int childIndex = 0;
+    while (child != null && childIndex < textChildCount) {
+      // zmtzawqlp
+      if (hideWidgets == null || !hideWidgets.contains(childIndex)) {
+        placeholderDimensions[childIndex] =
+            ExtendedRenderParagraph._layoutChild(
+          child,
+          maxWidth,
+          layoutChild,
+        );
+      }
+
+      child = childAfter(child);
+      childIndex += 1;
+    }
+    if (textPainter != null) {
+      textPainter.setPlaceholderDimensions(placeholderDimensions);
+      return _placeholderDimensions ?? <PlaceholderDimensions>[];
+    }
+    return placeholderDimensions;
+
+    // return <PlaceholderDimensions>[
+    //   for (RenderBox? child = firstChild;
+    //       child != null;
+    //       child = childAfter(child))
+    //     _layoutChild(child, maxWidth, layoutChild),
+    // ];
+  }
+
+  @override
+  void positionInlineChildren(List<ui.TextBox> boxes) {
+    RenderBox? child = firstChild;
+    int childIndex = 0;
+    for (final ui.TextBox box in boxes) {
+      if (child == null) {
+        assert(false,
+            'The length of boxes (${boxes.length}) should be greater than childCount ($childCount)');
+        return;
+      }
+      final _TextParentData textParentData =
+          child.parentData! as _TextParentData;
+      textParentData._offset = Offset(box.left, box.top);
+      child = childAfter(child);
+      childIndex++;
+    }
+    // zmtzawqlp
+    while (child != null && childIndex < textChildCount) {
+      final _TextParentData textParentData =
+          child.parentData! as _TextParentData;
+      textParentData._offset = null;
+      child = childAfter(child);
+      childIndex++;
+    }
+  }
+
+  /// Paints each inline child.
+  ///
+  /// Render children whose [TextParentData.offset] is null will be skipped by
+  /// this method.
+  @override
+  @protected
+  void paintInlineChildren(PaintingContext context, Offset offset) {
+    RenderBox? child = firstChild;
+
+    while (child != null) {
+      final TextParentData childParentData =
+          child.parentData! as TextParentData;
+      final Offset? childOffset = childParentData.offset;
+      if (childOffset == null) {
+        child = childAfter(child);
+        // zmtzawqlp
+        continue;
+        // return;
+      }
+      context.paintChild(child, childOffset + offset);
+      child = childAfter(child);
     }
   }
 }
