@@ -23,9 +23,9 @@ class TextDemo extends StatelessWidget {
           '\n\nif you meet any problem, please let me know @zmtzawqlp .[sun_glasses]',
           onSpecialTextTap: (dynamic parameter) {
             if (parameter.toString().startsWith('\$')) {
-              launch('https://github.com/fluttercandies');
+              launchUrl(Uri.parse('https://github.com/fluttercandies'));
             } else if (parameter.toString().startsWith('@')) {
-              launch('mailto:zmtzawqlp@live.com');
+              launchUrl(Uri.parse('mailto:zmtzawqlp@live.com'));
             }
           },
           specialTextSpanBuilder: MySpecialTextSpanBuilder(),

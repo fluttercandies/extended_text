@@ -2,9 +2,11 @@
 
 [![pub package](https://img.shields.io/pub/v/extended_text.svg)](https://pub.dartlang.org/packages/extended_text) [![GitHub stars](https://img.shields.io/github/stars/fluttercandies/extended_text)](https://github.com/fluttercandies/extended_text/stargazers) [![GitHub forks](https://img.shields.io/github/forks/fluttercandies/extended_text)](https://github.com/fluttercandies/extended_text/network)  [![GitHub license](https://img.shields.io/github/license/fluttercandies/extended_text)](https://github.com/fluttercandies/extended_text/blob/master/LICENSE)  [![GitHub issues](https://img.shields.io/github/issues/fluttercandies/extended_text)](https://github.com/fluttercandies/extended_text/issues) <a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5bcc0gy"><img border="0" src="https://pub.idqqimg.com/wpa/images/group.png" alt="flutter-candies" title="flutter-candies"></a>
 
-文档语言: [English](README.md) | [中文简体](README-ZH.md)
+文档语言: [English](README.md) | 中文简体
 
 官方Text扩展组件，支持特殊文本效果（比如图片，@人）,自定义背景，自定义文本溢出效果,文本选择以及自定义选择菜单和选择器
+
+[ExtendedText 在线 Demo](https://fluttercandies.github.io/extended_text/)
 
 - [Flutter RichText 支持图片显示和自定义图片效果](https://juejin.im/post/5c8be0d06fb9a049a42ff067)
 - [Flutter RichText 支持自定义文本溢出效果](https://juejin.im/post/5c8ca608f265da2dd6394001)
@@ -12,7 +14,14 @@
 - [Flutter RichText 支持特殊文字效果](https://juejin.im/post/5c8bf4fce51d451066008fa2)
 - [Flutter RichText支持文本选择](https://juejin.im/post/5cff71d46fb9a07ea6486a0e)
 
-欢迎加入[Flutter Candies](https://github.com/fluttercandies)，一起生产可爱的Flutter小糖果(QQ群181398081)
+
+ExtendedText 是 Flutter 官方 Text 的三方扩展库，主要扩展功能如下:
+| 功能                                   | ExtendedText                                              | Flutter 官方 Text                                     |
+|--------------------------------------|-----------------------------------------------------------|-----------------------------------------------------|
+| 支持自定义文本溢出效果                | 支持，可以自定义溢出的 Widget，并控制溢出位置（前、中、后）   | 不支 持 ([26748](https://github.com/flutter/flutter/issues/26748),[45336](https://github.com/flutter/flutter/issues/45336))                                               |
+| 支持复制特殊文本的真实值                         | 支持，可以复制出文本的真实值，而不仅是 WidgetSpan 的占位值    | 只能复制出 WidgetSpan 的占位值 (\uFFFC)                  |
+| 根据文本格式快速构建富文本                 | 支持，可以根据文本格式快速构建富文本                         | 不支持                                               |
+
 
 ## 目录
 - [extended_text](#extendedtext)
@@ -212,30 +221,201 @@ ImageSpan(AssetImage("xxx.jpg"),
 
 ### 文本选择控制器
 
-extended_text提供了默认的控制器MaterialExtendedTextSelectionControls/CupertinoExtendedTextSelectionControls
-
-你可以通过重写，来定义工具栏和选择器
+ 
+你可以通过重写 [SelectionArea.contextMenuBuilder] 和 [TextSelectionControls]， 来定义工具栏和选择器
 
 ```dart
-class MyExtendedMaterialTextSelectionControls
-    extends ExtendedMaterialTextSelectionControls {
-  MyExtendedMaterialTextSelectionControls();
-  @override
-  Widget buildToolbar(
-    BuildContext context,
-    Rect globalEditableRegion,
-    double textLineHeight,
-    Offset selectionMidpoint,
-    List<TextSelectionPoint> endpoints,
-    TextSelectionDelegate delegate,
-  ) {}
+const double _kHandleSize = 22.0;
 
+/// Android Material styled text selection controls.
+
+class MyTextSelectionControls extends TextSelectionControls
+    with TextSelectionHandleControls {
+  MyTextSelectionControls({this.joinZeroWidthSpace = false});
+  final bool joinZeroWidthSpace;
+
+  /// Returns the size of the Material handle.
+  @override
+  Size getHandleSize(double textLineHeight) =>
+      const Size(_kHandleSize, _kHandleSize);
+
+  /// Builder for material-style text selection handles.
   @override
   Widget buildHandle(
-      BuildContext context, TextSelectionHandleType type, double textHeight) {
+      BuildContext context, TextSelectionHandleType type, double textLineHeight,
+      [VoidCallback? onTap, double? startGlyphHeight, double? endGlyphHeight]) {
+    final Widget handle = SizedBox(
+      width: _kHandleSize,
+      height: _kHandleSize,
+      child: Image.asset(
+        'assets/40.png',
+      ),
+    );
+
+    // [handle] is a circle, with a rectangle in the top left quadrant of that
+    // circle (an onion pointing to 10:30). We rotate [handle] to point
+    // straight up or up-right depending on the handle type.
+    switch (type) {
+      case TextSelectionHandleType.left: // points up-right
+        return Transform.rotate(
+          angle: math.pi / 4.0,
+          child: handle,
+        );
+      case TextSelectionHandleType.right: // points up-left
+        return Transform.rotate(
+          angle: -math.pi / 4.0,
+          child: handle,
+        );
+      case TextSelectionHandleType.collapsed: // points up
+        return handle;
+    }
+  }
+
+  /// Gets anchor for material-style text selection handles.
+  ///
+  /// See [TextSelectionControls.getHandleAnchor].
+  @override
+  Offset getHandleAnchor(TextSelectionHandleType type, double textLineHeight,
+      [double? startGlyphHeight, double? endGlyphHeight]) {
+    switch (type) {
+      case TextSelectionHandleType.left:
+        return const Offset(_kHandleSize, 0);
+      case TextSelectionHandleType.right:
+        return Offset.zero;
+      default:
+        return const Offset(_kHandleSize / 2, -4);
+    }
   }
 }
 
+class CommonSelectionArea extends StatelessWidget {
+  const CommonSelectionArea({
+    super.key,
+    required this.child,
+    this.joinZeroWidthSpace = false,
+  });
+  final Widget child;
+  final bool joinZeroWidthSpace;
+
+  @override
+  Widget build(BuildContext context) {
+    SelectedContent? _selectedContent;
+    return SelectionArea(
+      contextMenuBuilder:
+          (BuildContext context, SelectableRegionState selectableRegionState) {
+        return AdaptiveTextSelectionToolbar.buttonItems(
+          buttonItems: <ContextMenuButtonItem>[
+            ContextMenuButtonItem(
+              onPressed: () {
+                // TODO(zmtzawqlp):  how to get Selectable
+                // and  _clearSelection is not public
+                // https://github.com/flutter/flutter/issues/126980
+
+                //  onCopy: () {
+                //   _copy();
+
+                //   // In Android copy should clear the selection.
+                //   switch (defaultTargetPlatform) {
+                //     case TargetPlatform.android:
+                //     case TargetPlatform.fuchsia:
+                //       _clearSelection();
+                //     case TargetPlatform.iOS:
+                //       hideToolbar(false);
+                //     case TargetPlatform.linux:
+                //     case TargetPlatform.macOS:
+                //     case TargetPlatform.windows:
+                //       hideToolbar();
+                //   }
+                // },
+
+                // if (_selectedContent != null) {
+                //   String content = _selectedContent!.plainText;
+                //   if (joinZeroWidthSpace) {
+                //     content = content.replaceAll(zeroWidthSpace, '');
+                //   }
+
+                //   Clipboard.setData(ClipboardData(text: content));
+                //   selectableRegionState.hideToolbar(true);
+                //   selectableRegionState._clearSelection();
+                // }
+
+                selectableRegionState
+                    .copySelection(SelectionChangedCause.toolbar);
+
+                // remove zeroWidthSpace
+                if (joinZeroWidthSpace) {
+                  Clipboard.getData('text/plain').then((ClipboardData? value) {
+                    if (value != null) {
+                      // remove zeroWidthSpace
+                      final String? plainText =
+                          value.text?.replaceAll(ExtendedTextLibraryUtils.zeroWidthSpace, '');
+                      if (plainText != null) {
+                        Clipboard.setData(ClipboardData(text: plainText));
+                      }
+                    }
+                  });
+                }
+              },
+              type: ContextMenuButtonType.copy,
+            ),
+            ContextMenuButtonItem(
+              onPressed: () {
+                selectableRegionState.selectAll(SelectionChangedCause.toolbar);
+              },
+              type: ContextMenuButtonType.selectAll,
+            ),
+            ContextMenuButtonItem(
+              onPressed: () {
+                launchUrl(Uri.parse(
+                    'mailto:zmtzawqlp@live.com?subject=extended_text_share&body=${_selectedContent?.plainText}'));
+                selectableRegionState.hideToolbar();
+              },
+              type: ContextMenuButtonType.custom,
+              label: 'like',
+            ),
+          ],
+          anchors: selectableRegionState.contextMenuAnchors,
+        );
+        // return AdaptiveTextSelectionToolbar.selectableRegion(
+        //   selectableRegionState: selectableRegionState,
+        // );
+      },
+      // magnifierConfiguration: TextMagnifierConfiguration(
+      //   magnifierBuilder: (
+      //     BuildContext context,
+      //     MagnifierController controller,
+      //     ValueNotifier<MagnifierInfo> magnifierInfo,
+      //   ) {
+      //     return TextMagnifier(
+      //       magnifierInfo: magnifierInfo,
+      //     );
+      //     // switch (defaultTargetPlatform) {
+      //     //   case TargetPlatform.iOS:
+      //     //     return CupertinoTextMagnifier(
+      //     //       controller: controller,
+      //     //       magnifierInfo: magnifierInfo,
+      //     //     );
+      //     //   case TargetPlatform.android:
+      //     //     return TextMagnifier(
+      //     //       magnifierInfo: magnifierInfo,
+      //     //     );
+      //     //   case TargetPlatform.fuchsia:
+      //     //   case TargetPlatform.linux:
+      //     //   case TargetPlatform.macOS:
+      //     //   case TargetPlatform.windows:
+      //     //     return null;
+      //     // }
+      //   },
+      // ),
+      // selectionControls: MyTextSelectionControls(),
+      onSelectionChanged: (SelectedContent? value) {
+        print(value?.plainText);
+        _selectedContent = value;
+      },
+      child: child,
+    );
+  }
+}
 ```
 
 ### 工具栏和选择器的控制

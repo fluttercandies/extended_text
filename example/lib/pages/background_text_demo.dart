@@ -30,8 +30,8 @@ class BackgroundTextDemo extends StatelessWidget {
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          launch(
-                              'https://github.com/flutter/flutter/issues/24335');
+                          launchUrl(Uri.parse(
+                              'https://github.com/flutter/flutter/issues/24335'));
                         }),
                   const TextSpan(text: '/'),
                   TextSpan(
@@ -39,8 +39,8 @@ class BackgroundTextDemo extends StatelessWidget {
                       style: const TextStyle(color: Colors.blue),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          launch(
-                              'https://github.com/flutter/flutter/issues/24337');
+                          launchUrl(Uri.parse(
+                              'https://github.com/flutter/flutter/issues/24337'));
                         }),
                 ])),
                 const Text(

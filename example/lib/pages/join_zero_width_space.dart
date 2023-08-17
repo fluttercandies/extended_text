@@ -1,5 +1,5 @@
-import 'package:example/text/my_extended_text_selection_controls.dart';
 import 'package:example/text/my_special_text_span_builder.dart';
+import 'package:example/text/selection_area.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/material.dart';
@@ -65,18 +65,17 @@ class JoinZeroWidthSpaceDemo extends StatelessWidget {
                   color: Colors.grey,
                 ),
               ),
-              ExtendedText(
-                content,
-                onSpecialTextTap: onSpecialTextTap,
-                specialTextSpanBuilder: builder,
-                joinZeroWidthSpace: joinZeroWidthSpace,
-                overflow: TextOverflow.ellipsis,
-                maxLines: maxLines,
-                selectionEnabled: true,
+              CommonSelectionArea(
                 // if betterLineBreakingAndOverflowStyle is true, you must take care of copy text.
                 // override [TextSelectionControls.handleCopy], remove zero width space.
-                selectionControls: MyTextSelectionControls(
+                joinZeroWidthSpace: joinZeroWidthSpace,
+                child: ExtendedText(
+                  content,
+                  onSpecialTextTap: onSpecialTextTap,
+                  specialTextSpanBuilder: builder,
                   joinZeroWidthSpace: joinZeroWidthSpace,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: maxLines,
                 ),
               ),
             ],
@@ -87,12 +86,12 @@ class JoinZeroWidthSpaceDemo extends StatelessWidget {
   void onSpecialTextTap(dynamic parameter) {
     if (parameter.toString().startsWith('\$')) {
       if (parameter.toString().contains('issue')) {
-        launch('https://github.com/flutter/flutter/issues/26748');
+        launchUrl(Uri.parse('https://github.com/flutter/flutter/issues/26748'));
       } else {
-        launch('https://github.com/fluttercandies');
+        launchUrl(Uri.parse('https://github.com/fluttercandies'));
       }
     } else if (parameter.toString().startsWith('@')) {
-      launch('mailto:zmtzawqlp@live.com');
+      launchUrl(Uri.parse('mailto:zmtzawqlp@live.com'));
     }
   }
 }

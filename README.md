@@ -2,12 +2,23 @@
 
 [![pub package](https://img.shields.io/pub/v/extended_text.svg)](https://pub.dartlang.org/packages/extended_text) [![GitHub stars](https://img.shields.io/github/stars/fluttercandies/extended_text)](https://github.com/fluttercandies/extended_text/stargazers) [![GitHub forks](https://img.shields.io/github/forks/fluttercandies/extended_text)](https://github.com/fluttercandies/extended_text/network)  [![GitHub license](https://img.shields.io/github/license/fluttercandies/extended_text)](https://github.com/fluttercandies/extended_text/blob/master/LICENSE)  [![GitHub issues](https://img.shields.io/github/issues/fluttercandies/extended_text)](https://github.com/fluttercandies/extended_text/issues) <a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5bcc0gy"><img border="0" src="https://pub.idqqimg.com/wpa/images/group.png" alt="flutter-candies" title="flutter-candies"></a>
 
-Language: [English](README.md) | [中文简体](README-ZH.md)
+Language: English | [中文简体](README-ZH.md)
 
 Extended official text to build special text like inline image or @somebody quickly,it also support custom background,custom over flow and custom selection toolbar and handles.
 
+[Web demo for ExtendedText](https://fluttercandies.github.io/extended_text/)
+
+ExtendedText is a third-party extension library for Flutter's official Text component. The main extended features are as follows:
+
+| Feature                                   | ExtendedText                                                |  Text                                  |
+|------------------------------------------|-------------------------------------------------------------|-------------------------------------------------------|
+| Customized text overflow effects          | Supported, allows customizing the overflow widget and controlling overflow positions (before, middle, after) | Not supported ([26748](https://github.com/flutter/flutter/issues/26748),[45336](https://github.com/flutter/flutter/issues/45336)) |
+| Copying the actual value of special text  | Supported, enables copying the actual value of the text, not just the placeholder value of WidgetSpan | Can only copy the placeholder value of WidgetSpan (\uFFFC) |
+| Quick construction of rich text based on text format  | Supported, enables quick construction of rich text based on text format | Not supported                                            |
+
+
 ## Table of contents
-- [extended_text](#extended_text)
+- [extended\_text](#extended_text)
   - [Table of contents](#table-of-contents)
   - [Speical Text](#speical-text)
     - [Create Speical Text](#create-speical-text)
@@ -189,27 +200,199 @@ class ImageSpan extends ExtendedWidgetSpan {
 
 ### TextSelectionControls
 
-default value of textSelectionControls are MaterialExtendedTextSelectionControls/CupertinoExtendedTextSelectionControls
+override [SelectionArea.contextMenuBuilder] and [TextSelectionControls] to custom your toolbar widget or handle widget
 
-override buildToolbar or buildHandle to custom your toolbar widget or handle widget
 
 ```dart
-class MyExtendedMaterialTextSelectionControls
-    extends ExtendedMaterialTextSelectionControls {
-  MyExtendedMaterialTextSelectionControls();
-  @override
-  Widget buildToolbar(
-    BuildContext context,
-    Rect globalEditableRegion,
-    double textLineHeight,
-    Offset selectionMidpoint,
-    List<TextSelectionPoint> endpoints,
-    TextSelectionDelegate delegate,
-  ) {}
+const double _kHandleSize = 22.0;
 
+/// Android Material styled text selection controls.
+
+class MyTextSelectionControls extends TextSelectionControls
+    with TextSelectionHandleControls {
+  MyTextSelectionControls({this.joinZeroWidthSpace = false});
+  final bool joinZeroWidthSpace;
+
+  /// Returns the size of the Material handle.
+  @override
+  Size getHandleSize(double textLineHeight) =>
+      const Size(_kHandleSize, _kHandleSize);
+
+  /// Builder for material-style text selection handles.
   @override
   Widget buildHandle(
-      BuildContext context, TextSelectionHandleType type, double textHeight) {
+      BuildContext context, TextSelectionHandleType type, double textLineHeight,
+      [VoidCallback? onTap, double? startGlyphHeight, double? endGlyphHeight]) {
+    final Widget handle = SizedBox(
+      width: _kHandleSize,
+      height: _kHandleSize,
+      child: Image.asset(
+        'assets/40.png',
+      ),
+    );
+
+    // [handle] is a circle, with a rectangle in the top left quadrant of that
+    // circle (an onion pointing to 10:30). We rotate [handle] to point
+    // straight up or up-right depending on the handle type.
+    switch (type) {
+      case TextSelectionHandleType.left: // points up-right
+        return Transform.rotate(
+          angle: math.pi / 4.0,
+          child: handle,
+        );
+      case TextSelectionHandleType.right: // points up-left
+        return Transform.rotate(
+          angle: -math.pi / 4.0,
+          child: handle,
+        );
+      case TextSelectionHandleType.collapsed: // points up
+        return handle;
+    }
+  }
+
+  /// Gets anchor for material-style text selection handles.
+  ///
+  /// See [TextSelectionControls.getHandleAnchor].
+  @override
+  Offset getHandleAnchor(TextSelectionHandleType type, double textLineHeight,
+      [double? startGlyphHeight, double? endGlyphHeight]) {
+    switch (type) {
+      case TextSelectionHandleType.left:
+        return const Offset(_kHandleSize, 0);
+      case TextSelectionHandleType.right:
+        return Offset.zero;
+      default:
+        return const Offset(_kHandleSize / 2, -4);
+    }
+  }
+}
+
+class CommonSelectionArea extends StatelessWidget {
+  const CommonSelectionArea({
+    super.key,
+    required this.child,
+    this.joinZeroWidthSpace = false,
+  });
+  final Widget child;
+  final bool joinZeroWidthSpace;
+
+  @override
+  Widget build(BuildContext context) {
+    SelectedContent? _selectedContent;
+    return SelectionArea(
+      contextMenuBuilder:
+          (BuildContext context, SelectableRegionState selectableRegionState) {
+        return AdaptiveTextSelectionToolbar.buttonItems(
+          buttonItems: <ContextMenuButtonItem>[
+            ContextMenuButtonItem(
+              onPressed: () {
+                // TODO(zmtzawqlp):  how to get Selectable
+                // and  _clearSelection is not public
+                // https://github.com/flutter/flutter/issues/126980
+
+                //  onCopy: () {
+                //   _copy();
+
+                //   // In Android copy should clear the selection.
+                //   switch (defaultTargetPlatform) {
+                //     case TargetPlatform.android:
+                //     case TargetPlatform.fuchsia:
+                //       _clearSelection();
+                //     case TargetPlatform.iOS:
+                //       hideToolbar(false);
+                //     case TargetPlatform.linux:
+                //     case TargetPlatform.macOS:
+                //     case TargetPlatform.windows:
+                //       hideToolbar();
+                //   }
+                // },
+
+                // if (_selectedContent != null) {
+                //   String content = _selectedContent!.plainText;
+                //   if (joinZeroWidthSpace) {
+                //     content = content.replaceAll(zeroWidthSpace, '');
+                //   }
+
+                //   Clipboard.setData(ClipboardData(text: content));
+                //   selectableRegionState.hideToolbar(true);
+                //   selectableRegionState._clearSelection();
+                // }
+
+                selectableRegionState
+                    .copySelection(SelectionChangedCause.toolbar);
+
+                // remove zeroWidthSpace
+                if (joinZeroWidthSpace) {
+                  Clipboard.getData('text/plain').then((ClipboardData? value) {
+                    if (value != null) {
+                      // remove zeroWidthSpace
+                      final String? plainText =
+                          value.text?.replaceAll(ExtendedTextLibraryUtils.zeroWidthSpace, '');
+                      if (plainText != null) {
+                        Clipboard.setData(ClipboardData(text: plainText));
+                      }
+                    }
+                  });
+                }
+              },
+              type: ContextMenuButtonType.copy,
+            ),
+            ContextMenuButtonItem(
+              onPressed: () {
+                selectableRegionState.selectAll(SelectionChangedCause.toolbar);
+              },
+              type: ContextMenuButtonType.selectAll,
+            ),
+            ContextMenuButtonItem(
+              onPressed: () {
+                launchUrl(Uri.parse(
+                    'mailto:zmtzawqlp@live.com?subject=extended_text_share&body=${_selectedContent?.plainText}'));
+                selectableRegionState.hideToolbar();
+              },
+              type: ContextMenuButtonType.custom,
+              label: 'like',
+            ),
+          ],
+          anchors: selectableRegionState.contextMenuAnchors,
+        );
+        // return AdaptiveTextSelectionToolbar.selectableRegion(
+        //   selectableRegionState: selectableRegionState,
+        // );
+      },
+      // magnifierConfiguration: TextMagnifierConfiguration(
+      //   magnifierBuilder: (
+      //     BuildContext context,
+      //     MagnifierController controller,
+      //     ValueNotifier<MagnifierInfo> magnifierInfo,
+      //   ) {
+      //     return TextMagnifier(
+      //       magnifierInfo: magnifierInfo,
+      //     );
+      //     // switch (defaultTargetPlatform) {
+      //     //   case TargetPlatform.iOS:
+      //     //     return CupertinoTextMagnifier(
+      //     //       controller: controller,
+      //     //       magnifierInfo: magnifierInfo,
+      //     //     );
+      //     //   case TargetPlatform.android:
+      //     //     return TextMagnifier(
+      //     //       magnifierInfo: magnifierInfo,
+      //     //     );
+      //     //   case TargetPlatform.fuchsia:
+      //     //   case TargetPlatform.linux:
+      //     //   case TargetPlatform.macOS:
+      //     //   case TargetPlatform.windows:
+      //     //     return null;
+      //     // }
+      //   },
+      // ),
+      // selectionControls: MyTextSelectionControls(),
+      onSelectionChanged: (SelectedContent? value) {
+        print(value?.plainText);
+        _selectedContent = value;
+      },
+      child: child,
+    );
   }
 }
 

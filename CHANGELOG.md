@@ -1,4 +1,43 @@
-# 8.0.2
+## 11.0.1
+
+* Fix Flutter 3.10 onTap not triggered inside TextOverflowWidget #147
+
+## 11.0.0
+
+* Migrate to Flutter 3.10.0
+* Refactoring codes and sync codes from 3.10.0
+* Support SelectionArea
+* Breaking change: 
+  Remove [ExtendedText.textSelectionGestureDetectorBuilder],[ExtendedText.shouldShowSelectionHandles],[ExtendedText.selectionHeightStyle],[sExtendedText.electionWidthStyle],[ExtendedText.dragStartBehavior],[ExtendedText.selectionEnabled], [ExtendedTextSelectionPointerHandler]. They are all refer to selection function. It's replaced by SelectionArea.
+* Add [ExtendedText.canSelectPlaceholderSpan] control selection behavior.
+ 
+## 10.0.1
+
+* fix issue on ios after flutter version 3.7.0. #191 #198
+
+## 10.0.0
+
+* Migrate to 3.7.0
+
+## 9.1.2
+
+* Add TextOverflowWidget.clearType
+
+## 9.1.1
+
+* Fix cutOffInlineSpan should take care of emoji #131.
+
+## 9.1.0
+
+* Migrate to 3.0.0
+
+## 9.0.0
+
+* Migrate to 2.10.0.
+* Add shouldShowSelectionHandles and textSelectionGestureDetectorBuilder call back to define the behavior of handles and toolbar.
+* Shortcut support for web and desktop.
+
+## 8.0.2
 
 * Fix selectionWidthStyle and selectionHeightStyle are not working.
 

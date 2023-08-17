@@ -10,8 +10,8 @@ description: A new Flutter application.
 version: 1.0.0+1
 
 environment:
-  sdk: '>=2.13.0 <3.0.0'
-  flutter: ">=2.8.0"
+  sdk: '>=2.17.0 <4.0.0'
+  flutter: ">=3.10.0"
 dependencies:
   cupertino_icons: ^1.0.2
   ff_annotation_route_library: ^3.0.0
@@ -22,7 +22,12 @@ dependencies:
 dependency_overrides:
   extended_text:
     path: ../
-
+  # extended_text_library:
+    # git: 
+    #   url: https://github.com/fluttercandies/extended_text_library.git
+    #   ref: refactor
+    # path: ../../extended_text_library
+ 
 dev_dependencies:
   flutter_test:
     sdk: flutter
