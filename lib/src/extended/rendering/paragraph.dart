@@ -207,6 +207,12 @@ class ExtendedRenderParagraph extends _RenderParagraph
       context.canvas.clipRect(bounds);
     }
 
+    if (_lastSelectableFragments != null) {
+      for (final _SelectableFragment fragment in _lastSelectableFragments!) {
+        fragment.paint(context, offset);
+      }
+    }
+
     // zmtzawqlp
     // clip rect of over flow
     if (_overflowRect != null) {
@@ -275,11 +281,7 @@ class ExtendedRenderParagraph extends _RenderParagraph
       }
       context.canvas.restore();
     }
-    if (_lastSelectableFragments != null) {
-      for (final _SelectableFragment fragment in _lastSelectableFragments!) {
-        fragment.paint(context, offset);
-      }
-    }
+
     super.paint(context, offset);
   }
 
