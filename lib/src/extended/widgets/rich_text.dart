@@ -14,7 +14,7 @@ class ExtendedRichText extends _RichText {
     super.textDirection,
     super.softWrap = true,
     super.overflow = TextOverflow.clip,
-    super.textScaleFactor = 1.0,
+    super.textScaler = TextScaler.noScaling,
     super.maxLines,
     super.locale,
     super.strutStyle,
@@ -25,7 +25,7 @@ class ExtendedRichText extends _RichText {
     this.overflowWidget,
     this.canSelectPlaceholderSpan = true,
   }) : super(
-          children: _extractChildren(text, overflowWidget, textScaleFactor),
+          children: _extractChildren(text, overflowWidget, textScaler),
         );
 
   final TextOverflowWidget? overflowWidget;
@@ -42,7 +42,7 @@ class ExtendedRichText extends _RichText {
       textDirection: textDirection ?? Directionality.of(context),
       softWrap: softWrap,
       overflow: overflow,
-      textScaleFactor: textScaleFactor,
+      textScaler: textScaler,
       maxLines: maxLines,
       strutStyle: strutStyle,
       textWidthBasis: textWidthBasis,
@@ -65,7 +65,7 @@ class ExtendedRichText extends _RichText {
       ..textDirection = textDirection ?? Directionality.of(context)
       ..softWrap = softWrap
       ..overflow = overflow
-      ..textScaleFactor = textScaleFactor
+      ..textScaler = textScaler
       ..maxLines = maxLines
       ..strutStyle = strutStyle
       ..textWidthBasis = textWidthBasis
@@ -77,21 +77,21 @@ class ExtendedRichText extends _RichText {
       ..canSelectPlaceholderSpan = canSelectPlaceholderSpan;
   }
 
-  // Traverses the InlineSpan tree and depth-first collects the list of
-  // child widgets that are created in WidgetSpans.
+  /// Traverses the InlineSpan tree and depth-first collects the list of
+  /// child widgets that are created in WidgetSpans.
+  // TODO(zmtzawqlp): _extractChildren has replace with WidgetSpan.extractFromInlineSpan
   static List<Widget> _extractChildren(
     InlineSpan span,
     TextOverflowWidget? overflowWidget,
-    double textScaleFactor,
+    TextScaler textScaler,
   ) {
-    int index = 0;
     final List<Widget> result = <Widget>[
-      ...WidgetSpan.extractFromInlineSpan(span, textScaleFactor)
+      ...WidgetSpan.extractFromInlineSpan(span, textScaler)
     ];
 
     if (overflowWidget != null) {
       result.add(Semantics(
-        tagForChildren: PlaceholderSpanIndexSemanticsTag(index++),
+        tagForChildren: PlaceholderSpanIndexSemanticsTag(result.length),
         child: overflowWidget,
       ));
     }

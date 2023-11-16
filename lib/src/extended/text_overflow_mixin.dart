@@ -619,7 +619,7 @@ mixin TextOverflowMixin on _RenderParagraph {
       text: inlineSpan ?? text,
       textAlign: _textPainter.textAlign,
       textDirection: _textPainter.textDirection,
-      textScaleFactor: _textPainter.textScaleFactor,
+      textScaler: _textPainter.textScaler,
       maxLines: maxLines,
       ellipsis: null,
       locale: _textPainter.locale,

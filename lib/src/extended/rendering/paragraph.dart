@@ -32,7 +32,7 @@ class ExtendedRenderParagraph extends _RenderParagraph
     required super.textDirection,
     super.softWrap = true,
     super.overflow = TextOverflow.clip,
-    super.textScaleFactor = 1.0,
+    super.textScaler = TextScaler.noScaling,
     super.maxLines,
     super.locale,
     super.strutStyle,
@@ -125,7 +125,7 @@ class ExtendedRenderParagraph extends _RenderParagraph
           final TextPainter fadeSizePainter = TextPainter(
             text: TextSpan(style: _textPainter.text!.style, text: '\u2026'),
             textDirection: textDirection,
-            textScaleFactor: textScaleFactor,
+            textScaler: textScaler,
             locale: locale,
           )..layout();
           if (didOverflowWidth) {

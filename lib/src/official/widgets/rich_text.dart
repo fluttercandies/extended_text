@@ -6,7 +6,7 @@ part of 'package:extended_text/src/extended/widgets/rich_text.dart';
 ///
 /// {@youtube 560 315 https://www.youtube.com/watch?v=rykDVh-QFfw}
 ///
-/// The [_RichText] widget displays text that uses multiple different styles. The
+/// The [RichText] widget displays text that uses multiple different styles. The
 /// text to display is described using a tree of [TextSpan] objects, each of
 /// which has an associated style that is used for that subtree. The text might
 /// break across multiple lines or might all be displayed on the same line
@@ -86,9 +86,6 @@ part of 'package:extended_text/src/extended/widgets/rich_text.dart';
 abstract class _RichText extends MultiChildRenderObjectWidget {
   /// Creates a paragraph of rich text.
   ///
-  /// The [text], [textAlign], [softWrap], [overflow], and [textScaleFactor]
-  /// arguments must not be null.
-  ///
   /// The [maxLines] property may be null (and indeed defaults to null), but if
   /// it is not null, it must be greater than zero.
   ///
@@ -101,7 +98,7 @@ abstract class _RichText extends MultiChildRenderObjectWidget {
     this.textDirection,
     this.softWrap = true,
     this.overflow = TextOverflow.clip,
-    this.textScaleFactor = 1.0,
+    this.textScaler = TextScaler.noScaling,
     this.maxLines,
     this.locale,
     this.strutStyle,
@@ -115,23 +112,6 @@ abstract class _RichText extends MultiChildRenderObjectWidget {
         assert(selectionRegistrar == null || selectionColor != null),
         // zmtzawqlp
         super(children: children);
-
-  // Traverses the InlineSpan tree and depth-first collects the list of
-  // child widgets that are created in WidgetSpans.
-  static List<Widget> _extractChildren(InlineSpan span) {
-    int index = 0;
-    final List<Widget> result = <Widget>[];
-    span.visitChildren((InlineSpan span) {
-      if (span is WidgetSpan) {
-        result.add(Semantics(
-          tagForChildren: PlaceholderSpanIndexSemanticsTag(index++),
-          child: span.child,
-        ));
-      }
-      return true;
-    });
-    return result;
-  }
 
   /// The text to display in this widget.
   final InlineSpan text;
@@ -167,7 +147,9 @@ abstract class _RichText extends MultiChildRenderObjectWidget {
   ///
   /// For example, if the text scale factor is 1.5, text will be 50% larger than
   /// the specified font size.
-  final double textScaleFactor;
+
+  /// {@macro flutter.painting.textPainter.textScaler}
+  final TextScaler textScaler;
 
   /// An optional maximum number of lines for the text to span, wrapping if necessary.
   /// If the text exceeds the given number of lines, it will be truncated according
@@ -204,8 +186,8 @@ abstract class _RichText extends MultiChildRenderObjectWidget {
   ///
   /// This is ignored if [selectionRegistrar] is null.
   ///
-  /// See the section on selections in the [_RichText] top-level API
-  /// documentation for more details on enabling selection in [_RichText]
+  /// See the section on selections in the [RichText] top-level API
+  /// documentation for more details on enabling selection in [RichText]
   /// widgets.
   final Color? selectionColor;
 
@@ -218,7 +200,7 @@ abstract class _RichText extends MultiChildRenderObjectWidget {
   //     textDirection: textDirection ?? Directionality.of(context),
   //     softWrap: softWrap,
   //     overflow: overflow,
-  //     textScaleFactor: textScaleFactor,
+  //     textScaler: textScaler,
   //     maxLines: maxLines,
   //     strutStyle: strutStyle,
   //     textWidthBasis: textWidthBasis,
@@ -238,7 +220,7 @@ abstract class _RichText extends MultiChildRenderObjectWidget {
   //     ..textDirection = textDirection ?? Directionality.of(context)
   //     ..softWrap = softWrap
   //     ..overflow = overflow
-  //     ..textScaleFactor = textScaleFactor
+  //     ..textScaler = textScaler
   //     ..maxLines = maxLines
   //     ..strutStyle = strutStyle
   //     ..textWidthBasis = textWidthBasis
@@ -262,8 +244,8 @@ abstract class _RichText extends MultiChildRenderObjectWidget {
         showName: true));
     properties.add(EnumProperty<TextOverflow>('overflow', overflow,
         defaultValue: TextOverflow.clip));
-    properties.add(
-        DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: 1.0));
+    properties.add(DiagnosticsProperty<TextScaler>('textScaler', textScaler,
+        defaultValue: TextScaler.noScaling));
     properties.add(IntProperty('maxLines', maxLines, ifNull: 'unlimited'));
     properties.add(EnumProperty<TextWidthBasis>(
         'textWidthBasis', textWidthBasis,

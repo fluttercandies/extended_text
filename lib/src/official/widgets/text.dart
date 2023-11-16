@@ -17,7 +17,7 @@ part of 'package:extended_text/src/extended/widgets/text.dart';
 ///
 /// {@tool snippet}
 ///
-/// This example shows how to display text using the [_Text] widget with the
+/// This example shows how to display text using the [Text] widget with the
 /// [overflow] set to [TextOverflow.ellipsis].
 ///
 /// ![If the text is shorter than the available space, it is displayed in full without an ellipsis.](https://flutter.github.io/assets-for-api-docs/assets/widgets/text.png)
@@ -34,7 +34,7 @@ part of 'package:extended_text/src/extended/widgets/text.dart';
 /// ```
 /// {@end-tool}
 ///
-/// Using the [Text.rich] constructor, the [_Text] widget can
+/// Using the [Text.rich] constructor, the [Text] widget can
 /// display a paragraph with differently styled [TextSpan]s. The sample
 /// that follows displays "Hello beautiful world" with different styles
 /// for each word.
@@ -58,7 +58,7 @@ part of 'package:extended_text/src/extended/widgets/text.dart';
 ///
 /// ## Interactivity
 ///
-/// To make [_Text] react to touch events, wrap it in a [GestureDetector] widget
+/// To make [Text] react to touch events, wrap it in a [GestureDetector] widget
 /// with a [GestureDetector.onTap] handler.
 ///
 /// In a Material Design application, consider using a [TextButton] instead, or
@@ -71,7 +71,7 @@ part of 'package:extended_text/src/extended/widgets/text.dart';
 ///
 /// ## Selection
 ///
-/// [_Text] is not selectable by default. To make a [_Text] selectable, one can
+/// [Text] is not selectable by default. To make a [Text] selectable, one can
 /// wrap a subtree with a [SelectionArea] widget. To exclude a part of a subtree
 /// under [SelectionArea] from selection, once can also wrap that part of the
 /// subtree with [SelectionContainer.disabled].
@@ -94,8 +94,6 @@ class _Text extends StatelessWidget {
   /// If the [style] argument is null, the text will use the style from the
   /// closest enclosing [DefaultTextStyle].
   ///
-  /// The [data] parameter must not be null.
-  ///
   /// The [overflow] property's behavior is affected by the [softWrap] argument.
   /// If the [softWrap] is true or null, the glyph causing overflow, and those
   /// that follow, will not be rendered. Otherwise, it will be shown with the
@@ -110,7 +108,7 @@ class _Text extends StatelessWidget {
     this.locale,
     this.softWrap,
     this.overflow,
-    this.textScaleFactor,
+    this.textScaler,
     this.maxLines,
     this.semanticsLabel,
     this.textWidthBasis,
@@ -138,7 +136,7 @@ class _Text extends StatelessWidget {
     this.locale,
     this.softWrap,
     this.overflow,
-    this.textScaleFactor,
+    this.textScaler,
     this.maxLines,
     this.semanticsLabel,
     this.textWidthBasis,
@@ -210,9 +208,11 @@ class _Text extends StatelessWidget {
   /// the specified font size.
   ///
   /// The value given to the constructor as textScaleFactor. If null, will
-  /// use the [MediaQueryData.textScaleFactor] obtained from the ambient
+  /// use the [MediaQueryData.textScaler] obtained from the ambient
   /// [MediaQuery], or 1.0 if there is no [MediaQuery] in scope.
-  final double? textScaleFactor;
+
+  /// {@macro flutter.painting.textPainter.textScaler}
+  final TextScaler? textScaler;
 
   /// An optional maximum number of lines for the text to span, wrapping if necessary.
   /// If the text exceeds the given number of lines, it will be truncated according
@@ -280,7 +280,7 @@ class _Text extends StatelessWidget {
       softWrap: softWrap ?? defaultTextStyle.softWrap,
       overflow:
           overflow ?? effectiveTextStyle?.overflow ?? defaultTextStyle.overflow,
-      textScaleFactor: textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
+      textScaler: textScaler ?? MediaQuery.textScalerOf(context),
       maxLines: maxLines ?? defaultTextStyle.maxLines,
       strutStyle: strutStyle,
       textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
@@ -299,7 +299,8 @@ class _Text extends StatelessWidget {
     );
     if (registrar != null) {
       result = MouseRegion(
-        cursor: SystemMouseCursors.text,
+        cursor: DefaultSelectionStyle.of(context).mouseCursor ??
+            SystemMouseCursors.text,
         child: result,
       );
     }
@@ -337,8 +338,8 @@ class _Text extends StatelessWidget {
         showName: true));
     properties.add(
         EnumProperty<TextOverflow>('overflow', overflow, defaultValue: null));
-    properties.add(
-        DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: null));
+    properties.add(DiagnosticsProperty<TextScaler>('textScaler', textScaler,
+        defaultValue: null));
     properties.add(IntProperty('maxLines', maxLines, defaultValue: null));
     properties.add(EnumProperty<TextWidthBasis>(
         'textWidthBasis', textWidthBasis,

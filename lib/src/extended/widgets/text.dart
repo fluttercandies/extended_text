@@ -29,7 +29,7 @@ class ExtendedText extends Text {
     super.locale,
     super.softWrap,
     super.overflow,
-    super.textScaleFactor,
+    super.textScaler,
     super.maxLines,
     super.semanticsLabel,
     super.textWidthBasis,
@@ -62,7 +62,7 @@ class ExtendedText extends Text {
     super.locale,
     super.softWrap,
     super.overflow,
-    super.textScaleFactor,
+    super.textScaler,
     super.maxLines,
     super.semanticsLabel,
     super.textWidthBasis,
@@ -116,7 +116,7 @@ class ExtendedText extends Text {
       softWrap: softWrap ?? defaultTextStyle.softWrap,
       overflow:
           overflow ?? effectiveTextStyle?.overflow ?? defaultTextStyle.overflow,
-      textScaleFactor: textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
+      textScaler: textScaler ?? MediaQuery.textScalerOf(context),
       maxLines: maxLines ?? defaultTextStyle.maxLines,
       strutStyle: strutStyle,
       textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
@@ -136,7 +136,8 @@ class ExtendedText extends Text {
     );
     if (registrar != null) {
       result = MouseRegion(
-        cursor: SystemMouseCursors.text,
+        cursor: DefaultSelectionStyle.of(context).mouseCursor ??
+            SystemMouseCursors.text,
         child: result,
       );
     }

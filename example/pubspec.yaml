@@ -11,7 +11,7 @@ version: 1.0.0+1
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
-  flutter: ">=3.13.0"
+  flutter: ">=3.16.0"
 dependencies:
   cupertino_icons: ^1.0.2
   ff_annotation_route_library: ^3.0.0

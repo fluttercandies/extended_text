@@ -65,8 +65,8 @@ class CommonSelectionArea extends StatelessWidget {
                   Clipboard.getData('text/plain').then((ClipboardData? value) {
                     if (value != null) {
                       // remove zeroWidthSpace
-                      final String? plainText =
-                          value.text?.replaceAll(ExtendedTextLibraryUtils.zeroWidthSpace, '');
+                      final String? plainText = value.text?.replaceAll(
+                          ExtendedTextLibraryUtils.zeroWidthSpace, '');
                       if (plainText != null) {
                         Clipboard.setData(ClipboardData(text: plainText));
                       }
