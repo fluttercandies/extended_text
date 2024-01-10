@@ -1,3 +1,7 @@
+# 10.0.1-ohos
+
+* support openharmony
+
 # 10.0.1
 
 * fix issue on ios after flutter version 3.7.0. #191 #198

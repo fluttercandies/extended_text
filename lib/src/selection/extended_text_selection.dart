@@ -237,6 +237,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
           break;
 
         case TargetPlatform.android:
+        case TargetPlatform.ohos:
         case TargetPlatform.fuchsia:
           _textSelectionControls ??= materialTextSelectionControls;
 
@@ -341,6 +342,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
         break;
 
       case TargetPlatform.android:
+      case TargetPlatform.ohos:
       case TargetPlatform.fuchsia:
         forcePressEnabled = false;
         _textSelectionControls ??= materialTextSelectionControls;
@@ -772,6 +774,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
           break;
         case TargetPlatform.macOS:
         case TargetPlatform.android:
+        case TargetPlatform.ohos:
         case TargetPlatform.fuchsia:
         case TargetPlatform.linux:
         case TargetPlatform.windows:
