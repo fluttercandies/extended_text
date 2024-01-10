@@ -1,14 +1,14 @@
 import 'package:example/text/my_extended_text_selection_controls.dart';
 import 'package:example/text/my_special_text_span_builder.dart';
 import 'package:extended_text/extended_text.dart';
+import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-//import 'package:url_launcher/url_launcher.dart';
 
-// @FFRoute(
-//     name: 'fluttercandies://CustomTextOverflowDemo',
-//     routeName: 'CustomTextOverflow',
-//     description: 'workaround for issue 26748. how to custom text overflow')
+@FFRoute(
+    name: 'fluttercandies://CustomTextOverflowDemo',
+    routeName: 'CustomTextOverflow',
+    description: 'workaround for issue 26748. how to custom text overflow')
 class CustomTextOverflowDemo extends StatefulWidget {
   @override
   _CustomTextOverflowDemoState createState() => _CustomTextOverflowDemoState();
@@ -58,8 +58,8 @@ class _CustomTextOverflowDemoState extends State<CustomTextOverflowDemo> {
 
   Widget _buildText({
     TextOverflowPosition position = TextOverflowPosition.end,
-    int maxLines = 4,
-    String title,
+    int? maxLines = 4,
+    String? title,
   }) {
     return Card(
       child: Padding(
@@ -107,8 +107,8 @@ class _CustomTextOverflowDemoState extends State<CustomTextOverflowDemo> {
                             'more',
                           ),
                           onTap: () {
-                            launch(
-                                'https://github.com/fluttercandies/extended_text');
+                            launchUrl(Uri.parse(
+                                'https://github.com/fluttercandies/extended_text'));
                           },
                         )
                       ],
@@ -125,12 +125,12 @@ class _CustomTextOverflowDemoState extends State<CustomTextOverflowDemo> {
   void onSpecialTextTap(dynamic parameter) {
     if (parameter.toString().startsWith('\$')) {
       if (parameter.toString().contains('issue')) {
-        launch('https://github.com/flutter/flutter/issues/26748');
+        launchUrl(Uri.parse('https://github.com/flutter/flutter/issues/26748'));
       } else {
-        launch('https://github.com/fluttercandies');
+        launchUrl(Uri.parse('https://github.com/fluttercandies'));
       }
     } else if (parameter.toString().startsWith('@')) {
-      launch('mailto:zmtzawqlp@live.com');
+      launchUrl(Uri.parse('mailto:zmtzawqlp@live.com'));
     }
   }
 }

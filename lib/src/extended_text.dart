@@ -1,9 +1,13 @@
 import 'dart:ui' as ui show TextHeightBehavior, BoxWidthStyle, BoxHeightStyle;
-import 'package:extended_text/extended_text.dart';
+
 import 'package:extended_text/src/extended_rich_text.dart';
+import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+
+import 'selection/extended_text_selection.dart';
+import 'text_overflow_widget.dart';
 
 class ExtendedText extends StatelessWidget {
   /// Creates a text widget.
@@ -11,8 +15,8 @@ class ExtendedText extends StatelessWidget {
   /// If the [style] argument is null, the text will use the style from the
   /// closest enclosing [DefaultTextStyle].
   const ExtendedText(
-    this.data, {
-    Key key,
+    String this.data, {
+    Key? key,
     this.style,
     this.strutStyle,
     this.textAlign,
@@ -36,6 +40,8 @@ class ExtendedText extends StatelessWidget {
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
     this.overflowWidget,
     this.joinZeroWidthSpace = false,
+    this.shouldShowSelectionHandles,
+    this.textSelectionGestureDetectorBuilder,
   })  : textSpan = null,
         // assert(!(betterLineBreakingAndOverflowStyle && selectionEnabled),
         //    'join zero width space into text, the word will not be a word, the [TextPainter] won\'t work any more.'),
@@ -43,8 +49,8 @@ class ExtendedText extends StatelessWidget {
 
   /// Creates a text widget with a [InlineSpan].
   const ExtendedText.rich(
-    this.textSpan, {
-    Key key,
+    InlineSpan this.textSpan, {
+    Key? key,
     this.style,
     this.strutStyle,
     this.textAlign,
@@ -67,15 +73,26 @@ class ExtendedText extends StatelessWidget {
     this.selectionWidthStyle = ui.BoxWidthStyle.tight,
     this.overflowWidget,
     this.joinZeroWidthSpace = false,
+    this.shouldShowSelectionHandles,
+    this.textSelectionGestureDetectorBuilder,
   })  : data = null,
         specialTextSpanBuilder = null,
         // assert(!(betterLineBreakingAndOverflowStyle && selectionEnabled),
         //     'join zero width space into text, the word will not be a word, the [TextPainter] won\'t work any more.'),
         super(key: key);
 
+  /// create custom TextSelectionGestureDetectorBuilder
+  final TextSelectionGestureDetectorBuilderCallback?
+      textSelectionGestureDetectorBuilder;
+
+  /// Whether should show selection handles
+  /// handles are not shown in desktop or web as default
+  /// you can define your behavior
+  final ShouldShowSelectionHandlesCallback? shouldShowSelectionHandles;
+
   /// maxheight is equal to textPainter.preferredLineHeight
   /// maxWidth is equal to textPainter.width
-  final TextOverflowWidget overflowWidget;
+  final TextOverflowWidget? overflowWidget;
 
   /// Controls how tall the selection highlight boxes are computed to be.
   ///
@@ -89,16 +106,16 @@ class ExtendedText extends StatelessWidget {
 
   /// An interface for building the selection UI, to be provided by the
   /// implementor of the toolbar widget or handle widget
-  final TextSelectionControls selectionControls;
+  final TextSelectionControls? selectionControls;
 
   ///DragStartBehavior for text selection
   final DragStartBehavior dragStartBehavior;
 
   ///Color of selection
-  final Color selectionColor;
+  final Color? selectionColor;
 
   ///Called when the user taps on this text.
-  final GestureTapCallback onTap;
+  final GestureTapCallback? onTap;
 
   ///whether enable selection
   final bool selectionEnabled;
@@ -106,31 +123,31 @@ class ExtendedText extends StatelessWidget {
   /// The text to display.
   ///
   /// This will be null if a [textSpan] is provided instead.
-  final String data;
+  final String? data;
 
   ///build your ccustom text span
-  final SpecialTextSpanBuilder specialTextSpanBuilder;
+  final SpecialTextSpanBuilder? specialTextSpanBuilder;
 
   ///call back of SpecialText tap
-  final SpecialTextGestureTapCallback onSpecialTextTap;
+  final SpecialTextGestureTapCallback? onSpecialTextTap;
 
   /// The text to display as a [InlineSpan].
   ///
   /// This will be null if [data] is provided instead.
-  final InlineSpan textSpan;
+  final InlineSpan? textSpan;
 
   /// If non-null, the style to use for this text.
   ///
   /// If the style's "inherit" property is true, the style will be merged with
   /// the closest enclosing [DefaultTextStyle]. Otherwise, the style will
   /// replace the closest enclosing [DefaultTextStyle].
-  final TextStyle style;
+  final TextStyle? style;
 
   /// {@macro flutter.painting.textPainter.strutStyle}
-  final StrutStyle strutStyle;
+  final StrutStyle? strutStyle;
 
   /// How the text should be aligned horizontally.
-  final TextAlign textAlign;
+  final TextAlign? textAlign;
 
   /// The directionality of the text.
   ///
@@ -145,7 +162,7 @@ class ExtendedText extends StatelessWidget {
   /// its left.
   ///
   /// Defaults to the ambient [Directionality], if any.
-  final TextDirection textDirection;
+  final TextDirection? textDirection;
 
   /// Used to select a font when the same Unicode character can
   /// be rendered differently, depending on the locale.
@@ -154,15 +171,15 @@ class ExtendedText extends StatelessWidget {
   /// is inherited from the enclosing app with `Localizations.localeOf(context)`.
   ///
   /// See [RenderParagraph.locale] for more information.
-  final Locale locale;
+  final Locale? locale;
 
   /// Whether the text should break at soft line breaks.
   ///
   /// If false, the glyphs in the text will be positioned as if there was unlimited horizontal space.
-  final bool softWrap;
+  final bool? softWrap;
 
   /// How visual overflow should be handled.
-  final TextOverflow overflow;
+  final TextOverflow? overflow;
 
   /// The number of font pixels for each logical pixel.
   ///
@@ -172,7 +189,7 @@ class ExtendedText extends StatelessWidget {
   /// The value given to the constructor as textScaleFactor. If null, will
   /// use the [MediaQueryData.textScaleFactor] obtained from the ambient
   /// [MediaQuery], or 1.0 if there is no [MediaQuery] in scope.
-  final double textScaleFactor;
+  final double? textScaleFactor;
 
   /// An optional maximum number of lines for the text to span, wrapping if necessary.
   /// If the text exceeds the given number of lines, it will be truncated according
@@ -185,7 +202,7 @@ class ExtendedText extends StatelessWidget {
   /// an explicit number for its [DefaultTextStyle.maxLines], then the
   /// [DefaultTextStyle] value will take precedence. You can use a [RichText]
   /// widget directly to entirely override the [DefaultTextStyle].
-  final int maxLines;
+  final int? maxLines;
 
   /// An alternative semantics label for this text.
   ///
@@ -200,13 +217,13 @@ class ExtendedText extends StatelessWidget {
   /// Text(r'$$', semanticsLabel: 'Double dollars')
   ///
   /// ```
-  final String semanticsLabel;
+  final String? semanticsLabel;
 
   /// {@macro flutter.dart:ui.text.TextWidthBasis}
-  final TextWidthBasis textWidthBasis;
+  final TextWidthBasis? textWidthBasis;
 
   /// {@macro flutter.dart:ui.textHeightBehavior}
-  final ui.TextHeightBehavior textHeightBehavior;
+  final ui.TextHeightBehavior? textHeightBehavior;
 
   /// Whether join '\u{200B}' into text
   /// https://github.com/flutter/flutter/issues/18761#issuecomment-812390920
@@ -220,15 +237,15 @@ class ExtendedText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DefaultTextStyle defaultTextStyle = DefaultTextStyle.of(context);
-    TextStyle effectiveTextStyle = style;
-    if (style == null || style.inherit)
+    TextStyle? effectiveTextStyle = style;
+    if (style == null || style!.inherit)
       effectiveTextStyle = defaultTextStyle.style.merge(style);
     if (MediaQuery.boldTextOverride(context))
-      effectiveTextStyle = effectiveTextStyle
+      effectiveTextStyle = effectiveTextStyle!
           .merge(const TextStyle(fontWeight: FontWeight.bold));
 
-    InlineSpan innerTextSpan = specialTextSpanBuilder?.build(
-      data,
+    InlineSpan? innerTextSpan = specialTextSpanBuilder?.build(
+      data!,
       textStyle: effectiveTextStyle,
       onTap: onSpecialTextTap,
     );
@@ -236,7 +253,7 @@ class ExtendedText extends StatelessWidget {
     innerTextSpan ??= TextSpan(
       style: effectiveTextStyle,
       text: data,
-      children: textSpan != null ? <InlineSpan>[textSpan] : null,
+      children: textSpan != null ? <InlineSpan>[textSpan!] : null,
     );
 
     if (joinZeroWidthSpace) {
@@ -264,17 +281,20 @@ class ExtendedText extends StatelessWidget {
             textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
         maxLines: maxLines ?? defaultTextStyle.maxLines,
         text: innerTextSpan,
-        selectionColor: selectionColor ?? Theme.of(context).textSelectionColor,
+        selectionColor: selectionColor,
         dragStartBehavior: dragStartBehavior,
         onTap: onTap,
         data: (joinZeroWidthSpace ? data?.joinChar() : data) ??
             textSpanToActualText(innerTextSpan),
-        selectionControls: selectionControls,
+        textSelectionControls: selectionControls,
         textHeightBehavior:
             textHeightBehavior ?? defaultTextStyle.textHeightBehavior,
         textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
         overFlowWidget: overflowWidget,
         strutStyle: strutStyle,
+        shouldShowSelectionHandles: shouldShowSelectionHandles,
+        textSelectionGestureDetectorBuilder:
+            textSelectionGestureDetectorBuilder,
       );
     } else {
       result = ExtendedRichText(
@@ -333,7 +353,7 @@ class ExtendedText extends StatelessWidget {
     super.debugFillProperties(properties);
     properties.add(StringProperty('data', data, showName: false));
     if (textSpan != null) {
-      properties.add(textSpan.toDiagnosticsNode(
+      properties.add(textSpan!.toDiagnosticsNode(
           name: 'textSpan', style: DiagnosticsTreeStyle.transition));
     }
     style?.debugFillProperties(properties);

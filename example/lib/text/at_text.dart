@@ -3,15 +3,15 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class AtText extends SpecialText {
-  AtText(TextStyle textStyle, SpecialTextGestureTapCallback onTap,
-      {@required this.start})
+  AtText(TextStyle? textStyle, SpecialTextGestureTapCallback? onTap,
+      {required this.start})
       : super(flag, ' ', textStyle, onTap: onTap);
   static const String flag = '@';
   final int start;
 
   @override
   InlineSpan finishText() {
-    final TextStyle textStyle =
+    final TextStyle? textStyle =
         this.textStyle?.copyWith(color: Colors.blue, fontSize: 16.0);
 
     final String atText = toString();
@@ -24,9 +24,16 @@ class AtText extends SpecialText {
       recognizer: (TapGestureRecognizer()
         ..onTap = () {
           if (onTap != null) {
-            onTap(atText);
+            onTap!(atText);
           }
         }),
+      mouseCursor: SystemMouseCursors.text,
+      onEnter: (PointerEnterEvent event) {
+        print(event);
+      },
+      onExit: (PointerExitEvent event) {
+        print(event);
+      },
     );
   }
 }

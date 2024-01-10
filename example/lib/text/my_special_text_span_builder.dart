@@ -9,9 +9,11 @@ class MySpecialTextSpanBuilder extends SpecialTextSpanBuilder {
   MySpecialTextSpanBuilder();
 
   @override
-  SpecialText createSpecialText(String flag,
-      {TextStyle textStyle, SpecialTextGestureTapCallback onTap, int index}) {
-    if (flag == null || flag == '') {
+  SpecialText? createSpecialText(String flag,
+      {TextStyle? textStyle,
+      SpecialTextGestureTapCallback? onTap,
+      int? index}) {
+    if (flag == '') {
       return null;
     }
 
@@ -20,13 +22,13 @@ class MySpecialTextSpanBuilder extends SpecialTextSpanBuilder {
       return AtText(
         textStyle,
         onTap,
-        start: index - (AtText.flag.length - 1),
+        start: index! - (AtText.flag.length - 1),
       );
     } else if (isStart(flag, EmojiText.flag)) {
-      return EmojiText(textStyle, start: index - (EmojiText.flag.length - 1));
+      return EmojiText(textStyle, start: index! - (EmojiText.flag.length - 1));
     } else if (isStart(flag, DollarText.flag)) {
       return DollarText(textStyle, onTap,
-          start: index - (DollarText.flag.length - 1));
+          start: index! - (DollarText.flag.length - 1));
     }
     return null;
   }

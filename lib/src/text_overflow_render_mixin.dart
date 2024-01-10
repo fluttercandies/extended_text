@@ -2,21 +2,21 @@ part of 'extended_render_paragraph.dart';
 
 mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
   TextOverflow get oldOverflow;
-  Rect _overflowRect;
+  Rect? _overflowRect;
 
   /// crop rect before _overflowRect
   /// it's used for [TextOverflowPosition.middle]
-  List<Rect> _overflowRects;
+  List<Rect>? _overflowRects;
   bool _hasVisualOverflow = false;
-  ui.Shader _overflowShader;
+  ui.Shader? _overflowShader;
   bool _needsClipping = false;
   // Retuns a cached plain text version of the text in the painter.
-  String _cachedPlainText;
+  String? _cachedPlainText;
   @override
-  TextOverflowWidget get overflowWidget => _overflowWidget;
+  TextOverflowWidget? get overflowWidget => _overflowWidget;
 
-  TextOverflowWidget _overflowWidget;
-  set overflowWidget(TextOverflowWidget value) {
+  TextOverflowWidget? _overflowWidget;
+  set overflowWidget(TextOverflowWidget? value) {
     if (_overflowWidget == value) {
       return;
     }
@@ -32,7 +32,7 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
   /// How visual overflow should be handled.
   @override
   TextOverflow get overflow => _overflow;
-  TextOverflow _overflow;
+  late TextOverflow _overflow;
   set overflow(TextOverflow value) {
     final TextOverflow temp =
         overflowWidget != null ? TextOverflow.clip : value;
@@ -51,11 +51,11 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
     _overflowRects = null;
     if (overflowWidget != null) {
       // #97, the overflowWidget is already added, we must layout it as official.
-      lastChild.layout(
+      lastChild!.layout(
         BoxConstraints(
           maxWidth: constraints.maxWidth,
           maxHeight:
-              overflowWidget.maxHeight ?? textPainter.preferredLineHeight,
+              overflowWidget!.maxHeight ?? textPainter.preferredLineHeight,
         ),
         parentUsesSize: true,
       );
@@ -63,16 +63,17 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
       if (!_hasVisualOverflow) {
         return;
       }
-      //assert(textPainter.width >= lastChild.size.width);
+      //assert(textPainter.width >= lastChild!.size.width);
 
       final TextParentData textParentData =
-          lastChild.parentData as TextParentData;
+          lastChild!.parentData as TextParentData;
       textParentData.scale = 1.0;
 
       final Rect rect = Offset.zero & size;
-      final Size overflowWidgetSize = lastChild.size;
-      final TextOverflowPosition textOverflowPosition = overflowWidget.position;
-      final int maxOffset = text.toPlainText().length;
+      final Size overflowWidgetSize = lastChild!.size;
+      final TextOverflowPosition textOverflowPosition =
+          overflowWidget!.position;
+      final int maxOffset = text!.toPlainText().runes.length;
       if (textOverflowPosition == TextOverflowPosition.end) {
         final TextSelection overflowSelection = TextSelection(
           baseOffset: textPainter
@@ -93,7 +94,7 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
           textParentData,
           rect,
           maxOffset,
-          overflowWidget.position,
+          overflowWidget!.position,
         );
       }
       // middle/start
@@ -102,7 +103,7 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
 
         int start = 0;
         int end = 0;
-        final int maxLines = textPainter.maxLines;
+        final int maxLines = textPainter.maxLines!;
         final bool even = maxLines % 2 == 0;
 
         // middle
@@ -120,7 +121,7 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
                   0, rect.centerLeft.dy + textPainter.preferredLineHeight / 2.0)
               : rect.center - Offset(overflowWidgetSize.width / 2, 0));
           position =
-              convertTextPainterPostionToTextInputPostion(text, position);
+              convertTextPainterPostionToTextInputPostion(text!, position)!;
 
           start = position.offset;
           end = start + 1;
@@ -142,7 +143,8 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
           TextPosition position = textPainter.getPositionForOffset(Offset(
               overflowWidgetSize.width, textPainter.preferredLineHeight / 2));
           position =
-              convertTextPainterPostionToTextInputPostion(text, position);
+              convertTextPainterPostionToTextInputPostion(text!, position)!;
+
           end = position.offset;
         }
 
@@ -154,10 +156,10 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
 
         assert(!_hasVisualOverflow);
 
-        final InlineSpan oldSpan = textPainter.text;
+        final InlineSpan oldSpan = textPainter.text!;
         // recreate text
         textPainter.text = testTextPainter.text;
-        extractPlaceholderSpans(textPainter.text);
+        extractPlaceholderSpans(textPainter.text!);
         _cachedPlainText = null;
         layoutChildren(constraints, hideWidgets: hideWidgets);
         layoutText(
@@ -189,21 +191,24 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
             textParentData,
             rect,
             maxOffset,
-            overflowWidget.position,
+            overflowWidget!.position,
           );
         }
         // middle
         else {
           TextSelection overflowSelection = TextSelection(
             baseOffset: range.start,
-            extentOffset: range.end,
+            extentOffset: range.start + math.max(1, range.end - range.start),
           );
 
           overflowSelection = convertTextInputSelectionToTextPainterSelection(
               oldSpan, overflowSelection);
 
-          final List<ui.TextBox> boxs =
-              textPainter.getBoxesForSelection(overflowSelection);
+          final List<ui.TextBox> boxs = textPainter.getBoxesForSelection(
+            overflowSelection,
+            boxWidthStyle: selectionWidthStyle,
+            boxHeightStyle: selectionHeightStyle,
+          );
           _overflowRects ??= <Rect>[];
           for (final ui.TextBox box in boxs) {
             final Rect boxRect = box.toRect();
@@ -234,7 +239,7 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
             textParentData,
             rect,
             maxOffset,
-            overflowWidget.position,
+            overflowWidget!.position,
           );
         }
       }
@@ -244,8 +249,8 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
   int _layoutCount = 0;
   TextPainter _findNoOverflow(_TextRange range, List<int> hideWidgets) {
     _layoutCount = 0;
-    TextPainter testTextPainter;
-    final int maxOffset = textSpanToActualText(text).length;
+    late TextPainter testTextPainter;
+    final int maxOffset = textSpanToActualText(text!).runes.length;
     int maxEnd = maxOffset;
     while (_hasVisualOverflow) {
       testTextPainter = _tryToFindNoOverflow1(range, hideWidgets);
@@ -255,13 +260,15 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
         // not find
         assert(range.end != maxOffset, 'can\' find no overflow');
         range.end = math.min(
-            range.end + math.max((maxEnd - range.end) ~/ 2, 1) as int,
-            maxOffset);
+            range.end + math.max((maxEnd - range.end) ~/ 2, 1), maxOffset);
         hideWidgets.clear();
       } else {
         // see pre one whether overflow
         range.end = math.min(range.end - 1, maxOffset);
+
+        final _TextRange pre = range.copyWith();
         _tryToFindNoOverflow1(range, <int>[]);
+
         if (_hasVisualOverflow) {
           // fix end
           range.end = math.min(range.end + 1, maxOffset);
@@ -271,10 +278,14 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
           maxEnd = range.end;
           range.end = math.max(
               range.start,
-              math.min(maxEnd - math.max((maxEnd - range.start) ~/ 2, 1) as int,
-                  maxEnd));
-          // continue
-          _hasVisualOverflow = true;
+              math.min(
+                  maxEnd - math.max((maxEnd - range.start) ~/ 2, 1), maxEnd));
+          // if range is not changed, so maybe we should break.
+          if (pre == range) {
+            _hasVisualOverflow = false;
+          } else {
+            _hasVisualOverflow = true;
+          }
         }
       }
     }
@@ -288,7 +299,7 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
 
   TextPainter _tryToFindNoOverflow1(_TextRange range, List<int> hideWidgets) {
     final InlineSpan inlineSpan = _cutOffInlineSpan(
-      text,
+      text!,
       Accumulator(),
       range,
       hideWidgets,
@@ -333,37 +344,37 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
       effectiveOffset: Offset.zero,
     );
 
-    final bool rightBig = _overflowRect.right > overflowRect.right;
+    final bool rightBig = _overflowRect!.right > overflowRect.right;
 
-    final bool leftBig = _overflowRect.left > overflowRect.left;
+    final bool leftBig = _overflowRect!.left > overflowRect.left;
 
     if (
         //position != TextOverflowPosition.middle ||
-        _overflowRect.overlaps(overflowRect)) {
+        _overflowRect!.overlaps(overflowRect)) {
       if (overflowRect.width == 0) {
-        overflowRect = Rect.fromLTWH(overflowRect.left, _overflowRect.top,
-            overflowRect.width, _overflowRect.height);
+        overflowRect = Rect.fromLTWH(overflowRect.left, _overflowRect!.top,
+            overflowRect.width, _overflowRect!.height);
       }
-      _overflowRect = _overflowRect.expandToInclude(overflowRect);
+      _overflowRect = _overflowRect!.expandToInclude(overflowRect);
     }
 
     bool go = true;
     while (go) {
       go = false;
       if (overflowSelection.baseOffset > 0 &&
-          rect.left < _overflowRect.left &&
+          rect.left < _overflowRect!.left &&
           (leftBig
-              ? _overflowRect.left > overflowRect.left
-              : _overflowRect.left < overflowRect.left)) {
+              ? _overflowRect!.left > overflowRect.left
+              : _overflowRect!.left < overflowRect.left)) {
         overflowSelection = overflowSelection.copyWith(
             baseOffset: overflowSelection.baseOffset - 1);
         go = true;
       }
       if (overflowSelection.extentOffset < maxOffset &&
-          rect.right > _overflowRect.right &&
+          rect.right > _overflowRect!.right &&
           (rightBig
-              ? _overflowRect.right > overflowRect.right
-              : _overflowRect.right < overflowRect.right)) {
+              ? _overflowRect!.right > overflowRect.right
+              : _overflowRect!.right < overflowRect.right)) {
         overflowSelection = overflowSelection.copyWith(
           extentOffset: overflowSelection.extentOffset + 1,
         );
@@ -380,21 +391,21 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
         effectiveOffset: Offset.zero,
       );
       // igore zero width
-      if (_overflowRect.overlaps(overflowRect)) {
+      if (_overflowRect!.overlaps(overflowRect)) {
         if (overflowRect.width == 0) {
-          overflowRect = Rect.fromLTWH(overflowRect.left, _overflowRect.top,
-              overflowRect.width, _overflowRect.height);
+          overflowRect = Rect.fromLTWH(overflowRect.left, _overflowRect!.top,
+              overflowRect.width, _overflowRect!.height);
         }
-        _overflowRect = _overflowRect.expandToInclude(overflowRect);
+        _overflowRect = _overflowRect!.expandToInclude(overflowRect);
       } else {
         // out _overflowRect and reach rect
-        if (rect.left >= _overflowRect.left ||
-            rect.right <= _overflowRect.right) {
+        if (rect.left >= _overflowRect!.left ||
+            rect.right <= _overflowRect!.right) {
           // see whether in the same line
-          overflowRect = Rect.fromLTRB(_overflowRect.left, overflowRect.top,
-              _overflowRect.right, overflowRect.bottom);
-          if (_overflowRect.overlaps(overflowRect)) {
-            _overflowRect = _overflowRect.expandToInclude(overflowRect);
+          overflowRect = Rect.fromLTRB(_overflowRect!.left, overflowRect.top,
+              _overflowRect!.right, overflowRect.bottom);
+          if (_overflowRect!.overlaps(overflowRect)) {
+            _overflowRect = _overflowRect!.expandToInclude(overflowRect);
           }
           go = false;
         }
@@ -427,39 +438,39 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
       // }
     }
 
-    double left;
-    switch (overflowWidget.align) {
+    late double left;
+    switch (overflowWidget!.align) {
       case TextOverflowAlign.left:
-        left = _overflowRect.left;
+        left = _overflowRect!.left;
         break;
       case TextOverflowAlign.right:
-        left = _overflowRect.right - overFlowWidgetSize.width;
+        left = _overflowRect!.right - overFlowWidgetSize.width;
         break;
       case TextOverflowAlign.center:
-        left = _overflowRect.center.dx - overFlowWidgetSize.width / 2;
+        left = _overflowRect!.center.dx - overFlowWidgetSize.width / 2;
         break;
       default:
     }
     textParentData.offset = Offset(
         left,
-        _overflowRect.top +
-            (_overflowRect.height - overFlowWidgetSize.height) / 2.0);
+        _overflowRect!.top +
+            (_overflowRect!.height - overFlowWidgetSize.height) / 2.0);
   }
 
   void _paintTextOverflow(PaintingContext context, Offset offset) {
     if (overflowWidget != null && _overflowRect != null) {
-      //assert(textPainter.width >= lastChild.size.width);
+      //assert(textPainter.width >= lastChild!.size.width);
 
       final TextParentData textParentData =
-          lastChild.parentData as TextParentData;
-      final double scale = textParentData.scale;
+          lastChild!.parentData as TextParentData;
+      final double scale = textParentData.scale!;
       context.pushTransform(
         needsCompositing,
         offset + textParentData.offset,
         Matrix4.diagonal3Values(scale, scale, scale),
         (PaintingContext context, Offset offset) {
           context.paintChild(
-            lastChild,
+            lastChild!,
             offset,
           );
         },
@@ -475,8 +486,8 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
     List<int> hideWidgets,
     Accumulator hideWidgetIndex,
   ) {
-    InlineSpan output;
-    String actualText;
+    late InlineSpan output;
+    String? actualText;
     bool deleteAll = false;
     if (value is SpecialInlineSpanBase) {
       final SpecialInlineSpanBase base = value as SpecialInlineSpanBase;
@@ -486,30 +497,51 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
       deleteAll = false;
     }
     if (value is TextSpan) {
-      List<InlineSpan> children;
+      List<InlineSpan>? children;
       final int start = offset.value;
 
-      String text = value.text;
+      String? text = value.text;
       if (text != null) {
-        String temp = '';
-        for (int i = 0; i < text.length; i++) {
+        // https://github.com/dart-lang/sdk/issues/35798
+        final List<int> runes = text.runes.toList();
+
+        // if (kDebugMode) {
+        //   if (runes.length != text.length) {}
+        // }
+
+        final List<int> finallyRunes = <int>[];
+        //bool hasUtf16Surrogate = false;
+        for (int i = 0; i < runes.length; i++) {
           final int index = i + offset.value;
           if (range.contains(index)) {
+            // if (_isUtf16Surrogate(text.codeUnitAt(index))) {
+            //   hasUtf16Surrogate = true;
+            // }
             continue;
           }
-          temp += text[i];
+          finallyRunes.add(runes[i]);
         }
-        text = temp;
+        text = String.fromCharCodes(finallyRunes);
+
+        // String temp = '';
+        // for (int i = 0; i < text.length; i++) {
+        //   final int index = i + offset.value;
+        //   if (range.contains(index)) {
+        //     continue;
+        //   }
+        //   temp += text[i];
+        // }
+        // text = temp;
       }
 
       actualText ??= value.text;
       if (actualText != null) {
-        offset.increment(actualText.length);
+        offset.increment(actualText.runes.length);
       }
 
       if (value.children != null) {
         children = <InlineSpan>[];
-        for (final InlineSpan child in value.children) {
+        for (final InlineSpan child in value.children!) {
           children.add(_cutOffInlineSpan(
             child,
             offset,
@@ -572,9 +604,14 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
     return output;
   }
 
+  // ignore: unused_element
+  bool _isUtf16Surrogate(int value) {
+    return value & 0xF800 == 0xD800;
+  }
+
   TextPainter _copyTextPainter({
-    InlineSpan inlineSpan,
-    int maxLines,
+    InlineSpan? inlineSpan,
+    int? maxLines,
   }) {
     return TextPainter(
       text: inlineSpan ?? text,
@@ -590,7 +627,7 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
     );
   }
 
-  bool _didVisualOverflow({TextPainter textPainter}) {
+  bool _didVisualOverflow({TextPainter? textPainter}) {
     final Size textSize = (textPainter ?? this.textPainter).size;
     final bool textDidExceedMaxLines =
         (textPainter ?? this.textPainter).didExceedMaxLines;
@@ -649,7 +686,7 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
         case TextOverflow.fade:
           _needsClipping = true;
           final TextPainter fadeSizePainter = TextPainter(
-            text: TextSpan(style: textPainter.text.style, text: '\u2026'),
+            text: TextSpan(style: textPainter.text!.style, text: '\u2026'),
             textDirection: textDirection,
             textScaleFactor: textPainter.textScaleFactor,
             locale: textPainter.locale,
@@ -691,14 +728,18 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
   Rect getTextRect(
     TextSelection selection,
     TextOverflowPosition position, {
-    Offset effectiveOffset,
+    Offset? effectiveOffset,
     Rect caretPrototype = Rect.zero,
   }) {
     effectiveOffset ??= Offset.zero;
 
-    final List<TextBox> boxs = textPainter.getBoxesForSelection(selection);
+    final List<TextBox> boxs = textPainter.getBoxesForSelection(
+      selection,
+      boxWidthStyle: selectionWidthStyle,
+      boxHeightStyle: selectionHeightStyle,
+    );
     if (boxs.isNotEmpty) {
-      Rect rect;
+      Rect? rect;
       for (final TextBox box in boxs) {
         final Rect boxRect = box.toRect();
         if (rect == null) {
@@ -713,40 +754,40 @@ mixin TextOverflowMixin on ExtendedTextSelectionRenderObject {
         //  break;
         // }
       }
-      return rect.shift(effectiveOffset);
+      return rect!.shift(effectiveOffset);
     } else {
-      Rect rect;
+      Rect? rect;
       for (int i = selection.baseOffset; i <= selection.extentOffset; i++) {
         final TextPosition textPosition = TextPosition(offset: i);
         final Offset offset =
             textPainter.getOffsetForCaret(textPosition, Rect.zero);
-        final double height =
+        final double? height =
             textPainter.getFullHeightForCaret(textPosition, caretPrototype);
         //assert(height != null, 'can\' find selection');
         if (rect == null) {
-          rect = Rect.fromLTWH(offset.dx, offset.dy, 1, height);
+          rect = Rect.fromLTWH(offset.dx, offset.dy, 1, height ?? 0);
         } else {
-          rect = rect
-              .expandToInclude(Rect.fromLTWH(offset.dx, offset.dy, 1, height));
+          rect = rect.expandToInclude(
+              Rect.fromLTWH(offset.dx, offset.dy, 1, height ?? 0));
         }
       }
 
-      return rect;
+      return rect!;
     }
   }
 
   /// never drag over the over flow text span
   TextSelection neverDragOnOverflow(TextSelection result) {
     if (overflowWidget != null && _overflowRect != null) {
-      if (overflowWidget.position == TextOverflowPosition.end) {
+      if (overflowWidget!.position == TextOverflowPosition.end) {
         final TextPosition position =
-            textPainter.getPositionForOffset(_overflowRect.bottomLeft);
+            textPainter.getPositionForOffset(_overflowRect!.bottomLeft);
         if (result.extentOffset > position.offset) {
           result = result.copyWith(extentOffset: position.offset);
         }
-      } else if (overflowWidget.position == TextOverflowPosition.start) {
+      } else if (overflowWidget!.position == TextOverflowPosition.start) {
         final TextPosition position =
-            textPainter.getPositionForOffset(_overflowRect.topRight);
+            textPainter.getPositionForOffset(_overflowRect!.topRight);
         if (result.baseOffset < position.offset) {
           result = result.copyWith(baseOffset: position.offset);
         }
@@ -763,6 +804,24 @@ class _TextRange {
 
   bool contains(int value) {
     return start <= value && value <= end;
+  }
+
+  int get length => (end - start) + 1;
+
+  _TextRange copyWith({int? start, int? end}) => _TextRange(
+        start ?? this.start,
+        end ?? this.end,
+      );
+
+  @override
+  int get hashCode => Object.hash(start, end);
+
+  @override
+  bool operator ==(Object other) {
+    if (other.runtimeType != runtimeType) {
+      return false;
+    }
+    return (other is _TextRange) && start == other.start && end == other.end;
   }
 }
 

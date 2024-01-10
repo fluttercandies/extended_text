@@ -1,14 +1,15 @@
 import 'package:example/text/my_extended_text_selection_controls.dart';
 import 'package:example/text/my_special_text_span_builder.dart';
 import 'package:extended_text/extended_text.dart';
+import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-// @FFRoute(
-//     name: 'fluttercandies://JoinZeroWidthSpace',
-//     routeName: 'JoinZeroWidthSpace',
-//     description:
-//         'make line breaking and overflow style better, workaround for issue 18761.')
+@FFRoute(
+    name: 'fluttercandies://JoinZeroWidthSpace',
+    routeName: 'JoinZeroWidthSpace',
+    description:
+        'make line breaking and overflow style better, workaround for issue 18761.')
 class JoinZeroWidthSpaceDemo extends StatelessWidget {
   final String content =
       'relate to \$issue 26748\$ .[love]Extended text help you to build rich text quickly. any special text you will have with extended text. '
@@ -42,8 +43,8 @@ class JoinZeroWidthSpaceDemo extends StatelessWidget {
   }
 
   Widget _buildText({
-    int maxLines = 4,
-    String title,
+    int? maxLines = 4,
+    String? title,
     bool joinZeroWidthSpace = false,
   }) {
     return Card(
@@ -86,12 +87,12 @@ class JoinZeroWidthSpaceDemo extends StatelessWidget {
   void onSpecialTextTap(dynamic parameter) {
     if (parameter.toString().startsWith('\$')) {
       if (parameter.toString().contains('issue')) {
-        launch('https://github.com/flutter/flutter/issues/26748');
+        launchUrl(Uri.parse('https://github.com/flutter/flutter/issues/26748'));
       } else {
-        launch('https://github.com/fluttercandies');
+        launchUrl(Uri.parse('https://github.com/fluttercandies'));
       }
     } else if (parameter.toString().startsWith('@')) {
-      launch('mailto:zmtzawqlp@live.com');
+      launchUrl(Uri.parse('mailto:zmtzawqlp@live.com'));
     }
   }
 }

@@ -1,31 +1,78 @@
+# 10.0.1
 
-## 6.0.6-non-null-safety
+* fix issue on ios after flutter version 3.7.0. #191 #198
+
+# 10.0.0
+
+* Migrate to 3.7.0
+
+# 9.1.2
+
+* Add TextOverflowWidget.clearType
+
+# 9.1.1
+
+* Fix cutOffInlineSpan should take care of emoji #131.
+
+# 9.1.0
+
+* Migrate to 3.0.0
+
+# 9.0.0
+
+* Migrate to 2.10.0.
+* Add shouldShowSelectionHandles and textSelectionGestureDetectorBuilder call back to define the behavior of handles and toolbar.
+* Shortcut support for web and desktop.
+
+# 8.0.2
+
+* Fix selectionWidthStyle and selectionHeightStyle are not working.
+
+## 8.0.1
+
+* Support copy on desktop
+
+## 8.0.0
+
+* Migrate to 2.8
+
+## 7.0.1
+
+* Stop hittest if overflowWidget is not hit but overflowRect contains hit pointer.
+
+## 7.0.0
+
+* Add [SpecialTextSpan.mouseCursor], [SpecialTextSpan.onEnter] and [SpecialTextSpan.onExit].
+* merge code from 2.2.0
+
+## 6.0.6
 
 * Fix overflow rect is not right if overflowSelection has no selection(may be empty text).
-  
-## 6.0.5-non-null-safety
+
+## 6.0.5
 
 * Remove unnecessary assert (assert(textPainter.width >= lastChild!.size.width))
 * Initialize _offset with Offset.zero.
-  
-## 6.0.4-non-null-safety
+
+## 6.0.4
 
 * Fix find no overflow endless loop. #105
 * Store raw text to reduce layout.
-
-## 6.0.3-non-null-safety
+  
+## 6.0.3
 
 * Fix hitTest is failed when set TextOverflowWidget and selectionEnabled false.
 * Fix text is cut off when set TextOverflowPosition.end.
-
-## 6.0.2-non-null-safety
+  
+## 6.0.2
 
 * Remove unnecessary canvas.save() when clear _overflowRect
-## 6.0.1-non-null-safety
+
+## 6.0.1
 
 * Improve performance when find no overflow.
 
-## 6.0.0-non-null-safety
+## 6.0.0
 
 * Add [TextOverflowWidget.position] to support show overflow at start, middle or end.
   https://github.com/flutter/flutter/issues/45336
@@ -35,15 +82,31 @@
 * Breaking change: remove [TextOverflowWidget.fixedOffset]
 * Breaking change: [SpecialText.getContent] is not include endflag now.(please check if you call getContent and your endflag length is more than 1)
 
-## 5.0.1-non-null-safety
+## 5.0.5
+
+* Fix issue that childIndex == children.length assert false in assembleSemanticsNode when use overflowWidget and text is not overflow.
+
+## 5.0.4
+
+* Fix issue that the overflowWidget is not layout #97
+
+## 5.0.3
+
+* Fix null-safety error #96
+
+## 5.0.2
+
+* Fix null-safety error
+
+## 5.0.1
 
 * Add add SemanticsInformation for overflowWidget
 * Improve performance for overflowWidget
 * Do not paint Selection in the region of overFlowWidget
 
-## 5.0.0-non-null-safety
+## 5.0.0
 
-* non-null-safety
+* Support null-safety
 
 ## 4.1.0
 

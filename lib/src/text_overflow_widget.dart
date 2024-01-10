@@ -25,13 +25,27 @@ enum TextOverflowPosition {
   end,
 }
 
+/// https://github.com/fluttercandies/extended_text/issues/118
+/// Clear the text under TextOverflowWidget
+/// default:  Paint()..BlendMode.clear
+/// Canvas.clipRect
+/// BlendMode.clear will make BackdropFilter to be black background
+enum TextOverflowClearType {
+  ///
+  clipRect,
+
+  /// Paint()..BlendMode.clear
+  blendModeClear,
+}
+
 class TextOverflowWidget extends StatelessWidget {
   const TextOverflowWidget({
-    @required this.child,
+    required this.child,
     this.align = TextOverflowAlign.right,
     this.maxHeight,
     this.position = TextOverflowPosition.end,
     this.debugOverflowRectColor,
+    this.clearType = TextOverflowClearType.blendModeClear,
   });
 
   /// The widget of TextOverflow.
@@ -41,14 +55,21 @@ class TextOverflowWidget extends StatelessWidget {
   final TextOverflowAlign align;
 
   /// The maxHeight of [TextOverflowWidget], default is preferredLineHeight.
-  final double maxHeight;
+  final double? maxHeight;
 
   /// The position which TextOverflowWidget should be shown
   final TextOverflowPosition position;
 
   /// Whether paint overflow rect, just for debug
   /// https://github.com/flutter/flutter/issues/45336
-  final Color debugOverflowRectColor;
+  final Color? debugOverflowRectColor;
+
+  /// https://github.com/fluttercandies/extended_text/issues/118
+  /// Clear the text under TextOverflowWidget
+  /// default:  Paint()..BlendMode.clear
+  /// Canvas.clipRect
+  /// BlendMode.clear will make BackdropFilter to be black background
+  final TextOverflowClearType clearType;
 
   @override
   Widget build(BuildContext context) {

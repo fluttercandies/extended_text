@@ -1,14 +1,13 @@
 import 'package:extended_text/extended_text.dart';
+import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-//import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-// import 'package:ff_annotation_route/ff_annotation_route.dart' hide Path;
-
-// @FFRoute(
-//     name: 'fluttercandies://BackgroundTextDemo',
-//     routeName: 'BackgroundText',
-//     description: 'workaround for issue 24335/24337 about background')
+@FFRoute(
+    name: 'fluttercandies://BackgroundTextDemo',
+    routeName: 'BackgroundText',
+    description: 'workaround for issue 24335/24337 about background')
 class BackgroundTextDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -31,8 +30,8 @@ class BackgroundTextDemo extends StatelessWidget {
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          // launch(
-                          //     'https://github.com/flutter/flutter/issues/24335');
+                          launchUrl(Uri.parse(
+                              'https://github.com/flutter/flutter/issues/24335'));
                         }),
                   const TextSpan(text: '/'),
                   TextSpan(
@@ -40,8 +39,8 @@ class BackgroundTextDemo extends StatelessWidget {
                       style: const TextStyle(color: Colors.blue),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          // launch(
-                          //     'https://github.com/flutter/flutter/issues/24337');
+                          launchUrl(Uri.parse(
+                              'https://github.com/flutter/flutter/issues/24337'));
                         }),
                 ])),
                 const Text(
@@ -124,11 +123,11 @@ class BackgroundTextDemo extends StatelessWidget {
                       paintBackground: (BackgroundTextSpan backgroundTextSpan,
                           Canvas canvas,
                           Offset offset,
-                          TextPainter painter,
+                          TextPainter? painter,
                           Rect rect,
-                          {Offset endOffset,
-                          TextPainter wholeTextPainter}) {
-                        final Rect textRect = offset & painter.size;
+                          {Offset? endOffset,
+                          TextPainter? wholeTextPainter}) {
+                        final Rect textRect = offset & painter!.size;
 
                         ///top-right
                         if (endOffset != null) {
@@ -138,7 +137,7 @@ class BackgroundTextDemo extends StatelessWidget {
                           if (backgroundTextSpan.clipBorderRadius != null) {
                             canvas.save();
                             canvas.clipPath(Path()
-                              ..addRRect(backgroundTextSpan.clipBorderRadius
+                              ..addRRect(backgroundTextSpan.clipBorderRadius!
                                   .resolve(painter.textDirection)
                                   .toRRect(firstLineRect)));
                           }
@@ -166,7 +165,8 @@ class BackgroundTextDemo extends StatelessWidget {
                               if (backgroundTextSpan.clipBorderRadius != null) {
                                 canvas.save();
                                 canvas.clipPath(Path()
-                                  ..addRRect(backgroundTextSpan.clipBorderRadius
+                                  ..addRRect(backgroundTextSpan
+                                      .clipBorderRadius!
                                       .resolve(painter.textDirection)
                                       .toRRect(lastLineRect)));
                               }
@@ -186,7 +186,7 @@ class BackgroundTextDemo extends StatelessWidget {
                                 canvas.save();
                                 canvas.clipPath(Path()
                                   ..addRRect(backgroundTextSpan
-                                      .clipBorderRadius
+                                      .clipBorderRadius!
                                       .resolve(painter.textDirection)
                                       .toRRect(fullLineRect)));
                               }
@@ -204,7 +204,7 @@ class BackgroundTextDemo extends StatelessWidget {
                           if (backgroundTextSpan.clipBorderRadius != null) {
                             canvas.save();
                             canvas.clipPath(Path()
-                              ..addRRect(backgroundTextSpan.clipBorderRadius
+                              ..addRRect(backgroundTextSpan.clipBorderRadius!
                                   .resolve(painter.textDirection)
                                   .toRRect(textRect)));
                           }
