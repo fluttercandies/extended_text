@@ -16,6 +16,13 @@ ExtendedText is a third-party extension library for Flutter's official Text comp
 | Copying the actual value of special text  | Supported, enables copying the actual value of the text, not just the placeholder value of WidgetSpan | Can only copy the placeholder value of WidgetSpan (\uFFFC) |
 | Quick construction of rich text based on text format  | Supported, enables quick construction of rich text based on text format | Not supported                                            |
 
+> `HarmonyOS` is supported. Please use the latest version which contains `ohos` tag. You can check it in `Versions` tab.
+
+```yaml
+dependencies:
+  extended_text: 10.0.1-ohos
+```
+
 
 ## Table of contents
 - [extended\_text](#extended_text)
