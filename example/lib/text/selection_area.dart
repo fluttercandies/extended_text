@@ -85,7 +85,7 @@ class CommonSelectionArea extends StatelessWidget {
             ContextMenuButtonItem(
               onPressed: () {
                 launchUrl(Uri.parse(
-                    'mailto:zmtzawqlp@live.com?subject=extended_text_share&body=${_selectedContent?.plainText}'));
+                    'mailto:xxx@live.com?subject=extended_text_share&body=${_selectedContent?.plainText}'));
                 selectableRegionState.hideToolbar();
               },
               type: ContextMenuButtonType.custom,
