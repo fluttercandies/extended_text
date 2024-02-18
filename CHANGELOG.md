@@ -1,3 +1,7 @@
+## 13.0.0
+
+* Migrate to Flutter 3.19.0
+
 ## 12.0.1
 
 * Update readme about HarmonyOS
