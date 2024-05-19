@@ -1,3 +1,7 @@
+## 13.0.1
+
+* Merge https://github.com/flutter/flutter/pull/144577
+
 ## 13.0.0
 
 * Migrate to Flutter 3.19.0
