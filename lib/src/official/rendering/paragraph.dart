@@ -388,7 +388,7 @@ class _RenderParagraph extends RenderBox
 
   Offset _getOffsetForPosition(TextPosition position) {
     return getOffsetForCaret(position, Rect.zero) +
-        Offset(0, getFullHeightForCaret(position));
+        Offset(0, getFullHeightForCaret(position) ?? 0);
   }
 
   @override
@@ -720,7 +720,7 @@ class _RenderParagraph extends RenderBox
   /// {@macro flutter.painting.textPainter.getFullHeightForCaret}
   ///
   /// Valid only after [layout].
-  double getFullHeightForCaret(TextPosition position) {
+  double? getFullHeightForCaret(TextPosition position) {
     assert(!debugNeedsLayout);
     _layoutTextWithConstraints(constraints);
     return _textPainter.getFullHeightForCaret(position, Rect.zero);
