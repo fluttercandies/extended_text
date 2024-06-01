@@ -723,7 +723,9 @@ class _RenderParagraph extends RenderBox
   double getFullHeightForCaret(TextPosition position) {
     assert(!debugNeedsLayout);
     _layoutTextWithConstraints(constraints);
-    return _textPainter.getFullHeightForCaret(position, Rect.zero);
+    // zmtzawqlp
+    // ignore: dead_null_aware_expression
+    return _textPainter.getFullHeightForCaret(position, Rect.zero) ?? 0;
   }
 
   /// Returns a list of rects that bound the given selection.

@@ -1,3 +1,8 @@
+## 13.0.2
+
+* Adapt the `getFullHeightForCaret` method on 3.19.0 and 3.22.0
+
+
 ## 13.0.1
 
 * Merge https://github.com/flutter/flutter/pull/144577
