@@ -1,7 +1,10 @@
+## 14.0.0
+
+* Migrate to Flutter 3.24.0
+  
 ## 13.0.2
 
 * Adapt the `getFullHeightForCaret` method on 3.19.0 and 3.22.0
-
 
 ## 13.0.1
 

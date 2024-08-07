@@ -164,7 +164,10 @@ mixin TextOverflowMixin on _RenderParagraph {
 
         _textPainter.text = testTextPainter.text;
         _placeholderDimensions = layoutInlineChildren(
-            constraints.maxWidth, ChildLayoutHelper.layoutChild);
+          constraints.maxWidth,
+          ChildLayoutHelper.layoutChild,
+          ChildLayoutHelper.getDryBaseline,
+        );
         _layoutTextWithConstraints(constraints);
         positionInlineChildren(_textPainter.inlinePlaceholderBoxes!);
 
@@ -315,6 +318,7 @@ mixin TextOverflowMixin on _RenderParagraph {
     layoutInlineChildren(
       constraints.maxWidth,
       ChildLayoutHelper.layoutChild,
+      ChildLayoutHelper.getDryBaseline,
       textPainter: testTextPainter,
       hideWidgets: hideWidgets,
     );
@@ -881,7 +885,8 @@ mixin TextOverflowMixin on _RenderParagraph {
   @override
   List<PlaceholderDimensions> layoutInlineChildren(
     double maxWidth,
-    ChildLayouter layoutChild, {
+    ChildLayouter layoutChild,
+    ChildBaselineGetter getChildBaseline, {
     // zmtzawqlp
     List<int>? hideWidgets,
     // zmtzawqlp
@@ -890,6 +895,7 @@ mixin TextOverflowMixin on _RenderParagraph {
     if (childCount == 0) {
       return <PlaceholderDimensions>[];
     }
+    final BoxConstraints constraints = BoxConstraints(maxWidth: maxWidth);
     RenderBox? child = firstChild;
     final List<PlaceholderDimensions> placeholderDimensions =
         List<PlaceholderDimensions>.filled(
@@ -903,8 +909,9 @@ mixin TextOverflowMixin on _RenderParagraph {
         placeholderDimensions[childIndex] =
             ExtendedRenderParagraph._layoutChild(
           child,
-          maxWidth,
+          constraints,
           layoutChild,
+          getChildBaseline,
         );
       }
 
@@ -917,11 +924,12 @@ mixin TextOverflowMixin on _RenderParagraph {
     }
     return placeholderDimensions;
 
+    // final BoxConstraints constraints = BoxConstraints(maxWidth: maxWidth);
     // return <PlaceholderDimensions>[
     //   for (RenderBox? child = firstChild;
     //       child != null;
     //       child = childAfter(child))
-    //     _layoutChild(child, maxWidth, layoutChild),
+    //     _layoutChild(child, constraints, layoutChild, getChildBaseline),
     // ];
   }
 

@@ -57,17 +57,17 @@ class ExtendedRenderParagraph extends _RenderParagraph
   }
 
   static PlaceholderDimensions _layoutChild(
-    RenderBox child,
-    double maxWidth,
-    ChildLayouter layoutChild,
-  ) {
+      RenderBox child,
+      BoxConstraints childConstraints,
+      ChildLayouter layoutChild,
+      ChildBaselineGetter getBaseline) {
     final TextParentData parentData = child.parentData! as TextParentData;
     final PlaceholderSpan? span = parentData.span;
     assert(span != null);
     return span == null
         ? PlaceholderDimensions.empty
         : PlaceholderDimensions(
-            size: layoutChild(child, BoxConstraints(maxWidth: maxWidth)),
+            size: layoutChild(child, childConstraints),
             alignment: span.alignment,
             baseline: span.baseline,
             baselineOffset: switch (span.alignment) {
@@ -78,7 +78,7 @@ class ExtendedRenderParagraph extends _RenderParagraph
               ui.PlaceholderAlignment.top =>
                 null,
               ui.PlaceholderAlignment.baseline =>
-                child.getDistanceToBaseline(span.baseline!),
+                getBaseline(child, childConstraints, span.baseline!),
             },
           );
   }
@@ -86,22 +86,16 @@ class ExtendedRenderParagraph extends _RenderParagraph
   @override
   void performLayout() {
     final BoxConstraints constraints = this.constraints;
-    _placeholderDimensions = layoutInlineChildren(
-        constraints.maxWidth, ChildLayoutHelper.layoutChild);
+    _placeholderDimensions = layoutInlineChildren(constraints.maxWidth,
+        ChildLayoutHelper.layoutChild, ChildLayoutHelper.getBaseline);
     _layoutTextWithConstraints(constraints);
     positionInlineChildren(_textPainter.inlinePlaceholderBoxes!);
 
-    // We grab _textPainter.size and _textPainter.didExceedMaxLines here because
-    // assigning to `size` will trigger us to validate our intrinsic sizes,
-    // which will change _textPainter's layout because the intrinsic size
-    // calculations are destructive. Other _textPainter state will also be
-    // affected. See also RenderEditable which has a similar issue.
     final Size textSize = _textPainter.size;
-    final bool textDidExceedMaxLines = _textPainter.didExceedMaxLines;
     size = constraints.constrain(textSize);
 
     final bool didOverflowHeight =
-        size.height < textSize.height || textDidExceedMaxLines;
+        size.height < textSize.height || _textPainter.didExceedMaxLines;
     final bool didOverflowWidth = size.width < textSize.width;
     // TODO(abarth): We're only measuring the sizes of the line boxes here. If
     // the glyphs draw outside the line boxes, we might think that there isn't
