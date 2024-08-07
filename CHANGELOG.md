@@ -1,3 +1,7 @@
+## 14.0.1
+
+* Implement SelectionArea triple click gestures ([#144563](https://github.com/flutter/flutter/pull/144563))
+
 ## 14.0.0
 
 * Migrate to Flutter 3.24.0

@@ -1,7 +1,10 @@
+import 'dart:math';
 import 'dart:ui' as ui;
+import 'package:extended_text/src/extended/rendering/paragraph.dart';
 import 'package:extended_text/src/extended/widgets/rich_text.dart';
 import 'package:extended_text/src/extended/widgets/text_overflow_widget.dart';
 import 'package:extended_text_library/extended_text_library.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -107,38 +110,67 @@ class ExtendedText extends Text {
           .merge(const TextStyle(fontWeight: FontWeight.bold));
     }
     final SelectionRegistrar? registrar = SelectionContainer.maybeOf(context);
-    Widget result = ExtendedRichText(
-      textAlign: textAlign ?? defaultTextStyle.textAlign ?? TextAlign.start,
-      textDirection:
-          textDirection, // RichText uses Directionality.of to obtain a default if this is null.
-      locale:
-          locale, // RichText uses Localizations.localeOf to obtain a default if this is null
-      softWrap: softWrap ?? defaultTextStyle.softWrap,
-      overflow:
-          overflow ?? effectiveTextStyle?.overflow ?? defaultTextStyle.overflow,
-      textScaler: textScaler ?? MediaQuery.textScalerOf(context),
-      maxLines: maxLines ?? defaultTextStyle.maxLines,
-      strutStyle: strutStyle,
-      textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
-      textHeightBehavior: textHeightBehavior ??
-          defaultTextStyle.textHeightBehavior ??
-          DefaultTextHeightBehavior.maybeOf(context),
-      selectionRegistrar: registrar,
-      selectionColor: selectionColor ??
-          DefaultSelectionStyle.of(context).selectionColor ??
-          DefaultSelectionStyle.defaultColor,
-      // zmtzawqlp
-      text: _buildTextSpan(effectiveTextStyle),
-      // zmtzawqlp
-      overflowWidget: overflowWidget,
-      // zmtzawqlp
-      canSelectPlaceholderSpan: canSelectPlaceholderSpan,
-    );
+
+    late Widget result;
     if (registrar != null) {
       result = MouseRegion(
         cursor: DefaultSelectionStyle.of(context).mouseCursor ??
             SystemMouseCursors.text,
-        child: result,
+        child: ExtendedSelectableTextContainer(
+          textAlign: textAlign ?? defaultTextStyle.textAlign ?? TextAlign.start,
+          textDirection:
+              textDirection, // RichText uses Directionality.of to obtain a default if this is null.
+          locale:
+              locale, // RichText uses Localizations.localeOf to obtain a default if this is null
+          softWrap: softWrap ?? defaultTextStyle.softWrap,
+          overflow: overflow ??
+              effectiveTextStyle?.overflow ??
+              defaultTextStyle.overflow,
+          textScaler: textScaler ?? MediaQuery.textScalerOf(context),
+          maxLines: maxLines ?? defaultTextStyle.maxLines,
+          strutStyle: strutStyle,
+          textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
+          textHeightBehavior: textHeightBehavior ??
+              defaultTextStyle.textHeightBehavior ??
+              DefaultTextHeightBehavior.maybeOf(context),
+          selectionColor: selectionColor ??
+              DefaultSelectionStyle.of(context).selectionColor ??
+              DefaultSelectionStyle.defaultColor,
+          // zmtzawqlp
+          text: _buildTextSpan(effectiveTextStyle),
+          // zmtzawqlp
+          overflowWidget: overflowWidget,
+          // zmtzawqlp
+          canSelectPlaceholderSpan: canSelectPlaceholderSpan,
+        ),
+      );
+    } else {
+      result = ExtendedRichText(
+        textAlign: textAlign ?? defaultTextStyle.textAlign ?? TextAlign.start,
+        textDirection:
+            textDirection, // RichText uses Directionality.of to obtain a default if this is null.
+        locale:
+            locale, // RichText uses Localizations.localeOf to obtain a default if this is null
+        softWrap: softWrap ?? defaultTextStyle.softWrap,
+        overflow: overflow ??
+            effectiveTextStyle?.overflow ??
+            defaultTextStyle.overflow,
+        textScaler: textScaler ?? MediaQuery.textScalerOf(context),
+        maxLines: maxLines ?? defaultTextStyle.maxLines,
+        strutStyle: strutStyle,
+        textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
+        textHeightBehavior: textHeightBehavior ??
+            defaultTextStyle.textHeightBehavior ??
+            DefaultTextHeightBehavior.maybeOf(context),
+        selectionColor: selectionColor ??
+            DefaultSelectionStyle.of(context).selectionColor ??
+            DefaultSelectionStyle.defaultColor,
+        // zmtzawqlp
+        text: _buildTextSpan(effectiveTextStyle),
+        // zmtzawqlp
+        overflowWidget: overflowWidget,
+        // zmtzawqlp
+        canSelectPlaceholderSpan: canSelectPlaceholderSpan,
       );
     }
     if (semanticsLabel != null) {
@@ -175,5 +207,110 @@ class ExtendedText extends Text {
     }
 
     return innerTextSpan;
+  }
+}
+
+class ExtendedSelectableTextContainer extends _SelectableTextContainer {
+  const ExtendedSelectableTextContainer({
+    required super.text,
+    required super.textAlign,
+    super.textDirection,
+    required super.softWrap,
+    required super.overflow,
+    required super.textScaler,
+    super.maxLines,
+    super.locale,
+    super.strutStyle,
+    required super.textWidthBasis,
+    super.textHeightBehavior,
+    required super.selectionColor,
+    this.overflowWidget,
+    this.canSelectPlaceholderSpan = true,
+  });
+  final TextOverflowWidget? overflowWidget;
+
+  /// if false, it will skip PlaceholderSpan
+  final bool canSelectPlaceholderSpan;
+  @override
+  State<_SelectableTextContainer> createState() =>
+      ExtendedSelectableTextContainerState();
+}
+
+class ExtendedSelectableTextContainerState
+    extends _SelectableTextContainerState {
+  @override
+  Widget build(BuildContext context) {
+    return SelectionContainer(
+      delegate: _selectionDelegate,
+      // Use [_RichText] wrapper so the underlying [RenderParagraph] can register
+      // its [Selectable]s to the [SelectionContainer] created by this widget.
+      child: ExtendedRichTextWidget(
+        textKey: _textKey,
+        textAlign: widget.textAlign,
+        textDirection: widget.textDirection,
+        locale: widget.locale,
+        softWrap: widget.softWrap,
+        overflow: widget.overflow,
+        textScaler: widget.textScaler,
+        maxLines: widget.maxLines,
+        strutStyle: widget.strutStyle,
+        textWidthBasis: widget.textWidthBasis,
+        textHeightBehavior: widget.textHeightBehavior,
+        selectionColor: widget.selectionColor,
+        text: widget.text,
+        overflowWidget:
+            (widget as ExtendedSelectableTextContainer).overflowWidget,
+        canSelectPlaceholderSpan: (widget as ExtendedSelectableTextContainer)
+            .canSelectPlaceholderSpan,
+      ),
+    );
+  }
+}
+
+class ExtendedRichTextWidget extends _RichTextWidget {
+  const ExtendedRichTextWidget({
+    super.textKey,
+    required super.text,
+    required super.textAlign,
+    super.textDirection,
+    required super.softWrap,
+    required super.overflow,
+    required super.textScaler,
+    super.maxLines,
+    super.locale,
+    super.strutStyle,
+    required super.textWidthBasis,
+    super.textHeightBehavior,
+    required super.selectionColor,
+    this.overflowWidget,
+    this.canSelectPlaceholderSpan = true,
+  });
+  final TextOverflowWidget? overflowWidget;
+
+  /// if false, it will skip PlaceholderSpan
+  final bool canSelectPlaceholderSpan;
+  @override
+  Widget build(BuildContext context) {
+    final SelectionRegistrar? registrar = SelectionContainer.maybeOf(context);
+    return ExtendedRichText(
+      key: textKey,
+      textAlign: textAlign,
+      textDirection: textDirection,
+      locale: locale,
+      softWrap: softWrap,
+      overflow: overflow,
+      textScaler: textScaler,
+      maxLines: maxLines,
+      strutStyle: strutStyle,
+      textWidthBasis: textWidthBasis,
+      textHeightBehavior: textHeightBehavior,
+      selectionRegistrar: registrar,
+      selectionColor: selectionColor,
+      text: text,
+      // zmtzawqlp
+      overflowWidget: overflowWidget,
+      // zmtzawqlp
+      canSelectPlaceholderSpan: canSelectPlaceholderSpan,
+    );
   }
 }
