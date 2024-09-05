@@ -11,8 +11,8 @@ class AtText extends SpecialText {
 
   @override
   InlineSpan finishText() {
-    final TextStyle? textStyle =
-        this.textStyle?.copyWith(color: Colors.blue, fontSize: 16.0);
+    final TextStyle? textStyle = (this.textStyle ?? const TextStyle())
+        .copyWith(color: Colors.blue, fontSize: 16.0);
 
     final String atText = toString();
 

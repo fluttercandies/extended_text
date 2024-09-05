@@ -1,7 +1,10 @@
 import 'dart:collection';
 import 'dart:math' as math;
-import 'dart:ui' as ui;
 
+import 'dart:ui' as ui;
+import 'dart:ui';
+
+import 'package:extended_text/src/extended/gradient/gradient_config.dart';
 import 'package:extended_text/src/extended/widgets/text_overflow_widget.dart';
 import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/foundation.dart';
@@ -13,11 +16,12 @@ import 'package:flutter/services.dart';
 part 'package:extended_text/src/official/rendering/paragraph.dart';
 part 'package:extended_text/src/extended/text_overflow_mixin.dart';
 part 'package:extended_text/src/extended/selection_mixin.dart';
+part 'package:extended_text/src/extended/gradient/gradient_mixin.dart';
 
 /// [RenderParagraph]
 ///
 class ExtendedRenderParagraph extends _RenderParagraph
-    with TextOverflowMixin, SelectionMixin {
+    with TextOverflowMixin, SelectionMixin, GradientMixin {
   ExtendedRenderParagraph(
     super.text, {
     super.textAlign = TextAlign.start,
@@ -35,10 +39,12 @@ class ExtendedRenderParagraph extends _RenderParagraph
     super.registrar,
     TextOverflowWidget? overflowWidget,
     bool canSelectPlaceholderSpan = true,
+    GradientConfig? gradientConfig,
   }) {
     _oldOverflow = overflow;
     _overflowWidget = overflowWidget;
     _canSelectPlaceholderSpan = canSelectPlaceholderSpan;
+    _gradientConfig = gradientConfig;
   }
 
   // Layout the child inline widgets. We then pass the dimensions of the
@@ -269,9 +275,18 @@ class ExtendedRenderParagraph extends _RenderParagraph
         );
       }
     }
+
+    // zmtzawqlp
+    if (_gradientConfig != null) {
+      context.canvas.saveLayer(offset & size, Paint());
+    }
+
     _paintSpecialText(context, offset);
     _textPainter.paint(context.canvas, offset);
-
+    // zmtzawqlp
+    if (_gradientConfig != null && _gradientConfig!.ignoreWidgetSpan) {
+      drawGradient(context, offset);
+    }
     RenderBox? child = firstChild;
     int childIndex = 0;
     // childIndex might be out of index of placeholder boxes. This can happen
@@ -298,6 +313,10 @@ class ExtendedRenderParagraph extends _RenderParagraph
       childIndex += 1;
     }
 
+    // zmtzawqlp
+    if (_gradientConfig != null && !_gradientConfig!.ignoreWidgetSpan) {
+      drawGradient(context, offset);
+    }
     // zmtzawqlp
     if (_overflowRect != null) {
       // BlendMode.clear should be after textpainter

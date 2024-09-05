@@ -1,3 +1,7 @@
+## 11.0.9
+
+* Support gradient text 
+  
 ## 11.0.1
 
 * Fix Flutter 3.10 onTap not triggered inside TextOverflowWidget #147

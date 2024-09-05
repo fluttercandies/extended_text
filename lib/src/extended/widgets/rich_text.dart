@@ -1,4 +1,5 @@
 import 'dart:ui' as ui;
+import 'package:extended_text/src/extended/gradient/gradient_config.dart';
 import 'package:extended_text/src/extended/rendering/paragraph.dart';
 import 'package:extended_text/src/extended/widgets/text_overflow_widget.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,7 @@ class ExtendedRichText extends _RichText {
     super.selectionColor,
     this.overflowWidget,
     this.canSelectPlaceholderSpan = true,
+    this.gradientConfig,
   }) : super(
           children: _extractChildren(text, overflowWidget),
         );
@@ -33,6 +35,17 @@ class ExtendedRichText extends _RichText {
   /// if false, it will skip PlaceholderSpan
   final bool canSelectPlaceholderSpan;
 
+  /// Configuration for applying gradients to text.
+  ///
+  /// [gradient] is the gradient that will be applied to the text.
+  /// [ignoreWidgetSpan] determines whether `WidgetSpan` elements should be
+  /// included in the gradient application. By default, widget spans are ignored.
+  /// [mode] specifies how the gradient should be applied to the text. The default
+  /// is [GradientRenderMode.fullText], meaning the gradient will apply to the entire text.
+  /// [ignoreRegex] is a regular expression used to exclude certain parts of the text
+  /// from the gradient effect. For example, it can be used to exclude specific characters
+  /// or words (like emojis or special symbols) from the gradient application.
+  final GradientConfig? gradientConfig;
   @override
   ExtendedRenderParagraph createRenderObject(BuildContext context) {
     assert(textDirection != null || debugCheckHasDirectionality(context));
@@ -52,6 +65,7 @@ class ExtendedRichText extends _RichText {
       selectionColor: selectionColor,
       overflowWidget: overflowWidget,
       canSelectPlaceholderSpan: canSelectPlaceholderSpan,
+      gradientConfig: gradientConfig,
     );
   }
 
@@ -74,7 +88,8 @@ class ExtendedRichText extends _RichText {
       ..registrar = selectionRegistrar
       ..selectionColor = selectionColor
       ..overflowWidget = overflowWidget
-      ..canSelectPlaceholderSpan = canSelectPlaceholderSpan;
+      ..canSelectPlaceholderSpan = canSelectPlaceholderSpan
+      ..gradientConfig = gradientConfig;
   }
 
   // Traverses the InlineSpan tree and depth-first collects the list of
