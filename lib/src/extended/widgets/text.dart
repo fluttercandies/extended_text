@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'dart:ui' as ui;
+import 'package:extended_text/src/extended/gradient/gradient_config.dart';
 import 'package:extended_text/src/extended/rendering/paragraph.dart';
 import 'package:extended_text/src/extended/widgets/rich_text.dart';
 import 'package:extended_text/src/extended/widgets/text_overflow_widget.dart';
@@ -43,6 +44,7 @@ class ExtendedText extends Text {
     this.overflowWidget,
     this.specialTextSpanBuilder,
     this.canSelectPlaceholderSpan = true,
+    this.gradientConfig,
   });
 
   /// Creates a text widget with a [InlineSpan].
@@ -76,6 +78,7 @@ class ExtendedText extends Text {
     this.overflowWidget,
     this.specialTextSpanBuilder,
     this.canSelectPlaceholderSpan = true,
+    this.gradientConfig,
   }) : super.rich(textSpan);
 
   /// maxheight is equal to textPainter.preferredLineHeight
@@ -97,6 +100,21 @@ class ExtendedText extends Text {
 
   /// if false, it will skip PlaceholderSpan
   final bool canSelectPlaceholderSpan;
+
+  /// Configuration for applying gradients to text.
+  ///
+  /// [gradient] is the gradient that will be applied to the text.
+  ///
+  /// [ignoreWidgetSpan] determines whether `WidgetSpan` elements should be
+  /// included in the gradient application. By default, widget spans are ignored.
+  ///
+  /// [mode] specifies how the gradient should be applied to the text. The default
+  /// is [GradientRenderMode.fullText], meaning the gradient will apply to the entire text.
+  ///
+  /// [ignoreRegex] is a regular expression used to exclude certain parts of the text
+  /// from the gradient effect. For example, it can be used to exclude specific characters
+  /// or words (like emojis or special symbols) from the gradient application.
+  final GradientConfig? gradientConfig;
 
   @override
   Widget build(BuildContext context) {
@@ -142,6 +160,9 @@ class ExtendedText extends Text {
           overflowWidget: overflowWidget,
           // zmtzawqlp
           canSelectPlaceholderSpan: canSelectPlaceholderSpan,
+
+          // zmtzawqlp
+          gradientConfig: gradientConfig,
         ),
       );
     } else {
@@ -171,6 +192,8 @@ class ExtendedText extends Text {
         overflowWidget: overflowWidget,
         // zmtzawqlp
         canSelectPlaceholderSpan: canSelectPlaceholderSpan,
+        // zmtzawqlp
+        gradientConfig: gradientConfig,
       );
     }
     if (semanticsLabel != null) {
@@ -226,11 +249,24 @@ class ExtendedSelectableTextContainer extends _SelectableTextContainer {
     required super.selectionColor,
     this.overflowWidget,
     this.canSelectPlaceholderSpan = true,
+    this.gradientConfig,
   });
   final TextOverflowWidget? overflowWidget;
 
   /// if false, it will skip PlaceholderSpan
   final bool canSelectPlaceholderSpan;
+
+  /// Configuration for applying gradients to text.
+  ///
+  /// [gradient] is the gradient that will be applied to the text.
+  /// [ignoreWidgetSpan] determines whether `WidgetSpan` elements should be
+  /// included in the gradient application. By default, widget spans are ignored.
+  /// [mode] specifies how the gradient should be applied to the text. The default
+  /// is [GradientRenderMode.fullText], meaning the gradient will apply to the entire text.
+  /// [ignoreRegex] is a regular expression used to exclude certain parts of the text
+  /// from the gradient effect. For example, it can be used to exclude specific characters
+  /// or words (like emojis or special symbols) from the gradient application.
+  final GradientConfig? gradientConfig;
   @override
   State<_SelectableTextContainer> createState() =>
       ExtendedSelectableTextContainerState();
@@ -258,10 +294,13 @@ class ExtendedSelectableTextContainerState
         textHeightBehavior: widget.textHeightBehavior,
         selectionColor: widget.selectionColor,
         text: widget.text,
+        // zmtzawqlp
         overflowWidget:
             (widget as ExtendedSelectableTextContainer).overflowWidget,
         canSelectPlaceholderSpan: (widget as ExtendedSelectableTextContainer)
             .canSelectPlaceholderSpan,
+        gradientConfig:
+            (widget as ExtendedSelectableTextContainer).gradientConfig,
       ),
     );
   }
@@ -284,11 +323,24 @@ class ExtendedRichTextWidget extends _RichTextWidget {
     required super.selectionColor,
     this.overflowWidget,
     this.canSelectPlaceholderSpan = true,
+    this.gradientConfig,
   });
   final TextOverflowWidget? overflowWidget;
 
   /// if false, it will skip PlaceholderSpan
   final bool canSelectPlaceholderSpan;
+
+  /// Configuration for applying gradients to text.
+  ///
+  /// [gradient] is the gradient that will be applied to the text.
+  /// [ignoreWidgetSpan] determines whether `WidgetSpan` elements should be
+  /// included in the gradient application. By default, widget spans are ignored.
+  /// [mode] specifies how the gradient should be applied to the text. The default
+  /// is [GradientRenderMode.fullText], meaning the gradient will apply to the entire text.
+  /// [ignoreRegex] is a regular expression used to exclude certain parts of the text
+  /// from the gradient effect. For example, it can be used to exclude specific characters
+  /// or words (like emojis or special symbols) from the gradient application.
+  final GradientConfig? gradientConfig;
   @override
   Widget build(BuildContext context) {
     final SelectionRegistrar? registrar = SelectionContainer.maybeOf(context);
@@ -311,6 +363,8 @@ class ExtendedRichTextWidget extends _RichTextWidget {
       overflowWidget: overflowWidget,
       // zmtzawqlp
       canSelectPlaceholderSpan: canSelectPlaceholderSpan,
+      // zmtzawqlp
+      gradientConfig: gradientConfig,
     );
   }
 }

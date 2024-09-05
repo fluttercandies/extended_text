@@ -1,3 +1,7 @@
+## 14.1.0
+
+* Support gradient text 
+
 ## 14.0.1
 
 * Implement SelectionArea triple click gestures ([#144563](https://github.com/flutter/flutter/pull/144563))
