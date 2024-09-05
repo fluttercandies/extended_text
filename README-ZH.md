@@ -16,11 +16,11 @@
 
 
 ExtendedText 是 Flutter 官方 Text 的三方扩展库，主要扩展功能如下:
-| 功能                                   | ExtendedText                                              | Flutter 官方 Text                                     |
-|--------------------------------------|-----------------------------------------------------------|-----------------------------------------------------|
-| 支持自定义文本溢出效果                | 支持，可以自定义溢出的 Widget，并控制溢出位置（前、中、后）   | 不支 持 ([26748](https://github.com/flutter/flutter/issues/26748),[45336](https://github.com/flutter/flutter/issues/45336))                                               |
-| 支持复制特殊文本的真实值                         | 支持，可以复制出文本的真实值，而不仅是 WidgetSpan 的占位值    | 只能复制出 WidgetSpan 的占位值 (\uFFFC)                  |
-| 根据文本格式快速构建富文本                 | 支持，可以根据文本格式快速构建富文本                         | 不支持                                               |
+| 功能                       | ExtendedText                                                | Flutter 官方 Text                                                                                                           |
+| -------------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| 支持自定义文本溢出效果     | 支持，可以自定义溢出的 Widget，并控制溢出位置（前、中、后） | 不支 持 ([26748](https://github.com/flutter/flutter/issues/26748),[45336](https://github.com/flutter/flutter/issues/45336)) |
+| 支持复制特殊文本的真实值   | 支持，可以复制出文本的真实值，而不仅是 WidgetSpan 的占位值  | 只能复制出 WidgetSpan 的占位值 (\uFFFC)                                                                                     |
+| 根据文本格式快速构建富文本 | 支持，可以根据文本格式快速构建富文本                        | 不支持                                                                                                                      |
 
 
 ## 目录
@@ -493,12 +493,12 @@ Text背景相关的issue[24335](https://github.com/flutter/flutter/issues/24335)
 
 文本溢出相关issue [26748](https://github.com/flutter/flutter/issues/26748)
 
-| parameter   | description                                                  | default             |
-| ----------- | ------------------------------------------------------------ | ------------------- |
-| child       | The widget of TextOverflow.                                  | @required           |
-| maxHeight   | Widget的最大高度，默认为 TextPaint计算出来的行高 preferredLineHeight. | preferredLineHeight |
-| align       | left，靠近最后裁剪文本；right，靠近文本的右下角              | right               |
-| position | 溢出文本出现的地方.    | TextOverflowPosition.end                  |
+| parameter | description                                                           | default                  |
+| --------- | --------------------------------------------------------------------- | ------------------------ |
+| child     | The widget of TextOverflow.                                           | @required                |
+| maxHeight | Widget的最大高度，默认为 TextPaint计算出来的行高 preferredLineHeight. | preferredLineHeight      |
+| align     | left，靠近最后裁剪文本；right，靠近文本的右下角                       | right                    |
+| position  | 溢出文本出现的地方.                                                   | TextOverflowPosition.end |
 
 ```dart
   ExtendedText(
@@ -593,6 +593,49 @@ class MyTextSelectionControls extends TextSelectionControls {
 }
 
 ```
+
+## Gradient
+
+### GradientConfig
+
+
+用于配置文本渐变的设置。
+
+* [gradient] 是要应用于文本的渐变效果。
+* [ignoreWidgetSpan] 决定是否将 WidgetSpan 元素包含在渐变应用中。默认情况下，WidgetSpan 被忽略。
+* [renderMode] 指定渐变应用于文本的方式。默认值为 [GradientRenderMode.fullText]，即将渐变应用于整个文本。
+* [ignoreRegex] 是一个正则表达式，用于排除文本中的某些部分，使其不受渐变效果影响。例如，可以用来排除特定字符或词语（如表情符号或特殊符号）以免它们受到渐变的影响。
+* [beforeDrawGradient] 在渐变被绘制到文本之前调用的回调函数。
+
+* [blendMode] 应用于渐变的混合模式。
+   默认值: [BlendMode.srcIn]（即渐变将应用于文本上）。
+   推荐使用 [BlendMode.srcIn] 或 [BlendMode.srcATop]。
+
+``` dart
+  GradientConfig _config = GradientConfig(
+    gradient: const LinearGradient(
+      colors: <Color>[Colors.blue, Colors.red],
+    ),
+    ignoreRegex: GradientConfig.ignoreEmojiRegex,
+    ignoreWidgetSpan: true,
+    renderMode: GradientRenderMode.fullText,
+  );
+```
+
+### IgnoreGradientSpan
+
+该 `InlineSpan` 将始终忽略渐变效果。
+
+``` dart
+class IgnoreGradientTextSpan extends TextSpan with IgnoreGradientSpan {
+  IgnoreGradientTextSpan({String? text, List<InlineSpan>? children})
+      : super(
+          text: text,
+          children: children,
+        );
+}
+```
+
 
 
 ## ☕️Buy me a coffee

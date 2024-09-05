@@ -1,3 +1,7 @@
+## 11.2.0
+
+* Support gradient text 
+
 ## 11.1.0
 
 * Migrate to Flutter 3.13.0

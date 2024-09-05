@@ -10,11 +10,11 @@ Extended official text to build special text like inline image or @somebody quic
 
 ExtendedText is a third-party extension library for Flutter's official Text component. The main extended features are as follows:
 
-| Feature                                   | ExtendedText                                                |  Text                                  |
-|------------------------------------------|-------------------------------------------------------------|-------------------------------------------------------|
-| Customized text overflow effects          | Supported, allows customizing the overflow widget and controlling overflow positions (before, middle, after) | Not supported ([26748](https://github.com/flutter/flutter/issues/26748),[45336](https://github.com/flutter/flutter/issues/45336)) |
-| Copying the actual value of special text  | Supported, enables copying the actual value of the text, not just the placeholder value of WidgetSpan | Can only copy the placeholder value of WidgetSpan (\uFFFC) |
-| Quick construction of rich text based on text format  | Supported, enables quick construction of rich text based on text format | Not supported                                            |
+| Feature                                              | ExtendedText                                                                                                 | Text                                                                                                                              |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| Customized text overflow effects                     | Supported, allows customizing the overflow widget and controlling overflow positions (before, middle, after) | Not supported ([26748](https://github.com/flutter/flutter/issues/26748),[45336](https://github.com/flutter/flutter/issues/45336)) |
+| Copying the actual value of special text             | Supported, enables copying the actual value of the text, not just the placeholder value of WidgetSpan        | Can only copy the placeholder value of WidgetSpan (\uFFFC)                                                                        |
+| Quick construction of rich text based on text format | Supported, enables quick construction of rich text based on text format                                      | Not supported                                                                                                                     |
 
 
 ## Table of contents
@@ -33,6 +33,9 @@ ExtendedText is a third-party extension library for Flutter's official Text comp
   - [Custom Background](#custom-background)
   - [Custom Overflow](#custom-overflow)
   - [Join Zero-Width Space](#join-zero-width-space)
+  - [Gradient](#gradient)
+    - [GradientConfig](#gradientconfig)
+    - [IgnoreGradientSpan](#ignoregradientspan)
 
 ## Speical Text
 
@@ -474,12 +477,12 @@ refer to issues [24335](https://github.com/flutter/flutter/issues/24335)/[24337]
 
 refer to issue [26748](https://github.com/flutter/flutter/issues/26748)
 
-| parameter   | description                                                  | default             |
-| ----------- | ------------------------------------------------------------ | ------------------- |
-| child       | The widget of TextOverflow.                                  | @required           |
-| maxHeight   | The maxHeight of [TextOverflowWidget], default is preferredLineHeight. | preferredLineHeight |
-| align       | The Align of [TextOverflowWidget], left/right.               | right               |
-| position | The position which TextOverflowWidget should be shown.    | TextOverflowPosition.end                  |
+| parameter | description                                                            | default                  |
+| --------- | ---------------------------------------------------------------------- | ------------------------ |
+| child     | The widget of TextOverflow.                                            | @required                |
+| maxHeight | The maxHeight of [TextOverflowWidget], default is preferredLineHeight. | preferredLineHeight      |
+| align     | The Align of [TextOverflowWidget], left/right.                         | right                    |
+| position  | The position which TextOverflowWidget should be shown.                 | TextOverflowPosition.end |
 
 ```dart
   ExtendedText(
@@ -577,3 +580,52 @@ class MyTextSelectionControls extends TextSelectionControls {
 
 ```
 
+## Gradient
+
+### GradientConfig
+
+
+Configuration for applying gradients to text.
+
+* [gradient] is the gradient that will be applied to the text.
+
+* [ignoreWidgetSpan] determines whether `WidgetSpan` elements should be
+included in the gradient application. By default, widget spans are ignored.
+
+* [renderMode] specifies how the gradient should be applied to the text. The default
+is [GradientRenderMode.fullText], meaning the gradient will apply to the entire text.
+
+* [ignoreRegex] is a regular expression used to exclude certain parts of the text
+from the gradient effect. For example, it can be used to exclude specific characters
+or words (like emojis or special symbols) from the gradient application.
+
+* [beforeDrawGradient] A callback function that is called before the gradient is drawn on the text.
+
+* [blendMode] The blend mode to be used when applying the gradient.
+  default: [BlendMode.srcIn] (i.e., the gradient will be applied to the text).
+  It's better to use [BlendMode.srcIn] or [BlendMode.srcATop].
+
+``` dart
+  GradientConfig _config = GradientConfig(
+    gradient: const LinearGradient(
+      colors: <Color>[Colors.blue, Colors.red],
+    ),
+    ignoreRegex: GradientConfig.ignoreEmojiRegex,
+    ignoreWidgetSpan: true,
+    renderMode: GradientRenderMode.fullText,
+  );
+```
+
+### IgnoreGradientSpan
+
+The `InlineSpan` will always ignore the gradient.
+
+``` dart
+class IgnoreGradientTextSpan extends TextSpan with IgnoreGradientSpan {
+  IgnoreGradientTextSpan({String? text, List<InlineSpan>? children})
+      : super(
+          text: text,
+          children: children,
+        );
+}
+```
