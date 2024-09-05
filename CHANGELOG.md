@@ -1,3 +1,7 @@
+## 12.1.0
+
+* Support gradient text 
+
 ## 12.0.1
 
 * Update readme about HarmonyOS
