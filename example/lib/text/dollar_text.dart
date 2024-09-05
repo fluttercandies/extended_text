@@ -1,6 +1,6 @@
 // ignore_for_file: unused_element
 
-import 'package:extended_text_library/extended_text_library.dart';
+import 'package:extended_text/extended_text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +19,8 @@ class DollarText extends SpecialText {
         actualText: toString(),
         start: start!,
         deleteAll: false,
-        style: textStyle?.copyWith(color: Colors.orange, fontSize: 16),
+        style: (textStyle ?? const TextStyle())
+            .copyWith(color: Colors.orange, fontSize: 16),
         mouseCursor: SystemMouseCursors.text,
         recognizer: TapGestureRecognizer()
           ..onTap = () {
@@ -30,7 +31,7 @@ class DollarText extends SpecialText {
   }
 }
 
-class _SpecialTextSpan extends SpecialTextSpan {
+class _SpecialTextSpan extends SpecialTextSpan with IgnoreGradientSpan {
   _SpecialTextSpan({
     super.style,
     required super.text,
