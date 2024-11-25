@@ -102,60 +102,9 @@ mixin TextOverflowMixin on _RenderParagraph {
       }
       // middle/start
       else {
-        assert(_textPainter.maxLines != null);
+        final _TextRange range = _getEstimatedCropRange();
 
-        int start = 0;
-        int end = 0;
-        final int maxLines = _textPainter.maxLines!;
-        final bool even = maxLines % 2 == 0;
-
-        // middle
-        if (textOverflowPosition == TextOverflowPosition.middle) {
-          // Rect textRect = Offset.zero & reversedTextPainter.size;
-
-          // TextPosition position = reversedTextPainter.getPositionForOffset(even
-          //     ? textRect.centerRight - Offset(overflowWidgetSize.width, 0)
-          //     : textRect.center - Offset(overflowWidgetSize.width / 2, 0));
-
-          // end = maxOffset - position.offset;
-
-          TextPosition position = _textPainter.getPositionForOffset(even
-              ? Offset(0,
-                  rect.centerLeft.dy + _textPainter.preferredLineHeight / 2.0)
-              : rect.center - Offset(overflowWidgetSize.width / 2, 0));
-          position = ExtendedTextLibraryUtils
-              .convertTextPainterPostionToTextInputPostion(text, position)!;
-
-          start = position.offset;
-          end = start + 1;
-        }
-        // start
-        else {
-          // final TextPainter reversedTextPainter = _copyTextPainter(
-          //   inlineSpan: _reversedSpan(text!),
-          //   maxLines: textPainter.maxLines,
-          // );
-          // reversedTextPainter.setPlaceholderDimensions(
-          //     placeholderDimensions?.reversed.toList());
-          // reversedTextPainter.layout(
-          //   minWidth: constraints.minWidth,
-          //   maxWidth: constraints.maxWidth,
-          // );
-          // final TextPosition position =
-          //     reversedTextPainter.getPositionForOffset(rect.bottomRight);
-          TextPosition position = _textPainter.getPositionForOffset(Offset(
-              overflowWidgetSize.width, _textPainter.preferredLineHeight / 2));
-          position = ExtendedTextLibraryUtils
-              .convertTextPainterPostionToTextInputPostion(text, position)!;
-
-          end = position.offset;
-        }
-
-        final _TextRange range =
-            _TextRange(math.min(start, end), math.max(start, end));
-        final List<int> hideWidgets = <int>[];
-
-        final TextPainter testTextPainter = _findNoOverflow(range, hideWidgets);
+        final TextPainter testTextPainter = _findNoOverflow(range);
 
         assert(!_hasVisualOverflow);
 
@@ -247,11 +196,103 @@ mixin TextOverflowMixin on _RenderParagraph {
     }
   }
 
+  _TextRange _getEstimatedCropRange() {
+    int start = 0;
+    int end = 0;
+    final Size overflowWidgetSize = lastChild!.size;
+    final TextOverflowPosition position = overflowWidget!.position;
+
+    final TextPainter oneLineTextPainter = _copyTextPainter();
+
+    layoutInlineChildren(
+      constraints.maxWidth,
+      ChildLayoutHelper.layoutChild,
+      ChildLayoutHelper.getDryBaseline,
+      textPainter: oneLineTextPainter,
+      hideWidgets: <int>[],
+    );
+
+    oneLineTextPainter.layout();
+    double oneLineWidth = oneLineTextPainter.width;
+    final List<ui.LineMetrics> lines = _textPainter.computeLineMetrics();
+    switch (position) {
+      case TextOverflowPosition.start:
+        for (final ui.LineMetrics line in lines) {
+          oneLineWidth -= line.width;
+        }
+
+        end = ExtendedTextLibraryUtils
+                .convertTextPainterPostionToTextInputPostion(
+                    text,
+                    oneLineTextPainter.getPositionForOffset(Offset(
+                        math.max(oneLineWidth, overflowWidgetSize.width),
+                        oneLineTextPainter.height / 2)))!
+            .offset;
+
+        break;
+      case TextOverflowPosition.middle:
+        final int lineNum = (lines.length / 2).floor();
+        final bool isEven = lines.length.isEven;
+        final ui.LineMetrics line = lines[lineNum];
+        double lineTop = 0;
+
+        for (int index = 0; index < lineNum; index++) {
+          final ui.LineMetrics line = lines[index];
+          lineTop += line.height;
+        }
+
+        final double lineCenter = lineTop + line.height / 2;
+        ui.Rect overflowRect = Rect.zero;
+        final double textWidth = _textPainter.width;
+        if (isEven) {
+          overflowRect = Rect.fromLTRB(
+            0,
+            lineCenter - overflowWidgetSize.height / 2,
+            overflowWidgetSize.width,
+            lineCenter + overflowWidgetSize.height / 2,
+          );
+        } else {
+          overflowRect = Rect.fromLTRB(
+            textWidth / 2 - overflowWidgetSize.width / 2,
+            lineCenter - overflowWidgetSize.height / 2,
+            textWidth / 2 + overflowWidgetSize.width / 2,
+            lineCenter + overflowWidgetSize.height / 2,
+          );
+        }
+
+        start = ExtendedTextLibraryUtils
+                .convertTextPainterPostionToTextInputPostion(
+                    text,
+                    _textPainter
+                        .getPositionForOffset(overflowRect.centerRight))!
+            .offset;
+
+        for (int index = lines.length - 1; index > lineNum; index--) {
+          final ui.LineMetrics line = lines[index];
+          oneLineWidth -= line.width;
+        }
+
+        oneLineWidth -= line.width - overflowRect.right;
+
+        end = ExtendedTextLibraryUtils
+                .convertTextPainterPostionToTextInputPostion(
+                    text,
+                    oneLineTextPainter.getPositionForOffset(Offset(
+                        math.max(oneLineWidth, overflowWidgetSize.width),
+                        oneLineTextPainter.height / 2)))!
+            .offset;
+        break;
+      default:
+    }
+
+    return _TextRange(start, end);
+  }
+
   int _layoutCount = 0;
 
-  TextPainter _findNoOverflow(_TextRange range, List<int> hideWidgets) {
+  TextPainter _findNoOverflow(_TextRange range) {
     _layoutCount = 0;
-
+    final List<int> hideWidgets = <int>[];
     late TextPainter testTextPainter;
     final int maxOffset =
         ExtendedTextLibraryUtils.textSpanToActualText(text).runes.length;
@@ -264,7 +305,10 @@ mixin TextOverflowMixin on _RenderParagraph {
         // not find
         assert(range.end != maxOffset, 'can\' find no overflow');
         range.end = math.min(
-            range.end + math.max((maxEnd - range.end) ~/ 2, 1), maxOffset);
+            range.end + 1
+            // math.max((maxEnd - range.end) ~/ 2, 1)
+            ,
+            maxOffset);
         hideWidgets.clear();
       } else {
         // see pre one whether overflow
@@ -283,7 +327,9 @@ mixin TextOverflowMixin on _RenderParagraph {
           range.end = math.max(
               range.start,
               math.min(
-                  maxEnd - math.max((maxEnd - range.start) ~/ 2, 1), maxEnd));
+                  maxEnd - 1,
+                  //math.max((maxEnd - range.start) ~/ 2, 1),
+                  maxEnd));
           // if range is not changed, so maybe we should break.
           if (pre == range) {
             _hasVisualOverflow = false;
