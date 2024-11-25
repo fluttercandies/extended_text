@@ -23,6 +23,9 @@ enum TextOverflowPosition {
   start,
   middle,
   end,
+
+  /// The position of TextOverflowWidget is decided by the position of TextOverflowWidget.
+  auto,
 }
 
 /// https://github.com/fluttercandies/extended_text/issues/118
