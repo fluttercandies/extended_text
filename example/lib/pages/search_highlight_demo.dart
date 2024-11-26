@@ -67,16 +67,42 @@ class _SearchHighlightDemoState extends State<SearchHighlightDemo> {
               Expanded(
                 child: ListView.builder(
                   itemBuilder: (BuildContext context, int index) {
-                    return Container(
-                      padding: const EdgeInsets.all(5),
-                      margin: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(border: Border.all()),
-                      child: ExtendedText(
-                        searchMessages[index],
-                        specialTextSpanBuilder: HighlightTextSpanBuilder(),
-                        maxLines: searchText.isEmpty ? 3 : 1,
-                        overflowWidget: const TextOverflowWidget(
-                          child: Text('\u2026 '),
+                    return GestureDetector(
+                      onTap: () {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext b) {
+                              return AlertDialog(
+                                title: const Text('FullText'),
+                                content: ExtendedText(
+                                  searchMessages[index],
+                                  specialTextSpanBuilder:
+                                      HighlightTextSpanBuilder(),
+                                ),
+                                actions: <Widget>[
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(b);
+                                      },
+                                      child: const Text('OK'))
+                                ],
+                              );
+                            });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(5),
+                        margin: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(border: Border.all()),
+                        child: ExtendedText(
+                          searchMessages[index],
+                          specialTextSpanBuilder: HighlightTextSpanBuilder(),
+                          maxLines: searchText.isEmpty ? 3 : 1,
+                          overflowWidget: TextOverflowWidget(
+                            child: const Text('\u2026 '),
+                            position: searchText.isEmpty
+                                ? TextOverflowPosition.end
+                                : TextOverflowPosition.auto,
+                          ),
                         ),
                       ),
                     );

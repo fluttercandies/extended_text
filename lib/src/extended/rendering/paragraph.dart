@@ -160,7 +160,7 @@ class ExtendedRenderParagraph extends _RenderParagraph
     // zmtzawqlp
     _hasVisualOverflow = hasVisualOverflow;
     layoutOverflow();
-    _hasVisualOverflow = hasVisualOverflow;
+    // _hasVisualOverflow = hasVisualOverflow;
     if (overflowWidget != null && _hasVisualOverflow) {
       _removeSelectionRegistrarSubscription();
       _disposeSelectableFragments();
@@ -211,26 +211,22 @@ class ExtendedRenderParagraph extends _RenderParagraph
 
     // zmtzawqlp
     // clip rect of over flow
-    if (_overflowRect != null) {
+    if (_overflowRects != null) {
       context.canvas.saveLayer(offset & size, Paint());
       // clip should be before textpainter
       if (overflowWidget?.clearType == TextOverflowClearType.clipRect) {
         // crop rect before _overflowRect
         // it's used for [TextOverflowPosition.middle]
 
-        if (_overflowRects != null && _overflowRects!.isNotEmpty) {
-          for (final Rect rect in _overflowRects!) {
+        if (_overflowClipTextRects != null &&
+            _overflowClipTextRects!.isNotEmpty) {
+          for (final Rect rect in _overflowClipTextRects!) {
             context.canvas.clipRect(
               rect.shift(offset),
               clipOp: ui.ClipOp.difference,
             );
           }
         }
-
-        context.canvas.clipRect(
-          _overflowRect!.shift(offset),
-          clipOp: ui.ClipOp.difference,
-        );
       }
     }
 
@@ -251,27 +247,27 @@ class ExtendedRenderParagraph extends _RenderParagraph
       drawGradient(context, offset);
     }
     // zmtzawqlp
-    if (_overflowRect != null) {
+    if (_overflowRects != null) {
       // BlendMode.clear should be after textpainter
       if (overflowWidget?.clearType == TextOverflowClearType.blendModeClear) {
         // crop rect before _overflowRect
         // it's used for [TextOverflowPosition.middle]
-        if (_overflowRects != null && _overflowRects!.isNotEmpty) {
-          for (final Rect rect in _overflowRects!) {
+        if (_overflowClipTextRects != null &&
+            _overflowClipTextRects!.isNotEmpty) {
+          for (final Rect rect in _overflowClipTextRects!) {
             context.canvas.drawRect(
                 rect.shift(offset), Paint()..blendMode = BlendMode.clear);
           }
         }
-
-        context.canvas.drawRect(
-            _overflowRect!.shift(offset), Paint()..blendMode = BlendMode.clear);
       }
 
       if (kDebugMode &&
           overflowWidget != null &&
           overflowWidget!.debugOverflowRectColor != null) {
-        context.canvas.drawRect(_overflowRect!.shift(offset),
-            Paint()..color = overflowWidget!.debugOverflowRectColor!);
+        for (final ui.Rect rect in _overflowRects!) {
+          context.canvas.drawRect(rect.shift(offset),
+              Paint()..color = overflowWidget!.debugOverflowRectColor!);
+        }
       }
 
       context.canvas.restore();
