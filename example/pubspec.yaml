@@ -22,8 +22,8 @@ dependencies:
 dependency_overrides:
   extended_text:
     path: ../
-  extended_text_library:
-    path: ../../extended_text_library
+  # extended_text_library:
+  #   path: ../../extended_text_library
  
 dev_dependencies:
   flutter_test:

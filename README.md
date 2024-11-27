@@ -20,7 +20,8 @@ ExtendedText is a third-party extension library for Flutter's official Text comp
 
 ```yaml
 dependencies:
-  extended_text: 10.0.1-ohos
+  extended_text: 10.0.1-ohos //  3.7.12
+  extended_text: 13.0.2      //  3.22.0
 ```
 
 
@@ -34,15 +35,13 @@ dependencies:
     - [ImageSpan](#imagespan)
   - [Selection](#selection)
     - [TextSelectionControls](#textselectioncontrols)
-    - [Control ToolBar Handle](#control-toolbar-handle)
-      - [Default Behavior](#default-behavior)
-      - [Custom Behavior](#custom-behavior)
   - [Custom Background](#custom-background)
   - [Custom Overflow](#custom-overflow)
   - [Join Zero-Width Space](#join-zero-width-space)
   - [Gradient](#gradient)
     - [GradientConfig](#gradientconfig)
     - [IgnoreGradientSpan](#ignoregradientspan)
+
 
 ## Speical Text
 
@@ -201,12 +200,8 @@ class ImageSpan extends ExtendedWidgetSpan {
 
 ![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/selection.gif)
 
-| parameter             | description                                                                                                          | default                                                                      |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| selectionEnabled      | Whether enable selection                                                                                             | false                                                                        |
-| selectionColor        | Color of selection                                                                                                   | Theme.of(context).textSelectionColor                                         |
-| dragStartBehavior     | DragStartBehavior for text selection                                                                                 | DragStartBehavior.start                                                      |
-| textSelectionControls | An interface for building the selection UI, to be provided by the implementor of the toolbar widget or handle widget | extendedMaterialTextSelectionControls/extendedCupertinoTextSelectionControls |
+It works with `SelectionArea` now.
+
 
 ### TextSelectionControls
 
@@ -408,56 +403,6 @@ class CommonSelectionArea extends StatelessWidget {
 
 ```
 
-### Control ToolBar Handle
-
-contain your page into ExtendedTextSelectionPointerHandler, so you can control toolbar and handle.
-
-#### Default Behavior
-
-set your page as child of ExtendedTextSelectionPointerHandler
-
-```dart
- return ExtendedTextSelectionPointerHandler(
-      //default behavior
-       child: result,
-    );
-```
-
-- tap region outside of extended text, hide toolbar and handle
-- scorll, hide toolbar and handle
-
-#### Custom Behavior
-
-get selectionStates(ExtendedTextSelectionState) by builder call back, and handle by your self.
-
-```dart
- return ExtendedTextSelectionPointerHandler(
-      //default behavior
-      // child: result,
-      //custom your behavior
-      builder: (states) {
-        return Listener(
-          child: result,
-          behavior: HitTestBehavior.translucent,
-          onPointerDown: (value) {
-            for (var state in states) {
-              if (!state.containsPosition(value.position)) {
-                //clear other selection
-                state.clearSelection();
-              }
-            }
-          },
-          onPointerMove: (value) {
-            //clear other selection
-            for (var state in states) {
-              state.clearSelection();
-            }
-          },
-        );
-      },
-    );
-```
-
 ## Custom Background
 
 ![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/background.png)
@@ -480,7 +425,14 @@ refer to issues [24335](https://github.com/flutter/flutter/issues/24335)/[24337]
 
 ## Custom Overflow
 
-![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/overflow.jpg)
+
+
+
+
+| ![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/overflow.jpg) | ![](https://github.com/HarmonyCandies/HarmonyCandies/blob/main/gif/extended_text/textOverflowPosition_auto.png) |
+| ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+|                                                                                                   |                                                                                                                 |
+
 
 refer to issue [26748](https://github.com/flutter/flutter/issues/26748)
 
@@ -557,7 +509,7 @@ Take care of following things:
 
 1. the word is not a word, it will not working when you want to double tap to select a word.
 
-2. text is changed, if [ExtendedText.selectionEnabled] is true, you should override TextSelectionControls and remove zeroWidthSpace.
+2. text is changed, you should override TextSelectionControls and remove zeroWidthSpace.
 
 ``` dart
 

@@ -1,3 +1,8 @@
+## 14.2.0
+
+* Add TextOverflowPosition.auto and SearchHighlightDemo
+* Improve the algorithm efficiency of [findNoOverflow]
+
 ## 14.1.0
 
 * Support gradient text 

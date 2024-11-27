@@ -12,7 +12,9 @@
 - [Flutter RichText 支持自定义文本溢出效果](https://juejin.im/post/5c8ca608f265da2dd6394001)
 - [Flutter RichText 支持自定义文字背景](https://juejin.im/post/5c8bf9516fb9a049c9669204)
 - [Flutter RichText 支持特殊文字效果](https://juejin.im/post/5c8bf4fce51d451066008fa2)
-- [Flutter RichText支持文本选择](https://juejin.im/post/5cff71d46fb9a07ea6486a0e)
+- [Flutter RichText 支持文本选择](https://juejin.im/post/5cff71d46fb9a07ea6486a0e)
+- [Flutter Text: 扶我起来](https://juejin.cn/post/6955095562215489573)
+- [Flutter 我就要五彩斑斓渐进的黑](https://juejin.cn/post/7411799494415728674)
 
 
 ExtendedText 是 Flutter 官方 Text 的三方扩展库，主要扩展功能如下:
@@ -26,25 +28,29 @@ ExtendedText 是 Flutter 官方 Text 的三方扩展库，主要扩展功能如�
 
 ```yaml
 dependencies:
-  extended_text: 10.0.1-ohos
+  extended_text: 10.0.1-ohos //  3.7.12
+  extended_text: 13.0.2      //  3.22.0
 ```
 
 ## 目录
-- [extended_text](#extendedtext)
-  - [目录](#%e7%9b%ae%e5%bd%95)
-  - [特殊文本](#%e7%89%b9%e6%ae%8a%e6%96%87%e6%9c%ac)
-    - [创建特殊文本](#%e5%88%9b%e5%bb%ba%e7%89%b9%e6%ae%8a%e6%96%87%e6%9c%ac)
-    - [特殊文本Builder](#%e7%89%b9%e6%ae%8a%e6%96%87%e6%9c%acbuilder)
-  - [图片](#%e5%9b%be%e7%89%87)
+ 
+- [extended\_text](#extended_text)
+  - [目录](#目录)
+  - [特殊文本](#特殊文本)
+    - [创建特殊文本](#创建特殊文本)
+    - [特殊文本Builder](#特殊文本builder)
+  - [图片](#图片)
     - [ImageSpan](#imagespan)
-    - [缓存图片](#%e7%bc%93%e5%ad%98%e5%9b%be%e7%89%87)
-  - [文本选择](#%e6%96%87%e6%9c%ac%e9%80%89%e6%8b%a9)
-    - [文本选择控制器](#%e6%96%87%e6%9c%ac%e9%80%89%e6%8b%a9%e6%8e%a7%e5%88%b6%e5%99%a8)
-    - [工具栏和选择器的控制](#%e5%b7%a5%e5%85%b7%e6%a0%8f%e5%92%8c%e9%80%89%e6%8b%a9%e5%99%a8%e7%9a%84%e6%8e%a7%e5%88%b6)
-      - [默认行为](#%e9%bb%98%e8%ae%a4%e8%a1%8c%e4%b8%ba)
-      - [自定义行为](#%e8%87%aa%e5%ae%9a%e4%b9%89%e8%a1%8c%e4%b8%ba)
-  - [自定义背景](#%e8%87%aa%e5%ae%9a%e4%b9%89%e8%83%8c%e6%99%af)
-  - [自定义文本溢出](#%e8%87%aa%e5%ae%9a%e4%b9%89%e6%96%87%e6%9c%ac%e6%ba%a2%e5%87%ba)
+  - [文本选择](#文本选择)
+    - [文本选择控制器](#文本选择控制器)
+  - [自定义背景](#自定义背景)
+  - [自定义文本溢出](#自定义文本溢出)
+  - [Join Zero-Width Space](#join-zero-width-space)
+  - [Gradient](#gradient)
+    - [GradientConfig](#gradientconfig)
+    - [IgnoreGradientSpan](#ignoregradientspan)
+  - [☕️Buy me a coffee](#️buy-me-a-coffee)
+
 
 ## 特殊文本
 
@@ -216,14 +222,7 @@ ImageSpan(AssetImage("xxx.jpg"),
 
 ## 文本选择
 
-![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/selection.gif)
-
-| 参数                  | 描述                                                 | 默认                                                                         |
-| --------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------- |
-| selectionEnabled      | 是否开启文本选择功能                                 | false                                                                        |
-| selectionColor        | 文本选择的颜色                                       | Theme.of(context).textSelectionColor                                         |
-| dragStartBehavior     | 文本选择的拖拽行为                                   | DragStartBehavior.start                                                      |
-| textSelectionControls | 文本选择控制器，你可以通过重写，来定义工具栏和选择器 | extendedMaterialTextSelectionControls/extendedCupertinoTextSelectionControls |
+现在它和 `SelectionArea` 一起工作。
 
 ### 文本选择控制器
 
@@ -424,56 +423,7 @@ class CommonSelectionArea extends StatelessWidget {
 }
 ```
 
-### 工具栏和选择器的控制
-
-你可以通过将你的页面包裹到ExtendedTextSelectionPointerHandler里面来定义不同的行为效果。
-
-#### 默认行为
-
-通过赋值ExtendedTextSelectionPointerHandler的child为你的页面，将会有默认的行为
-
-```dart
- return ExtendedTextSelectionPointerHandler(
-      //default behavior
-       child: result,
-    );
-```
-
-- 当点击extended_text之外的区域的时候，关闭工具栏和选择器
-- 滚动的时候，关闭工具栏和选择器
-
-#### 自定义行为
-
-你可以通过builder方法获取到页面上面的全部的selectionStates(ExtendedTextSelectionState)，并且通过自己获取点击事件来处理工具栏和选择器
-
-```dart
- return ExtendedTextSelectionPointerHandler(
-      //default behavior
-      // child: result,
-      //custom your behavior
-      builder: (states) {
-        return Listener(
-          child: result,
-          behavior: HitTestBehavior.translucent,
-          onPointerDown: (value) {
-            for (var state in states) {
-              if (!state.containsPosition(value.position)) {
-                //clear other selection
-                state.clearSelection();
-              }
-            }
-          },
-          onPointerMove: (value) {
-            //clear other selection
-            for (var state in states) {
-              state.clearSelection();
-            }
-          },
-        );
-      },
-    );
-```
-
+ 
 ## 自定义背景
 
 ![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/background.png)
@@ -495,7 +445,9 @@ Text背景相关的issue[24335](https://github.com/flutter/flutter/issues/24335)
 
 ## 自定义文本溢出
 
-![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/overflow.jpg)
+| ![](https://github.com/fluttercandies/Flutter_Candies/blob/master/gif/extended_text/overflow.jpg) | ![](https://github.com/HarmonyCandies/HarmonyCandies/blob/main/gif/extended_text/textOverflowPosition_auto.png) |
+| ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+|                                                                                                   |                                                                                                                 |
 
 文本溢出相关issue [26748](https://github.com/flutter/flutter/issues/26748)
 
@@ -570,7 +522,7 @@ Text背景相关的issue[24335](https://github.com/flutter/flutter/issues/24335)
 
 1. word 不再是 word，你将无法通过双击选择 word。
 
-2. 文本被修改了, 如果 [ExtendedText.selectionEnabled] 为 true, 你需要重写 TextSelectionControls，将字符串还原。
+2. 文本被修改了, 你需要重写 TextSelectionControls，将字符串还原。
 
 ``` dart
 
