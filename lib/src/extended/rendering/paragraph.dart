@@ -218,9 +218,17 @@ class ExtendedRenderParagraph extends _RenderParagraph
         // crop rect before _overflowRect
         // it's used for [TextOverflowPosition.middle]
 
-        if (_overflowClipTextRects != null &&
-            _overflowClipTextRects!.isNotEmpty) {
+        if (_overflowClipTextRects != null) {
           for (final Rect rect in _overflowClipTextRects!) {
+            context.canvas.clipRect(
+              rect.shift(offset),
+              clipOp: ui.ClipOp.difference,
+            );
+          }
+        }
+
+        if (_overflowRects != null) {
+          for (final Rect rect in _overflowRects!) {
             context.canvas.clipRect(
               rect.shift(offset),
               clipOp: ui.ClipOp.difference,
@@ -252,14 +260,21 @@ class ExtendedRenderParagraph extends _RenderParagraph
       if (overflowWidget?.clearType == TextOverflowClearType.blendModeClear) {
         // crop rect before _overflowRect
         // it's used for [TextOverflowPosition.middle]
-        if (_overflowClipTextRects != null &&
-            _overflowClipTextRects!.isNotEmpty) {
+        if (_overflowClipTextRects != null) {
           for (final Rect rect in _overflowClipTextRects!) {
             context.canvas.drawRect(
                 rect.shift(offset), Paint()..blendMode = BlendMode.clear);
           }
         }
+        if (_overflowRects != null) {
+          for (final Rect rect in _overflowRects!) {
+            context.canvas.drawRect(
+                rect.shift(offset), Paint()..blendMode = BlendMode.clear);
+          }
+        }
       }
+
+      context.canvas.restore();
 
       if (kDebugMode &&
           overflowWidget != null &&
@@ -269,8 +284,6 @@ class ExtendedRenderParagraph extends _RenderParagraph
               Paint()..color = overflowWidget!.debugOverflowRectColor!);
         }
       }
-
-      context.canvas.restore();
     }
     // zmtzawqlp
     _paintTextOverflow(context, offset);

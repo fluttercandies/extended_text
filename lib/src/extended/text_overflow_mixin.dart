@@ -126,8 +126,7 @@ mixin TextOverflowMixin on _RenderParagraph {
           constraints.maxWidth,
           ChildLayoutHelper.layoutChild,
           ChildLayoutHelper.getDryBaseline,
-          // TODO
-          // hideWidgets: hideWidgets,
+          hideWidgets: hideWidgets,
         );
         _layoutTextWithConstraints(constraints);
         positionInlineChildren(_textPainter.inlinePlaceholderBoxes!);
@@ -153,14 +152,15 @@ mixin TextOverflowMixin on _RenderParagraph {
 
     final TextPainter oneLineTextPainter = _copyTextPainter();
 
-    layoutInlineChildren(
+    final List<PlaceholderDimensions> placeholderDimensions =
+        layoutInlineChildren(
       constraints.maxWidth,
       ChildLayoutHelper.layoutChild,
       ChildLayoutHelper.getDryBaseline,
       textPainter: oneLineTextPainter,
       hideWidgets: <int>[],
     );
-
+    oneLineTextPainter.setPlaceholderDimensions(placeholderDimensions);
     oneLineTextPainter.layout();
     double oneLineWidth = oneLineTextPainter.width;
     final List<ui.LineMetrics> lines = _textPainter.computeLineMetrics();
@@ -480,15 +480,17 @@ mixin TextOverflowMixin on _RenderParagraph {
         } else {
           maxEnd = range.end;
           range.end = math.max(
-              range.start,
-              math.min(
-                  maxEnd - 1,
-                  //math.max((maxEnd - range.start) ~/ 2, 1),
-                  maxEnd));
+            range.start,
+            maxEnd - 1,
+            // math.min(
+            //     math.max((maxEnd - range.start) ~/ 2, 1),
+            //     maxEnd)
+          );
           // if range is not changed, so maybe we should break.
           if (pre == range) {
             _hasVisualOverflow = false;
           } else {
+            hideWidgets.clear();
             _hasVisualOverflow = true;
           }
         }
@@ -521,7 +523,8 @@ mixin TextOverflowMixin on _RenderParagraph {
       maxLines: _textPainter.maxLines,
     );
 
-    layoutInlineChildren(
+    final List<PlaceholderDimensions> placeholderDimensions =
+        layoutInlineChildren(
       constraints.maxWidth,
       ChildLayoutHelper.layoutChild,
       ChildLayoutHelper.getDryBaseline,
@@ -529,10 +532,12 @@ mixin TextOverflowMixin on _RenderParagraph {
       hideWidgets: hideWidgets,
     );
 
-    testTextPainter.layout(
-      minWidth: constraints.minWidth,
-      maxWidth: constraints.maxWidth,
-    );
+    testTextPainter
+      ..setPlaceholderDimensions(placeholderDimensions)
+      ..layout(
+          minWidth: constraints.minWidth,
+          maxWidth: _adjustMaxWidth(constraints.maxWidth));
+
     if (kDebugMode) {
       _layoutCount++;
     }
@@ -872,7 +877,7 @@ mixin TextOverflowMixin on _RenderParagraph {
         style: value.style,
         baseline: value.baseline,
         actualText: actualText,
-        hide: range.contains(offset.value),
+        hide: hide,
       );
       if (hide) {
         hideWidgets.add(hideWidgetIndex.value);
@@ -1212,7 +1217,7 @@ mixin TextOverflowMixin on _RenderParagraph {
     }
     if (textPainter != null) {
       textPainter.setPlaceholderDimensions(placeholderDimensions);
-      return _placeholderDimensions ?? <PlaceholderDimensions>[];
+      // return _placeholderDimensions ?? <PlaceholderDimensions>[];
     }
     return placeholderDimensions;
 
@@ -1237,7 +1242,12 @@ mixin TextOverflowMixin on _RenderParagraph {
       }
       final _TextParentData textParentData =
           child.parentData! as _TextParentData;
-      textParentData._offset = Offset(box.left, box.top);
+      // not paint zero width widget
+      if ((box.left - box.right).abs() < precisionErrorTolerance) {
+        textParentData._offset = null;
+      } else {
+        textParentData._offset = Offset(box.left, box.top);
+      }
       child = childAfter(child);
       childIndex++;
     }
@@ -1259,19 +1269,20 @@ mixin TextOverflowMixin on _RenderParagraph {
   @protected
   void paintInlineChildren(PaintingContext context, Offset offset) {
     RenderBox? child = firstChild;
-
-    while (child != null) {
+    int childIndex = 0;
+    while (child != null && childIndex < textChildCount) {
       final TextParentData childParentData =
           child.parentData! as TextParentData;
       final Offset? childOffset = childParentData.offset;
       if (childOffset == null) {
         child = childAfter(child);
+        childIndex++;
         // zmtzawqlp
         continue;
-        // return;
       }
       context.paintChild(child, childOffset + offset);
       child = childAfter(child);
+      childIndex++;
     }
   }
 }

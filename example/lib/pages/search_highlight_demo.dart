@@ -1,7 +1,7 @@
 import 'package:example/text/highlight_text_span_builder.dart';
+import 'package:extended_text/extended_text.dart';
 import 'package:ff_annotation_route_library/ff_annotation_route_library.dart';
 import 'package:flutter/material.dart';
-import 'package:extended_text/extended_text.dart';
 
 @FFRoute(
   name: 'fluttercandies://SearchHighlightDemo',
@@ -25,7 +25,7 @@ class _SearchHighlightDemoState extends State<SearchHighlightDemo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('quickly build special text'),
+        title: const Text('SearchHighlightDemo'),
       ),
       body: Container(
           padding: const EdgeInsets.all(20.0),
@@ -99,6 +99,7 @@ class _SearchHighlightDemoState extends State<SearchHighlightDemo> {
                           maxLines: searchText.isEmpty ? 3 : 1,
                           overflowWidget: TextOverflowWidget(
                             child: const Text('\u2026 '),
+                            // debugOverflowRectColor: Colors.red.withOpacity(0.1),
                             position: searchText.isEmpty
                                 ? TextOverflowPosition.end
                                 : TextOverflowPosition.auto,

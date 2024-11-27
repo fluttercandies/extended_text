@@ -21,7 +21,8 @@ class HighlightText extends RegExpSpecialText {
       actualText: match[0],
       start: start,
       style: textStyle?.copyWith(
-          color: Color(int.parse(hexColor.substring(1), radix: 16))),
+        color: Color(int.parse(hexColor.substring(1), radix: 16)),
+      ),
       keepVisible: true,
     );
   }

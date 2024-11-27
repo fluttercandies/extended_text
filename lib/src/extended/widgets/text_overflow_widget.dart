@@ -48,7 +48,7 @@ class TextOverflowWidget extends StatelessWidget {
     this.maxHeight,
     this.position = TextOverflowPosition.end,
     this.debugOverflowRectColor,
-    this.clearType = TextOverflowClearType.blendModeClear,
+    this.clearType = TextOverflowClearType.clipRect,
   });
 
   /// The widget of TextOverflow.
