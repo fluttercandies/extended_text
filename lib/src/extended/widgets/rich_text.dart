@@ -109,6 +109,12 @@ class ExtendedRichText extends _RichText {
         tagForChildren: PlaceholderSpanIndexSemanticsTag(result.length),
         child: overflowWidget,
       ));
+      if (overflowWidget.position == TextOverflowPosition.auto) {
+        result.add(Semantics(
+          tagForChildren: PlaceholderSpanIndexSemanticsTag(result.length),
+          child: overflowWidget,
+        ));
+      }
     }
     return result;
   }

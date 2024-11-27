@@ -15,6 +15,7 @@ import 'pages/gradient_text.dart';
 import 'pages/join_zero_width_space.dart';
 import 'pages/main_page.dart';
 import 'pages/regexp_text_demo.dart';
+import 'pages/search_highlight_demo.dart';
 import 'pages/selectable_region_width_text_field_demo.dart';
 import 'pages/selection_area_demo.dart';
 import 'pages/text_demo.dart';
@@ -72,6 +73,19 @@ FFRouteSettings getRouteSettings({
         builder: () => RegExpTextDemo(),
         routeName: 'RegExText',
         description: 'quickly build special text with RegExp',
+      );
+    case 'fluttercandies://SearchHighlightDemo':
+      return FFRouteSettings(
+        name: name,
+        arguments: arguments,
+        builder: () => SearchHighlightDemo(
+          key: asT<Key?>(
+            safeArguments['key'],
+          ),
+        ),
+        routeName: 'SearchHighlightDemo',
+        description:
+            'show how to highlight text when searching. TextOverflowPosition.auto',
       );
     case 'fluttercandies://SelectableRegionWithTextFieldDemo':
       return FFRouteSettings(

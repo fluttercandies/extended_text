@@ -13,6 +13,7 @@ const List<String> routeNames = <String>[
   'fluttercandies://GradientText',
   'fluttercandies://JoinZeroWidthSpace',
   'fluttercandies://RegExpTextDemo',
+  'fluttercandies://SearchHighlightDemo',
   'fluttercandies://SelectableRegionWithTextFieldDemo',
   'fluttercandies://SelectionAreaDemo',
   'fluttercandies://TextDemo',
@@ -72,6 +73,16 @@ class Routes {
   /// [description] : 'quickly build special text with RegExp'
   static const String fluttercandiesRegExpTextDemo =
       'fluttercandies://RegExpTextDemo';
+
+  /// 'show how to highlight text when searching. TextOverflowPosition.auto'
+  ///
+  /// [name] : 'fluttercandies://SearchHighlightDemo'
+  ///
+  /// [routeName] : 'SearchHighlightDemo'
+  ///
+  /// [description] : 'show how to highlight text when searching. TextOverflowPosition.auto'
+  static const String fluttercandiesSearchHighlightDemo =
+      'fluttercandies://SearchHighlightDemo';
 
   /// 'SelectableRegion works with TextField'
   ///

@@ -23,6 +23,9 @@ enum TextOverflowPosition {
   start,
   middle,
   end,
+
+  /// The position of TextOverflowWidget is decided by the position of TextOverflowWidget.
+  auto,
 }
 
 /// https://github.com/fluttercandies/extended_text/issues/118
@@ -45,7 +48,7 @@ class TextOverflowWidget extends StatelessWidget {
     this.maxHeight,
     this.position = TextOverflowPosition.end,
     this.debugOverflowRectColor,
-    this.clearType = TextOverflowClearType.blendModeClear,
+    this.clearType = TextOverflowClearType.clipRect,
   });
 
   /// The widget of TextOverflow.

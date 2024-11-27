@@ -25,45 +25,47 @@ mixin SelectionMixin on TextOverflowMixin {
         return true;
       } else {
         // overflow widget should not be select
-        if (_overflowSelection != null) {
-          final List<int> range =
-              List<int>.generate(length, (int index) => start + index);
-          for (int i = _overflowSelection!.start;
-              i < _overflowSelection!.end;
-              i++) {
-            range.remove(i);
-          }
+        if (_overflowSelections != null) {
+          for (final _TextRange _overflowSelection in _overflowSelections!) {
+            final List<int> range =
+                List<int>.generate(length, (int index) => start + index);
+            for (int i = _overflowSelection.start;
+                i < _overflowSelection.end;
+                i++) {
+              range.remove(i);
+            }
 
-          if (range.isEmpty) {
-            start += length;
-            return true;
-          }
-          final List<int> temp = <int>[
-            range[0],
-          ];
+            if (range.isEmpty) {
+              start += length;
+              return true;
+            }
+            final List<int> temp = <int>[
+              range[0],
+            ];
 
-          void _add() {
-            result.add(_ExtendedSelectableFragment(
-              paragraph: this,
-              range:
-                  TextRange(start: temp.first, end: temp.first + temp.length),
-              fullText: plainText,
-              specialInlineSpanBase: span is SpecialInlineSpanBase
-                  ? span as SpecialInlineSpanBase
-                  : null,
-            ));
-            temp.clear();
-          }
+            void _add() {
+              result.add(_ExtendedSelectableFragment(
+                paragraph: this,
+                range:
+                    TextRange(start: temp.first, end: temp.first + temp.length),
+                fullText: plainText,
+                specialInlineSpanBase: span is SpecialInlineSpanBase
+                    ? span as SpecialInlineSpanBase
+                    : null,
+              ));
+              temp.clear();
+            }
 
-          for (int i = 1; i < range.length; i++) {
-            if (temp.last + 1 != range[i]) {
+            for (int i = 1; i < range.length; i++) {
+              if (temp.last + 1 != range[i]) {
+                _add();
+              }
+              temp.add(range[i]);
+            }
+
+            if (temp.isNotEmpty) {
               _add();
             }
-            temp.add(range[i]);
-          }
-
-          if (temp.isNotEmpty) {
-            _add();
           }
         } else {
           result.add(
