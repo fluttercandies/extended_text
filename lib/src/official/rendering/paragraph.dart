@@ -1148,6 +1148,24 @@ class _SelectableFragment
   LayerLink? _endHandleLayerLink;
 
   @override
+  SelectedContentRange? getSelection() {
+    if (_textSelectionStart == null || _textSelectionEnd == null) {
+      return null;
+    }
+    final int start =
+        math.min(_textSelectionStart!.offset, _textSelectionEnd!.offset);
+    final int end =
+        math.max(_textSelectionStart!.offset, _textSelectionEnd!.offset);
+    return SelectedContentRange(
+      startOffset: start,
+      endOffset: end,
+    );
+  }
+
+  @override
+  int get contentLength => range.end - range.start;
+
+  @override
   SelectionGeometry get value => _selectionGeometry;
   late SelectionGeometry _selectionGeometry;
   void _updateSelectionGeometry() {
