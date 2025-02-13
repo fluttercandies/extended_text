@@ -3322,4 +3322,18 @@ class _SelectableFragment
     properties.add(DiagnosticsProperty<TextRange>('range', range));
     properties.add(DiagnosticsProperty<String>('fullText', fullText));
   }
+  
+  @override
+  int get contentLength => fullText.length;
+  
+  @override
+  SelectedContentRange? getSelection() {
+    if (_textSelectionStart == null || _textSelectionEnd == null) {
+      return null;
+    }
+    return SelectedContentRange(
+      startOffset: _textSelectionStart!.offset,
+      endOffset: _textSelectionEnd!.offset,
+    );
+  }
 }
