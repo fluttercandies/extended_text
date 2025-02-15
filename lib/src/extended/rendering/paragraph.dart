@@ -63,37 +63,46 @@ class ExtendedRenderParagraph extends _RenderParagraph
   }
 
   static PlaceholderDimensions _layoutChild(
-      RenderBox child,
-      BoxConstraints childConstraints,
-      ChildLayouter layoutChild,
-      ChildBaselineGetter getBaseline) {
+    RenderBox child,
+    BoxConstraints childConstraints,
+    ChildLayouter layoutChild,
+    ChildBaselineGetter getBaseline,
+  ) {
     final TextParentData parentData = child.parentData! as TextParentData;
     final PlaceholderSpan? span = parentData.span;
     assert(span != null);
     return span == null
         ? PlaceholderDimensions.empty
         : PlaceholderDimensions(
-            size: layoutChild(child, childConstraints),
-            alignment: span.alignment,
-            baseline: span.baseline,
-            baselineOffset: switch (span.alignment) {
-              ui.PlaceholderAlignment.aboveBaseline ||
-              ui.PlaceholderAlignment.belowBaseline ||
-              ui.PlaceholderAlignment.bottom ||
-              ui.PlaceholderAlignment.middle ||
-              ui.PlaceholderAlignment.top =>
-                null,
-              ui.PlaceholderAlignment.baseline =>
-                getBaseline(child, childConstraints, span.baseline!),
-            },
-          );
+          size: layoutChild(child, childConstraints),
+          alignment: span.alignment,
+          baseline: span.baseline,
+          baselineOffset: switch (span.alignment) {
+            ui.PlaceholderAlignment.aboveBaseline ||
+            ui.PlaceholderAlignment.belowBaseline ||
+            ui.PlaceholderAlignment.bottom ||
+            ui.PlaceholderAlignment.middle ||
+            ui.PlaceholderAlignment.top => null,
+            ui.PlaceholderAlignment.baseline => getBaseline(
+              child,
+              childConstraints,
+              span.baseline!,
+            ),
+          },
+        );
   }
 
   @override
   void performLayout() {
+    _lastSelectableFragments?.forEach(
+      (_SelectableFragment element) => element.didChangeParagraphLayout(),
+    );
     final BoxConstraints constraints = this.constraints;
-    _placeholderDimensions = layoutInlineChildren(constraints.maxWidth,
-        ChildLayoutHelper.layoutChild, ChildLayoutHelper.getBaseline);
+    _placeholderDimensions = layoutInlineChildren(
+      constraints.maxWidth,
+      ChildLayoutHelper.layoutChild,
+      ChildLayoutHelper.getBaseline,
+    );
     _layoutTextWithConstraints(constraints);
     positionInlineChildren(_textPainter.inlinePlaceholderBoxes!);
 
@@ -132,9 +141,9 @@ class ExtendedRenderParagraph extends _RenderParagraph
             final (double fadeStart, double fadeEnd) = switch (textDirection) {
               TextDirection.rtl => (fadeSizePainter.width, 0.0),
               TextDirection.ltr => (
-                  size.width - fadeSizePainter.width,
-                  size.width
-                ),
+                size.width - fadeSizePainter.width,
+                size.width,
+              ),
             };
             _overflowShader = ui.Gradient.linear(
               Offset(fadeStart, 0.0),
@@ -263,13 +272,17 @@ class ExtendedRenderParagraph extends _RenderParagraph
         if (_overflowClipTextRects != null) {
           for (final Rect rect in _overflowClipTextRects!) {
             context.canvas.drawRect(
-                rect.shift(offset), Paint()..blendMode = BlendMode.clear);
+              rect.shift(offset),
+              Paint()..blendMode = BlendMode.clear,
+            );
           }
         }
         if (_overflowRects != null) {
           for (final Rect rect in _overflowRects!) {
             context.canvas.drawRect(
-                rect.shift(offset), Paint()..blendMode = BlendMode.clear);
+              rect.shift(offset),
+              Paint()..blendMode = BlendMode.clear,
+            );
           }
         }
       }
@@ -280,8 +293,10 @@ class ExtendedRenderParagraph extends _RenderParagraph
           overflowWidget != null &&
           overflowWidget!.debugOverflowRectColor != null) {
         for (final ui.Rect rect in _overflowRects!) {
-          context.canvas.drawRect(rect.shift(offset),
-              Paint()..color = overflowWidget!.debugOverflowRectColor!);
+          context.canvas.drawRect(
+            rect.shift(offset),
+            Paint()..color = overflowWidget!.debugOverflowRectColor!,
+          );
         }
       }
     }
@@ -291,9 +306,10 @@ class ExtendedRenderParagraph extends _RenderParagraph
     if (_needsClipping) {
       if (_overflowShader != null) {
         context.canvas.translate(offset.dx, offset.dy);
-        final Paint paint = Paint()
-          ..blendMode = BlendMode.modulate
-          ..shader = _overflowShader;
+        final Paint paint =
+            Paint()
+              ..blendMode = BlendMode.modulate
+              ..shader = _overflowShader;
         context.canvas.drawRect(Offset.zero & size, paint);
       }
       context.canvas.restore();
@@ -317,8 +333,11 @@ class ExtendedRenderParagraph extends _RenderParagraph
   }
 
   void _paintSpecialTextChildren(
-      List<InlineSpan> textSpans, Canvas canvas, Rect rect,
-      {int textOffset = 0}) {
+    List<InlineSpan> textSpans,
+    Canvas canvas,
+    Rect rect, {
+    int textOffset = 0,
+  }) {
     for (final InlineSpan ts in textSpans) {
       final Offset topLeftOffset = getOffsetForCaret(
         TextPosition(offset: textOffset),
@@ -338,11 +357,20 @@ class ExtendedRenderParagraph extends _RenderParagraph
           endOffset = _findEndOffset(rect, endTextOffset);
         }
 
-        ts.paint(canvas, topLeftOffset, rect,
-            endOffset: endOffset, wholeTextPainter: _textPainter);
+        ts.paint(
+          canvas,
+          topLeftOffset,
+          rect,
+          endOffset: endOffset,
+          wholeTextPainter: _textPainter,
+        );
       } else if (ts is TextSpan && ts.children != null) {
-        _paintSpecialTextChildren(ts.children!, canvas, rect,
-            textOffset: textOffset);
+        _paintSpecialTextChildren(
+          ts.children!,
+          canvas,
+          rect,
+          textOffset: textOffset,
+        );
       }
 
       textOffset += ts.toPlainText().length;

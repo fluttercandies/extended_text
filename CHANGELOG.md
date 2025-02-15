@@ -1,3 +1,7 @@
+## 15.0.0
+
+* Migrate to Flutter 3.29.0
+
 ## 14.2.0
 
 * Add TextOverflowPosition.auto and SearchHighlightDemo

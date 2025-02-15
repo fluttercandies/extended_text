@@ -299,15 +299,17 @@ class _Text extends StatelessWidget {
       effectiveTextStyle = defaultTextStyle.style.merge(style);
     }
     if (MediaQuery.boldTextOf(context)) {
-      effectiveTextStyle = effectiveTextStyle!
-          .merge(const TextStyle(fontWeight: FontWeight.bold));
+      effectiveTextStyle = effectiveTextStyle!.merge(
+        const TextStyle(fontWeight: FontWeight.bold),
+      );
     }
     final SelectionRegistrar? registrar = SelectionContainer.maybeOf(context);
 
     late Widget result;
     if (registrar != null) {
       result = MouseRegion(
-        cursor: DefaultSelectionStyle.of(context).mouseCursor ??
+        cursor:
+            DefaultSelectionStyle.of(context).mouseCursor ??
             SystemMouseCursors.text,
         child: _SelectableTextContainer(
           textAlign: textAlign ?? defaultTextStyle.textAlign ?? TextAlign.start,
@@ -316,17 +318,20 @@ class _Text extends StatelessWidget {
           locale:
               locale, // RichText uses Localizations.localeOf to obtain a default if this is null
           softWrap: softWrap ?? defaultTextStyle.softWrap,
-          overflow: overflow ??
+          overflow:
+              overflow ??
               effectiveTextStyle?.overflow ??
               defaultTextStyle.overflow,
           textScaler: textScaler ?? MediaQuery.textScalerOf(context),
           maxLines: maxLines ?? defaultTextStyle.maxLines,
           strutStyle: strutStyle,
           textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
-          textHeightBehavior: textHeightBehavior ??
+          textHeightBehavior:
+              textHeightBehavior ??
               defaultTextStyle.textHeightBehavior ??
               DefaultTextHeightBehavior.maybeOf(context),
-          selectionColor: selectionColor ??
+          selectionColor:
+              selectionColor ??
               DefaultSelectionStyle.of(context).selectionColor ??
               DefaultSelectionStyle.defaultColor,
           text: TextSpan(
@@ -344,17 +349,20 @@ class _Text extends StatelessWidget {
         locale:
             locale, // RichText uses Localizations.localeOf to obtain a default if this is null
         softWrap: softWrap ?? defaultTextStyle.softWrap,
-        overflow: overflow ??
+        overflow:
+            overflow ??
             effectiveTextStyle?.overflow ??
             defaultTextStyle.overflow,
         textScaler: textScaler ?? MediaQuery.textScalerOf(context),
         maxLines: maxLines ?? defaultTextStyle.maxLines,
         strutStyle: strutStyle,
         textWidthBasis: textWidthBasis ?? defaultTextStyle.textWidthBasis,
-        textHeightBehavior: textHeightBehavior ??
+        textHeightBehavior:
+            textHeightBehavior ??
             defaultTextStyle.textHeightBehavior ??
             DefaultTextHeightBehavior.maybeOf(context),
-        selectionColor: selectionColor ??
+        selectionColor:
+            selectionColor ??
             DefaultSelectionStyle.of(context).selectionColor ??
             DefaultSelectionStyle.defaultColor,
         text: TextSpan(
@@ -368,9 +376,7 @@ class _Text extends StatelessWidget {
       result = Semantics(
         textDirection: textDirection,
         label: semanticsLabel,
-        child: ExcludeSemantics(
-          child: result,
-        ),
+        child: ExcludeSemantics(child: result),
       );
     }
     return result;
@@ -381,30 +387,54 @@ class _Text extends StatelessWidget {
     super.debugFillProperties(properties);
     properties.add(StringProperty('data', data, showName: false));
     if (textSpan != null) {
-      properties.add(textSpan!.toDiagnosticsNode(
-          name: 'textSpan', style: DiagnosticsTreeStyle.transition));
+      properties.add(
+        textSpan!.toDiagnosticsNode(
+          name: 'textSpan',
+          style: DiagnosticsTreeStyle.transition,
+        ),
+      );
     }
     style?.debugFillProperties(properties);
     properties.add(
-        EnumProperty<TextAlign>('textAlign', textAlign, defaultValue: null));
-    properties.add(EnumProperty<TextDirection>('textDirection', textDirection,
-        defaultValue: null));
-    properties
-        .add(DiagnosticsProperty<Locale>('locale', locale, defaultValue: null));
-    properties.add(FlagProperty('softWrap',
+      EnumProperty<TextAlign>('textAlign', textAlign, defaultValue: null),
+    );
+    properties.add(
+      EnumProperty<TextDirection>(
+        'textDirection',
+        textDirection,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<Locale>('locale', locale, defaultValue: null),
+    );
+    properties.add(
+      FlagProperty(
+        'softWrap',
         value: softWrap,
         ifTrue: 'wrapping at box width',
         ifFalse: 'no wrapping except at line break characters',
-        showName: true));
+        showName: true,
+      ),
+    );
     properties.add(
-        EnumProperty<TextOverflow>('overflow', overflow, defaultValue: null));
+      EnumProperty<TextOverflow>('overflow', overflow, defaultValue: null),
+    );
     properties.add(IntProperty('maxLines', maxLines, defaultValue: null));
-    properties.add(EnumProperty<TextWidthBasis>(
-        'textWidthBasis', textWidthBasis,
-        defaultValue: null));
-    properties.add(DiagnosticsProperty<ui.TextHeightBehavior>(
-        'textHeightBehavior', textHeightBehavior,
-        defaultValue: null));
+    properties.add(
+      EnumProperty<TextWidthBasis>(
+        'textWidthBasis',
+        textWidthBasis,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<ui.TextHeightBehavior>(
+        'textHeightBehavior',
+        textHeightBehavior,
+        defaultValue: null,
+      ),
+    );
     if (semanticsLabel != null) {
       properties.add(StringProperty('semanticsLabel', semanticsLabel));
     }
@@ -545,10 +575,8 @@ class _RichTextWidget extends StatelessWidget {
 const double _kSelectableVerticalComparingThreshold = 3.0;
 
 class _SelectableTextContainerDelegate
-    extends MultiSelectableSelectionContainerDelegate {
-  _SelectableTextContainerDelegate(
-    GlobalKey textKey,
-  ) : _textKey = textKey;
+    extends StaticSelectionContainerDelegate {
+  _SelectableTextContainerDelegate(GlobalKey textKey) : _textKey = textKey;
 
   final GlobalKey _textKey;
   // zmtzawqlp
@@ -558,13 +586,7 @@ class _SelectableTextContainerDelegate
   @override
   SelectionResult handleSelectParagraph(SelectParagraphSelectionEvent event) {
     final SelectionResult result = _handleSelectParagraph(event);
-    if (currentSelectionStartIndex != -1) {
-      _hasReceivedStartEvent.add(selectables[currentSelectionStartIndex]);
-    }
-    if (currentSelectionEndIndex != -1) {
-      _hasReceivedEndEvent.add(selectables[currentSelectionEndIndex]);
-    }
-    _updateLastEdgeEventsFromGeometries();
+    super.didReceiveSelectionBoundaryEvents();
     return result;
   }
 
@@ -587,7 +609,9 @@ class _SelectableTextContainerDelegate
           selectables[index].boundingBoxes.isNotEmpty) {
         for (final Rect rect in selectables[index].boundingBoxes) {
           final Rect globalRect = MatrixUtils.transformRect(
-              selectables[index].getTransformTo(null), rect);
+            selectables[index].getTransformTo(null),
+            rect,
+          );
           if (globalRect.contains(event.globalPosition)) {
             currentSelectionStartIndex = currentSelectionEndIndex = index;
             return dispatchSelectionEventToChild(selectables[index], event);
@@ -603,9 +627,13 @@ class _SelectableTextContainerDelegate
       if (!paragraph.selectableBelongsToParagraph(selectables[index])) {
         if (foundStart) {
           final SelectionEvent synthesizedEvent = SelectParagraphSelectionEvent(
-              globalPosition: event.globalPosition, absorb: true);
+            globalPosition: event.globalPosition,
+            absorb: true,
+          );
           final SelectionResult result = dispatchSelectionEventToChild(
-              selectables[index], synthesizedEvent);
+            selectables[index],
+            synthesizedEvent,
+          );
           if (selectables.length - 1 == index) {
             currentSelectionEndIndex = index;
             _flushInactiveSelections();
@@ -615,8 +643,10 @@ class _SelectableTextContainerDelegate
         continue;
       }
       final SelectionGeometry existingGeometry = selectables[index].value;
-      lastSelectionResult =
-          dispatchSelectionEventToChild(selectables[index], event);
+      lastSelectionResult = dispatchSelectionEventToChild(
+        selectables[index],
+        event,
+      );
       if (index == selectables.length - 1 &&
           lastSelectionResult == SelectionResult.next) {
         if (foundStart) {
@@ -640,14 +670,17 @@ class _SelectableTextContainerDelegate
           if (lastNextIndex != null && selectionAtStartOfSelectable) {
             startIndex = lastNextIndex + 1;
           } else {
-            startIndex = lastNextIndex == null && selectionAtStartOfSelectable
-                ? 0
-                : index;
+            startIndex =
+                lastNextIndex == null && selectionAtStartOfSelectable
+                    ? 0
+                    : index;
           }
           for (int i = startIndex; i < index; i += 1) {
             final SelectionEvent synthesizedEvent =
                 SelectParagraphSelectionEvent(
-                    globalPosition: event.globalPosition, absorb: true);
+                  globalPosition: event.globalPosition,
+                  absorb: true,
+                );
             dispatchSelectionEventToChild(selectables[i], synthesizedEvent);
           }
           currentSelectionStartIndex = startIndex;
@@ -664,7 +697,9 @@ class _SelectableTextContainerDelegate
           for (int i = 0; i < index; i += 1) {
             final SelectionEvent synthesizedEvent =
                 SelectParagraphSelectionEvent(
-                    globalPosition: event.globalPosition, absorb: true);
+                  globalPosition: event.globalPosition,
+                  absorb: true,
+                );
             dispatchSelectionEventToChild(selectables[i], synthesizedEvent);
           }
         }
@@ -690,15 +725,20 @@ class _SelectableTextContainerDelegate
   /// Ideally, this method should only be called twice at the beginning of the
   /// drag selection, once for start edge update event, once for end edge update
   /// event.
-  SelectionResult _initSelection(SelectionEdgeUpdateEvent event,
-      {required bool isEnd}) {
-    assert((isEnd && currentSelectionEndIndex == -1) ||
-        (!isEnd && currentSelectionStartIndex == -1));
+  SelectionResult _initSelection(
+    SelectionEdgeUpdateEvent event, {
+    required bool isEnd,
+  }) {
+    assert(
+      (isEnd && currentSelectionEndIndex == -1) ||
+          (!isEnd && currentSelectionStartIndex == -1),
+    );
     SelectionResult? finalResult;
     // Begin the search for the selection edge at the opposite edge if it exists.
-    final bool hasOppositeEdge = isEnd
-        ? currentSelectionStartIndex != -1
-        : currentSelectionEndIndex != -1;
+    final bool hasOppositeEdge =
+        isEnd
+            ? currentSelectionStartIndex != -1
+            : currentSelectionEndIndex != -1;
     int newIndex = switch ((isEnd, hasOppositeEdge)) {
       (true, true) => currentSelectionStartIndex,
       (true, false) => 0,
@@ -719,10 +759,13 @@ class _SelectableTextContainerDelegate
     // 1. the selectable returns end, pending, none.
     // 2. the selectable returns previous when looking forward.
     // 2. the selectable returns next when looking backward.
-    while (
-        newIndex < selectables.length && newIndex >= 0 && finalResult == null) {
-      currentSelectableResult =
-          dispatchSelectionEventToChild(selectables[newIndex], event);
+    while (newIndex < selectables.length &&
+        newIndex >= 0 &&
+        finalResult == null) {
+      currentSelectableResult = dispatchSelectionEventToChild(
+        selectables[newIndex],
+        event,
+      );
       switch (currentSelectableResult) {
         case SelectionResult.end:
         case SelectionResult.pending:
@@ -759,16 +802,22 @@ class _SelectableTextContainerDelegate
     return finalResult!;
   }
 
-  SelectionResult _adjustSelection(SelectionEdgeUpdateEvent event,
-      {required bool isEnd}) {
+  SelectionResult _adjustSelection(
+    SelectionEdgeUpdateEvent event, {
+    required bool isEnd,
+  }) {
     assert(() {
       if (isEnd) {
-        assert(currentSelectionEndIndex < selectables.length &&
-            currentSelectionEndIndex >= 0);
+        assert(
+          currentSelectionEndIndex < selectables.length &&
+              currentSelectionEndIndex >= 0,
+        );
         return true;
       }
-      assert(currentSelectionStartIndex < selectables.length &&
-          currentSelectionStartIndex >= 0);
+      assert(
+        currentSelectionStartIndex < selectables.length &&
+            currentSelectionStartIndex >= 0,
+      );
       return true;
     }());
     SelectionResult? finalResult;
@@ -782,16 +831,18 @@ class _SelectableTextContainerDelegate
     //
     // This can happen when there is a scrollable child and the edge being adjusted
     // has been scrolled out of view.
-    final bool isCurrentEdgeWithinViewport = isEnd
-        ? value.endSelectionPoint != null
-        : value.startSelectionPoint != null;
-    final bool isOppositeEdgeWithinViewport = isEnd
-        ? value.startSelectionPoint != null
-        : value.endSelectionPoint != null;
+    final bool isCurrentEdgeWithinViewport =
+        isEnd
+            ? value.endSelectionPoint != null
+            : value.startSelectionPoint != null;
+    final bool isOppositeEdgeWithinViewport =
+        isEnd
+            ? value.startSelectionPoint != null
+            : value.endSelectionPoint != null;
     int newIndex = switch ((
       isEnd,
       isCurrentEdgeWithinViewport,
-      isOppositeEdgeWithinViewport
+      isOppositeEdgeWithinViewport,
     )) {
       (true, true, true) => currentSelectionEndIndex,
       (true, true, false) => currentSelectionEndIndex,
@@ -818,10 +869,13 @@ class _SelectableTextContainerDelegate
     // 1. the selectable returns end, pending, none.
     // 2. the selectable returns previous when looking forward.
     // 2. the selectable returns next when looking backward.
-    while (
-        newIndex < selectables.length && newIndex >= 0 && finalResult == null) {
-      currentSelectableResult =
-          dispatchSelectionEventToChild(selectables[newIndex], event);
+    while (newIndex < selectables.length &&
+        newIndex >= 0 &&
+        finalResult == null) {
+      currentSelectableResult = dispatchSelectionEventToChild(
+        selectables[newIndex],
+        event,
+      );
       switch (currentSelectableResult) {
         case SelectionResult.end:
         case SelectionResult.pending:
@@ -945,6 +999,102 @@ class _SelectableTextContainerDelegate
     return a.right > b.right ? 1 : -1;
   }
 
+  /// This method calculates a local [SelectedContentRange] based on the list
+  /// of [selections] that are accumulated from the [Selectable] children under this
+  /// delegate. This calculation takes into account the accumulated content
+  /// length before the active selection, and returns null when either selection
+  /// edge has not been set.
+  SelectedContentRange? _calculateLocalRange(List<_SelectionInfo> selections) {
+    if (currentSelectionStartIndex == -1 || currentSelectionEndIndex == -1) {
+      return null;
+    }
+    int startOffset = 0;
+    int endOffset = 0;
+    bool foundStart = false;
+    bool forwardSelection =
+        currentSelectionEndIndex >= currentSelectionStartIndex;
+    if (currentSelectionEndIndex == currentSelectionStartIndex) {
+      // Determining selection direction is innacurate if currentSelectionStartIndex == currentSelectionEndIndex.
+      // Use the range from the selectable within the selection as the source of truth for selection direction.
+      final SelectedContentRange rangeAtSelectableInSelection =
+          selectables[currentSelectionStartIndex].getSelection()!;
+      forwardSelection =
+          rangeAtSelectableInSelection.endOffset >=
+          rangeAtSelectableInSelection.startOffset;
+    }
+    for (int index = 0; index < selections.length; index++) {
+      final _SelectionInfo selection = selections[index];
+      if (selection.range == null) {
+        if (foundStart) {
+          return SelectedContentRange(
+            startOffset: forwardSelection ? startOffset : endOffset,
+            endOffset: forwardSelection ? endOffset : startOffset,
+          );
+        }
+        startOffset += selection.contentLength;
+        endOffset = startOffset;
+        continue;
+      }
+      final int selectionStartNormalized = min(
+        selection.range!.startOffset,
+        selection.range!.endOffset,
+      );
+      final int selectionEndNormalized = max(
+        selection.range!.startOffset,
+        selection.range!.endOffset,
+      );
+      if (!foundStart) {
+        // Because a RenderParagraph may split its content into multiple selectables
+        // we have to consider at what offset a selectable starts at relative
+        // to the RenderParagraph, when the selectable is not the start of the content.
+        final bool shouldConsiderContentStart =
+            index > 0 &&
+            paragraph.selectableBelongsToParagraph(selectables[index]);
+        startOffset +=
+            (selectionStartNormalized -
+                    (shouldConsiderContentStart
+                        ? paragraph
+                            .getPositionForOffset(
+                              selectables[index].boundingBoxes.first.centerLeft,
+                            )
+                            .offset
+                        : 0))
+                .abs();
+        endOffset =
+            startOffset +
+            (selectionEndNormalized - selectionStartNormalized).abs();
+        foundStart = true;
+      } else {
+        endOffset += (selectionEndNormalized - selectionStartNormalized).abs();
+      }
+    }
+    assert(
+      foundStart,
+      'The start of the selection has not been found despite this selection delegate having an existing currentSelectionStartIndex and currentSelectionEndIndex.',
+    );
+    return SelectedContentRange(
+      startOffset: forwardSelection ? startOffset : endOffset,
+      endOffset: forwardSelection ? endOffset : startOffset,
+    );
+  }
+
+  /// Returns a [SelectedContentRange] considering the [SelectedContentRange]
+  /// from each [Selectable] child managed under this delegate.
+  ///
+  /// When nothing is selected or either selection edge has not been set,
+  /// this method will return `null`.
+  @override
+  SelectedContentRange? getSelection() {
+    final List<_SelectionInfo> selections = <_SelectionInfo>[
+      for (final Selectable selectable in selectables)
+        (
+          contentLength: selectable.contentLength,
+          range: selectable.getSelection(),
+        ),
+    ];
+    return _calculateLocalRange(selections);
+  }
+
   // From [SelectableRegion].
 
   // Clears the selection on all selectables not in the range of
@@ -959,200 +1109,59 @@ class _SelectableTextContainerDelegate
       return;
     }
     if (currentSelectionStartIndex == -1 || currentSelectionEndIndex == -1) {
-      final int skipIndex = currentSelectionStartIndex == -1
-          ? currentSelectionEndIndex
-          : currentSelectionStartIndex;
+      final int skipIndex =
+          currentSelectionStartIndex == -1
+              ? currentSelectionEndIndex
+              : currentSelectionStartIndex;
       selectables
           .where((Selectable target) => target != selectables[skipIndex])
-          .forEach((Selectable target) => dispatchSelectionEventToChild(
-              target, const ClearSelectionEvent()));
+          .forEach(
+            (Selectable target) => dispatchSelectionEventToChild(
+              target,
+              const ClearSelectionEvent(),
+            ),
+          );
       return;
     }
-    final int skipStart =
-        min(currentSelectionStartIndex, currentSelectionEndIndex);
-    final int skipEnd =
-        max(currentSelectionStartIndex, currentSelectionEndIndex);
+    final int skipStart = min(
+      currentSelectionStartIndex,
+      currentSelectionEndIndex,
+    );
+    final int skipEnd = max(
+      currentSelectionStartIndex,
+      currentSelectionEndIndex,
+    );
     for (int index = 0; index < selectables.length; index += 1) {
       if (index >= skipStart && index <= skipEnd) {
         continue;
       }
       dispatchSelectionEventToChild(
-          selectables[index], const ClearSelectionEvent());
+        selectables[index],
+        const ClearSelectionEvent(),
+      );
     }
-  }
-
-  final Set<Selectable> _hasReceivedStartEvent = <Selectable>{};
-  final Set<Selectable> _hasReceivedEndEvent = <Selectable>{};
-
-  Offset? _lastStartEdgeUpdateGlobalPosition;
-  Offset? _lastEndEdgeUpdateGlobalPosition;
-
-  @override
-  void remove(Selectable selectable) {
-    _hasReceivedStartEvent.remove(selectable);
-    _hasReceivedEndEvent.remove(selectable);
-    super.remove(selectable);
-  }
-
-  void _updateLastEdgeEventsFromGeometries() {
-    if (currentSelectionStartIndex != -1 &&
-        selectables[currentSelectionStartIndex].value.hasSelection) {
-      final Selectable start = selectables[currentSelectionStartIndex];
-      final Offset localStartEdge =
-          start.value.startSelectionPoint!.localPosition +
-              Offset(0, -start.value.startSelectionPoint!.lineHeight / 2);
-      _lastStartEdgeUpdateGlobalPosition = MatrixUtils.transformPoint(
-          start.getTransformTo(null), localStartEdge);
-    }
-    if (currentSelectionEndIndex != -1 &&
-        selectables[currentSelectionEndIndex].value.hasSelection) {
-      final Selectable end = selectables[currentSelectionEndIndex];
-      final Offset localEndEdge = end.value.endSelectionPoint!.localPosition +
-          Offset(0, -end.value.endSelectionPoint!.lineHeight / 2);
-      _lastEndEdgeUpdateGlobalPosition =
-          MatrixUtils.transformPoint(end.getTransformTo(null), localEndEdge);
-    }
-  }
-
-  @override
-  SelectionResult handleSelectAll(SelectAllSelectionEvent event) {
-    final SelectionResult result = super.handleSelectAll(event);
-    for (final Selectable selectable in selectables) {
-      _hasReceivedStartEvent.add(selectable);
-      _hasReceivedEndEvent.add(selectable);
-    }
-    // Synthesize last update event so the edge updates continue to work.
-    _updateLastEdgeEventsFromGeometries();
-    return result;
-  }
-
-  /// Selects a word in a selectable at the location
-  /// [SelectWordSelectionEvent.globalPosition].
-  @override
-  SelectionResult handleSelectWord(SelectWordSelectionEvent event) {
-    final SelectionResult result = super.handleSelectWord(event);
-    if (currentSelectionStartIndex != -1) {
-      _hasReceivedStartEvent.add(selectables[currentSelectionStartIndex]);
-    }
-    if (currentSelectionEndIndex != -1) {
-      _hasReceivedEndEvent.add(selectables[currentSelectionEndIndex]);
-    }
-    _updateLastEdgeEventsFromGeometries();
-    return result;
-  }
-
-  @override
-  SelectionResult handleClearSelection(ClearSelectionEvent event) {
-    final SelectionResult result = super.handleClearSelection(event);
-    _hasReceivedStartEvent.clear();
-    _hasReceivedEndEvent.clear();
-    _lastStartEdgeUpdateGlobalPosition = null;
-    _lastEndEdgeUpdateGlobalPosition = null;
-    return result;
   }
 
   @override
   SelectionResult handleSelectionEdgeUpdate(SelectionEdgeUpdateEvent event) {
+    if (event.granularity != TextGranularity.paragraph) {
+      return super.handleSelectionEdgeUpdate(event);
+    }
+    updateLastSelectionEdgeLocation(
+      globalSelectionEdgeLocation: event.globalPosition,
+      forEnd: event.type == SelectionEventType.endEdgeUpdate,
+    );
     if (event.type == SelectionEventType.endEdgeUpdate) {
-      _lastEndEdgeUpdateGlobalPosition = event.globalPosition;
-    } else {
-      _lastStartEdgeUpdateGlobalPosition = event.globalPosition;
+      return currentSelectionEndIndex == -1
+          ? _initSelection(event, isEnd: true)
+          : _adjustSelection(event, isEnd: true);
     }
-
-    if (event.granularity == TextGranularity.paragraph) {
-      if (event.type == SelectionEventType.endEdgeUpdate) {
-        return currentSelectionEndIndex == -1
-            ? _initSelection(event, isEnd: true)
-            : _adjustSelection(event, isEnd: true);
-      }
-      return currentSelectionStartIndex == -1
-          ? _initSelection(event, isEnd: false)
-          : _adjustSelection(event, isEnd: false);
-    }
-
-    return super.handleSelectionEdgeUpdate(event);
-  }
-
-  @override
-  void dispose() {
-    _hasReceivedStartEvent.clear();
-    _hasReceivedEndEvent.clear();
-    super.dispose();
-  }
-
-  @override
-  SelectionResult dispatchSelectionEventToChild(
-      Selectable selectable, SelectionEvent event) {
-    switch (event.type) {
-      case SelectionEventType.startEdgeUpdate:
-        _hasReceivedStartEvent.add(selectable);
-        ensureChildUpdated(selectable);
-      case SelectionEventType.endEdgeUpdate:
-        _hasReceivedEndEvent.add(selectable);
-        ensureChildUpdated(selectable);
-      case SelectionEventType.clear:
-        _hasReceivedStartEvent.remove(selectable);
-        _hasReceivedEndEvent.remove(selectable);
-      case SelectionEventType.selectAll:
-      case SelectionEventType.selectWord:
-      case SelectionEventType.selectParagraph:
-        break;
-      case SelectionEventType.granularlyExtendSelection:
-      case SelectionEventType.directionallyExtendSelection:
-        _hasReceivedStartEvent.add(selectable);
-        _hasReceivedEndEvent.add(selectable);
-        ensureChildUpdated(selectable);
-    }
-    return super.dispatchSelectionEventToChild(selectable, event);
-  }
-
-  @override
-  void ensureChildUpdated(Selectable selectable) {
-    if (_lastEndEdgeUpdateGlobalPosition != null &&
-        _hasReceivedEndEvent.add(selectable)) {
-      final SelectionEdgeUpdateEvent synthesizedEvent =
-          SelectionEdgeUpdateEvent.forEnd(
-        globalPosition: _lastEndEdgeUpdateGlobalPosition!,
-      );
-      if (currentSelectionEndIndex == -1) {
-        handleSelectionEdgeUpdate(synthesizedEvent);
-      }
-      selectable.dispatchSelectionEvent(synthesizedEvent);
-    }
-    if (_lastStartEdgeUpdateGlobalPosition != null &&
-        _hasReceivedStartEvent.add(selectable)) {
-      final SelectionEdgeUpdateEvent synthesizedEvent =
-          SelectionEdgeUpdateEvent.forStart(
-        globalPosition: _lastStartEdgeUpdateGlobalPosition!,
-      );
-      if (currentSelectionStartIndex == -1) {
-        handleSelectionEdgeUpdate(synthesizedEvent);
-      }
-      selectable.dispatchSelectionEvent(synthesizedEvent);
-    }
-  }
-
-  @override
-  void didChangeSelectables() {
-    if (_lastEndEdgeUpdateGlobalPosition != null) {
-      handleSelectionEdgeUpdate(
-        SelectionEdgeUpdateEvent.forEnd(
-          globalPosition: _lastEndEdgeUpdateGlobalPosition!,
-        ),
-      );
-    }
-    if (_lastStartEdgeUpdateGlobalPosition != null) {
-      handleSelectionEdgeUpdate(
-        SelectionEdgeUpdateEvent.forStart(
-          globalPosition: _lastStartEdgeUpdateGlobalPosition!,
-        ),
-      );
-    }
-    final Set<Selectable> selectableSet = selectables.toSet();
-    _hasReceivedEndEvent.removeWhere(
-        (Selectable selectable) => !selectableSet.contains(selectable));
-    _hasReceivedStartEvent.removeWhere(
-        (Selectable selectable) => !selectableSet.contains(selectable));
-    super.didChangeSelectables();
+    return currentSelectionStartIndex == -1
+        ? _initSelection(event, isEnd: false)
+        : _adjustSelection(event, isEnd: false);
   }
 }
+
+/// The length of the content that can be selected, and the range that is
+/// selected.
+typedef _SelectionInfo = ({int contentLength, SelectedContentRange? range});
