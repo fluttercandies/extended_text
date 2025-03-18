@@ -2,6 +2,7 @@
 
 * Fix issue that setState() causes custom overflow to disappear(#171)
 * Fix issue that can' find no overflow(#167,#174)
+* Fix issue that OverflowWidget not work well when the size of window is changing.
 
 ## 14.2.0
 
