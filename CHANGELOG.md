@@ -1,6 +1,7 @@
 ## 14.2.1
 
 * Fix issue that setState() causes custom overflow to disappear(#171)
+* Fix issue that can' find no overflow(#167,#174)
 
 ## 14.2.0
 

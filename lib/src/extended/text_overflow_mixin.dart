@@ -455,12 +455,17 @@ mixin TextOverflowMixin on _RenderParagraph {
 
       if (_hasVisualOverflow) {
         // not find
-        assert(range.end != maxOffset, 'can\' find no overflow');
+        // assert(range.end != maxOffset, 'can\' find no overflow');
+        final _TextRange pre = range.copyWith();
         range.end = math.min(
-            range.end + 1
-            // math.max((maxEnd - range.end) ~/ 2, 1)
-            ,
-            maxOffset);
+          // range.end + 1,
+          range.end + math.max((maxEnd - range.end) ~/ 2, 1),
+          maxOffset,
+        );
+        if (pre == range) {
+          _hasVisualOverflow = false;
+          break;
+        }
         hideWidgets.clear();
       } else {
         // see pre one whether overflow
@@ -477,12 +482,11 @@ mixin TextOverflowMixin on _RenderParagraph {
         } else {
           maxEnd = range.end;
           range.end = math.max(
-            range.start,
-            maxEnd - 1,
-            // math.min(
-            //     math.max((maxEnd - range.start) ~/ 2, 1),
-            //     maxEnd)
-          );
+              range.start,
+              // maxEnd - 1,
+              math.min(
+                  maxEnd - math.max((maxEnd - range.start) ~/ 2, 1), maxEnd));
+
           // if range is not changed, so maybe we should break.
           if (pre == range) {
             _hasVisualOverflow = false;
