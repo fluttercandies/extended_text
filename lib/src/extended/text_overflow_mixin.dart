@@ -46,11 +46,8 @@ mixin TextOverflowMixin on _RenderParagraph {
     } else {
       overflow = _oldOverflow;
     }
-    if (_overflowWidget?.position != value?.position) {
-      markNeedsLayout();
-    }
     _overflowWidget = value;
-    markNeedsPaint();
+    markNeedsLayout();
   }
 
   /// How visual overflow should be handled.

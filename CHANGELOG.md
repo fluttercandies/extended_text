@@ -1,3 +1,7 @@
+## 14.2.1
+
+* Fix issue that setState() causes custom overflow to disappear(#171)
+
 ## 14.2.0
 
 * Add TextOverflowPosition.auto and SearchHighlightDemo
