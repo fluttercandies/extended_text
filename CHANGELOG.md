@@ -1,3 +1,7 @@
+## 15.0.1
+
+* Fix issue that setState() causes custom overflow to disappear(#171)
+
 ## 15.0.0
 
 * Migrate to Flutter 3.29.0
