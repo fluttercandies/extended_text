@@ -66,6 +66,15 @@ mixin TextOverflowMixin on _RenderParagraph {
     markNeedsLayout();
   }
 
+  BoxConstraints? _constraints;
+  InlineSpan? _textCache;
+
+  @override
+  set text(InlineSpan value) {
+    _textCache = value;
+    super.text = value;
+  }
+
   void layoutOverflow() {
     // final bool didOverflowWidth = _didVisualOverflow();
     // layoutOfficalOverflow(didOverflowWidth);
@@ -147,7 +156,9 @@ mixin TextOverflowMixin on _RenderParagraph {
     final Size overflowWidgetSize = lastChild!.size;
     final TextOverflowPosition position = overflowWidget!.position;
 
-    final TextPainter oneLineTextPainter = _copyTextPainter();
+    final TextPainter oneLineTextPainter = _copyTextPainter(
+      inlineSpan: _textCache,
+    );
 
     final List<PlaceholderDimensions> placeholderDimensions =
         layoutInlineChildren(

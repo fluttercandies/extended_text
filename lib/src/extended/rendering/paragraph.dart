@@ -53,6 +53,7 @@ class ExtendedRenderParagraph extends _RenderParagraph
     _overflowWidget = overflowWidget;
     _canSelectPlaceholderSpan = canSelectPlaceholderSpan;
     _gradientConfig = gradientConfig;
+    _textCache = text;
   }
 
   @override
@@ -103,6 +104,9 @@ class ExtendedRenderParagraph extends _RenderParagraph
       ChildLayoutHelper.layoutChild,
       ChildLayoutHelper.getBaseline,
     );
+    if (_textPainter.text != _textCache && _constraints != constraints) {
+      _textPainter.text = _textCache;
+    }    
     _layoutTextWithConstraints(constraints);
     positionInlineChildren(_textPainter.inlinePlaceholderBoxes!);
 
@@ -175,6 +179,7 @@ class ExtendedRenderParagraph extends _RenderParagraph
       _disposeSelectableFragments();
       _updateSelectionRegistrarSubscription();
     }
+    _constraints = constraints;    
   }
 
   @override
