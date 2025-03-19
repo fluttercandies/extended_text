@@ -74,6 +74,12 @@ mixin TextOverflowMixin on _RenderParagraph {
     _textCache = value;
     super.text = value;
   }
+  
+  /// https://github.com/fluttercandies/extended_text/issues/175
+  @override
+  double _adjustMaxWidth(double maxWidth) {
+    return _overflowWidget != null ? maxWidth : super._adjustMaxWidth(maxWidth);
+  }
 
   void layoutOverflow() {
     // final bool didOverflowWidth = _didVisualOverflow();
