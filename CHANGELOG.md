@@ -1,3 +1,7 @@
+## 14.2.2
+
+* Fix long Text Cropping Issue with Ellipsis Middle Overflow and setState (#175)
+
 ## 14.2.1
 
 * Fix issue that setState() causes custom overflow to disappear(#171)
